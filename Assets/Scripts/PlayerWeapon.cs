@@ -12,6 +12,8 @@ public class PlayerWeapon : MonoBehaviour
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
+    public float spreadAngle = 30f;
+
     void Awake()
     {
         inputActions = new InputSystem_Actions();
@@ -20,23 +22,24 @@ public class PlayerWeapon : MonoBehaviour
     private void OnEnable()
     {
         inputActions.Enable();
-
-        inputActions.Player.Move.performed += OnMove;
-        inputActions.Player.Move.canceled += OnMove;
-
         inputActions.Player.Attack.performed += OnFire;
-    }
-
-    private void OnDisable()
-    {
-        inputActions.Player.Move.performed -= OnMove;
-        inputActions.Player.Move.canceled -= OnMove;
-
+        inputActions.Player.Move.performed += OnMove;
+        inputActions.Player.AltAttack.performed += OnAltFire;
+    }                          
+                               
+    private void OnDisable()   
+    {   
         inputActions.Player.Attack.performed -= OnFire;
-
+        inputActions.Player.Move.performed -= OnMove;
+        inputActions.Player.AltAttack.performed -= OnAltFire;
         inputActions.Disable();
+
     }
 
+    private void OnAltFire(InputAction.CallbackContext ctx)
+    {
+        ShootSpread();
+    }
     private void OnMove(InputAction.CallbackContext ctx)
     {
         movement = ctx.ReadValue<Vector2>();
@@ -49,22 +52,47 @@ public class PlayerWeapon : MonoBehaviour
 
     private void OnFire(InputAction.CallbackContext ctx)
     {
-        Shoot();
+        ShootNormal();
     }
 
-    void Shoot()
+    void ShootNormal()
     {
-        Vector2 shootDir = (movement != Vector2.zero)
+        Vector2 baseDir = (movement != Vector2.zero)
+        ? movement.normalized
+        : lastDirection;
+
+        FireBullet(baseDir);
+    }
+
+    void ShootSpread()
+    {
+        Vector2 baseDir = (movement != Vector2.zero)
             ? movement.normalized
             : lastDirection;
 
+        FireBullet(baseDir); // centro
+        FireBullet(Rotate(baseDir, spreadAngle));   // derecha
+        FireBullet(Rotate(baseDir, -spreadAngle));  // izquierda
+    }
+
+    Vector2 Rotate(Vector2 direction, float angle)
+    {
+        return Quaternion.Euler(0, 0, angle) * direction;
+    }
+
+    void FireBullet(Vector2 dir)
+    {
+
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
 
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = shootDir * bulletSpeed;
+        bullet.GetComponent<Bullet>().Init(dir);
 
-        // Opcional: rotar bala
-        float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        rb.linearVelocity = dir * bulletSpeed;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
+
+    
 }
