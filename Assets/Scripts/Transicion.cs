@@ -5,17 +5,14 @@ using UnityEngine.SceneManagement;
 public class Transicion : MonoBehaviour
 {
     [SerializeField] private string NombreEsena;
+    [SerializeField] private Animator anim;
 
-    private Animator animator;
+    
 
-    private void Start()
-    {
-        animator= GetComponent<Animator>();
-
-    }
+   
     public void StarTransicion()
     {
-        animator.SetTrigger("Start");
+        anim.SetTrigger("Start");
     }
 
     public void ChangeTransicion()
