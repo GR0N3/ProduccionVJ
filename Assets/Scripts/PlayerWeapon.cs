@@ -23,17 +23,23 @@ public class PlayerWeapon : MonoBehaviour
     {
         inputActions.Enable();
         inputActions.Player.Attack.performed += OnFire;
-        inputActions.Player.Move.performed += OnMove;
         inputActions.Player.AltAttack.performed += OnAltFire;
     }                          
                                
     private void OnDisable()   
     {   
         inputActions.Player.Attack.performed -= OnFire;
-        inputActions.Player.Move.performed -= OnMove;
         inputActions.Player.AltAttack.performed -= OnAltFire;
         inputActions.Disable();
 
+    }
+
+    void Update()
+    {
+        Vector2 dir = GetMouseDirection();
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private void OnAltFire(InputAction.CallbackContext ctx)
@@ -57,22 +63,17 @@ public class PlayerWeapon : MonoBehaviour
 
     void ShootNormal()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-        ? movement.normalized
-        : lastDirection;
-
-        FireBullet(baseDir);
+        Vector2 dir = GetMouseDirection();
+        FireBullet(dir);
     }
 
     void ShootSpread()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-            ? movement.normalized
-            : lastDirection;
+        Vector2 baseDir = GetMouseDirection();
 
-        FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, spreadAngle));   // derecha
-        FireBullet(Rotate(baseDir, -spreadAngle));  // izquierda
+        FireBullet(baseDir);
+        FireBullet(Rotate(baseDir, spreadAngle));
+        FireBullet(Rotate(baseDir, -spreadAngle));
     }
 
     Vector2 Rotate(Vector2 direction, float angle)
@@ -94,5 +95,15 @@ public class PlayerWeapon : MonoBehaviour
         bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    
+    Vector2 GetMouseDirection()
+    {
+        Vector3 mouseScreen = Mouse.current.position.ReadValue();
+
+        mouseScreen.z = Mathf.Abs(Camera.main.transform.position.z);
+
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
+
+        return (mouseWorld - firePoint.position).normalized;
+    }
+
 }

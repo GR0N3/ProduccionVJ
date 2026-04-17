@@ -60,7 +60,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Check de suelo
         isGrounded = Physics2D.OverlapCircle(
             groundCheck.position,
             groundRadius,
@@ -81,6 +80,27 @@ public class PlayerMovement : MonoBehaviour
         );
 
         rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
+
+        LimitLeft();
+
+
+    }
+    public Transform cameraTarget;
+    public float offset;
+    void LimitLeft()
+    {
+        float camHalfWidth = Camera.main.orthographicSize * Camera.main.aspect;
+        float camLeft = cameraTarget.position.x - camHalfWidth - offset;
+
+        if (rb.position.x < camLeft)
+        {
+            rb.position = new Vector2(camLeft, rb.position.y);
+
+            if (rb.linearVelocity.x < 0)
+            {
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            }
+        }
     }
 
     void OnDrawGizmosSelected()
