@@ -5,8 +5,10 @@ public class Enemy : MonoBehaviour, IDamageable
     public int maxHealth = 3;
     public float knockbackResistance = 1f;
 
-    private int currentHealth;
+    public int currentHealth;
     private Rigidbody2D rb;
+
+    public bool IsDead => currentHealth <= 0;
 
     void Awake()
     {
@@ -23,12 +25,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // Acá podés meter animaciones, partículas, etc
+        // Acï¿½ podï¿½s meter animaciones, partï¿½culas, etc
         Destroy(gameObject);
     }
 
-    public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
+    public bool TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
+        if (IsDead) return false;
+
         currentHealth -= damage;
 
         ApplyKnockback(hitDirection, knockbackForce);
@@ -36,6 +40,9 @@ public class Enemy : MonoBehaviour, IDamageable
         if (currentHealth <= 0)
         {
             Die();
+            return true;
         }
+
+        return false;
     }
 }
