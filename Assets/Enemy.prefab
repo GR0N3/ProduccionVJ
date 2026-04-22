@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2987946952633152323}
   - component: {fileID: 389599942464470757}
   - component: {fileID: 5544138790687911149}
-  - component: {fileID: 6175239196648954171}
+  - component: {fileID: -7482093177545304678}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -183,7 +183,7 @@ MonoBehaviour:
   maxHealth: 3
   knockbackResistance: 1
   currentHealth: 10
---- !u!114 &6175239196648954171
+--- !u!114 &-7482093177545304678
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -192,18 +192,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 4214904499902491054}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98702e5dc2ce02348a366498b4133da7, type: 3}
+  m_Script: {fileID: 11500000, guid: 557984f242c372e4b95691cbb454564d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   patrolSpeed: 2
   chaseSpeed: 4
+  patrolRange: 5
   detectionRange: 5
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   groundCheckDistance: 0.5
   wallCheckDistance: 0.5
   sensorOrigin: {fileID: 0}
+  rb: {fileID: 0}
+  player: {fileID: 0}
+  startPosition: {x: 0, y: 0}
+  movingRight: 1
+  lastTurnTime: 0
+  turnCooldown: 0.5
