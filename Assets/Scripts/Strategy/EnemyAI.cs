@@ -6,7 +6,7 @@ public class EnemyAI : MonoBehaviour
     [Header("Configuración de Movimiento")]
     public float patrolSpeed = 2f;
     public float chaseSpeed = 4f;
-    public float patrolRange = 5f;
+    public float patrolRange = 10f; // Aumentado de 5 a 10 por defecto
 
     [Header("Detección")]
     public float detectionRange = 5f;
@@ -14,7 +14,7 @@ public class EnemyAI : MonoBehaviour
     public LayerMask groundLayer;
 
     [Header("Sensores")]
-    public float groundCheckDistance = 0.5f;
+    public float groundCheckDistance = 1.0f; // Aumentado de 0.5 a 1.0 para mayor seguridad
     public float wallCheckDistance = 0.5f;
     public Transform sensorOrigin;
 
@@ -37,6 +37,14 @@ public class EnemyAI : MonoBehaviour
         enemyComponent = GetComponent<Enemy>();
         startPosition = transform.position;
         Physics2D.queriesStartInColliders = false;
+
+        // Si no asignaste el sensor en el Inspector, lo buscamos automáticamente por nombre
+        if (sensorOrigin == null)
+        {
+            Transform foundSensor = transform.Find("SensorOrigin");
+            if (foundSensor != null) sensorOrigin = foundSensor;
+            else Debug.LogWarning("¡Atención! El enemigo " + gameObject.name + " no tiene un objeto hijo llamado 'SensorOrigin'. Crea uno para que patrulle bien.");
+        }
 
         // Empezamos con la estrategia de patrulla
         currentStrategy = patrolStrategy;

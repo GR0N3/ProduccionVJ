@@ -14,7 +14,12 @@ public class PatrolStrategy : IEnemyStrategy
 
         // Detección de bordes y paredes
         Vector2 sensorPos = context.sensorOrigin != null ? (Vector2)context.sensorOrigin.position : (Vector2)context.transform.position;
-        RaycastHit2D groundInfo = Physics2D.Raycast(sensorPos, Vector2.down, context.groundCheckDistance, context.groundLayer);
+        
+        // Rayo de suelo: Buscamos un poco hacia adelante y abajo para anticipar el borde
+        Vector2 groundRayDir = (Vector2.down + (Vector2.right * moveDir * 0.3f)).normalized;
+        RaycastHit2D groundInfo = Physics2D.Raycast(sensorPos, groundRayDir, context.groundCheckDistance, context.groundLayer);
+        
+        // Rayo de pared: Directo hacia adelante
         RaycastHit2D wallInfo = Physics2D.Raycast(sensorPos, Vector2.right * moveDir, context.wallCheckDistance, context.groundLayer);
 
         // Distancia de patrulla
