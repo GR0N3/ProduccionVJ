@@ -6,6 +6,9 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 6f;
     public float jumpForce = 10f;
 
+    [Header("Border")]
+    public Transform leftBorder;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundRadius = 0.2f;
@@ -83,18 +86,13 @@ public class PlayerMovement : MonoBehaviour
 
         LimitLeft();
 
-
     }
-    public Transform cameraTarget;
-    public float offset;
+
     void LimitLeft()
     {
-        float camHalfWidth = Camera.main.orthographicSize * Camera.main.aspect;
-        float camLeft = cameraTarget.position.x - camHalfWidth - offset;
-
-        if (rb.position.x < camLeft)
+        if (rb.position.x < leftBorder.position.x)
         {
-            rb.position = new Vector2(camLeft, rb.position.y);
+            rb.position = new Vector2(leftBorder.position.x, rb.position.y);
 
             if (rb.linearVelocity.x < 0)
             {
@@ -102,6 +100,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
 
     void OnDrawGizmosSelected()
     {
