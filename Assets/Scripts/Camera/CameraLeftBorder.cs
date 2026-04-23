@@ -9,19 +9,19 @@ public class CameraLeftBorder : MonoBehaviour
 
     void Start()
     {
-        float camHalfWidth = cam.orthographicSize * cam.aspect;
-        maxX = cam.transform.position.x - camHalfWidth;
+        float halfWidth = cam.orthographicSize * cam.aspect;
+        maxX = cam.transform.position.x - halfWidth;
     }
 
     void LateUpdate()
     {
-        float camHalfWidth = cam.orthographicSize * cam.aspect;
+        float halfWidth = cam.orthographicSize * cam.aspect;
 
-        float targetX = cam.transform.position.x - camHalfWidth;
+        float playerPushPoint = player.position.x - halfWidth;
 
-        if (targetX > maxX)
+        if (playerPushPoint > maxX)
         {
-            maxX = targetX;
+            maxX = playerPushPoint;
         }
 
         transform.position = new Vector3(
