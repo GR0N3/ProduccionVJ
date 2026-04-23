@@ -41,5 +41,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Objects
+    uniqueID: 2914940731
+    locked: 0
+  - name: Enviroment
+    uniqueID: 552471085
+    locked: 0
+  - name: Player_Enemies
+    uniqueID: 1857619427
+    locked: 0
   m_RenderingLayers:
   - Default
