@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth 
 {
-    [SerializeField] private int maxHealth;
+    [SerializeField] private int maxHealth = 10;
     private int currentHealth;
 
     public static event Action OnPlayerDamaged;
@@ -11,7 +11,10 @@ public class PlayerHealth : MonoBehaviour
     public static event Action OnPlayerDeath;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
-
+    public PlayerHealth()
+    {
+        currentHealth = maxHealth;
+    }
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -20,9 +23,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void GainHealth(int heal)
     {
-        if((currentHealth += heal) < maxHealth)
-            currentHealth += heal;
-        OnPlayerHealed!.Invoke();
+        currentHealth = Mathf.Min(currentHealth + heal, maxHealth);
+        OnPlayerHealed?.Invoke();
     }
 
     public void Death()

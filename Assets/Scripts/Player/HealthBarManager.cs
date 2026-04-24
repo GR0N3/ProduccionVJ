@@ -5,7 +5,7 @@ using UnityEngine;
 public class HealthBarManager : MonoBehaviour
 {
     public GameObject heartsPrefab;
-    public PlayerHealth playerHealth;
+    private PlayerHealth playerHealth;
     List<HealthHeart> hearts = new List<HealthHeart>();
 
     private void OnEnable()
@@ -24,6 +24,8 @@ public class HealthBarManager : MonoBehaviour
 
     void Start()
     {
+        playerHealth = SessionController.Instance.PlayerManager.PlayerHealth;
+
         Drawheartss();
     }
     public void Drawheartss()
@@ -51,7 +53,7 @@ public class HealthBarManager : MonoBehaviour
     public void CreateEmptyhearts()
     {
         GameObject newhearts = Instantiate(heartsPrefab);
-        newhearts.transform.SetParent(transform);
+        newhearts.transform.SetParent(transform, false);
 
         HealthHeart heartsComponent = newhearts.GetComponent<HealthHeart>();
         heartsComponent.SetHeartImage(HeartStatus.Empty);

@@ -11,6 +11,7 @@ public class HealthHeart : MonoBehaviour
     private void Awake()
     {
         heartImage = GetComponent<Image>();
+        heartImage.color = Color.white;
     }
 
     public void SetHeartImage(HeartStatus Status)

@@ -7,6 +7,16 @@ public class ScoreManager : MonoBehaviour
 {
     private int score = 0;
 
+    //private void OnEnable()
+    //{
+    //    Enemy.OnEnemyDeath += UpdateScoreUI;
+    //}
+
+    //private void OnDisable()
+    //{
+    //    Enemy.OnEnemyDeath -= UpdateScoreUI;
+    //}
+
     private void Awake()
     {
 
@@ -28,7 +38,7 @@ public class ScoreManager : MonoBehaviour
     // Actualiza el contenido del texto
     private void UpdateScoreUI()
     {
-
+        
     }
     public int GetScore()
     {

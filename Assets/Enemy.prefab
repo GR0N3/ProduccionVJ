@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 3
-  knockbackResistance: 1
+  knockbackResistance: 0.1
   currentHealth: 10
 --- !u!114 &-7482093177545304678
 MonoBehaviour:
