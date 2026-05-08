@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
     public int maxHealth = 3;
     public float knockbackResistance = 1f;
+
+    public static event Action OnEnemyDeath;
 
     public int currentHealth;
     private Rigidbody2D rb;
@@ -25,7 +28,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // Ac� pod�s meter animaciones, part�culas, etc
+        OnEnemyDeath?.Invoke();
         Destroy(gameObject);
     }
 

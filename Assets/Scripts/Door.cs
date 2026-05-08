@@ -2,22 +2,17 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    public Transicion transicion;
-
-    private void OnTriggerEnter2D(Collider2D other)
-
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Algo entro");
-        if (other.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            Debug.Log("Es el player");
-            transicion.StarTransicion();
+            SceneController.Instance
+                .NewTransition()
+                .Load(SceneDataBase.Slots.SessionContent, SceneDataBase.Scenes.Shop, setActive: true)
+                .WithClearUnusedAssets()
+                .WithOverlay()
+                .Unload(SceneDataBase.Slots.SessionContent)
+                .Perfrom();
         }
-
-        if (other.CompareTag("Player"))
-        {
-            transicion.StarTransicion();
-        }
-        
     }
 }
