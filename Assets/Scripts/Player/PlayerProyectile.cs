@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -5,30 +6,25 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
 
-    public int damage = 1;
+    [SerializeField] private LayerMask hitMask;
 
-    public float knockbackForce = 5f;
-
-    public float lifeTime = 5f;
-
-
-
+    private int damage;
+    private float knockbackForce;
+    private float lifeTime = 5f;
     private Vector2 direction;
 
-
-    public void Init(Vector2 dir)
+    public void Init(Vector2 dir, float lifeTime, int damage, float knockbackforce)
     {
         direction = dir.normalized;
+        this.lifeTime = lifeTime;
+        this.damage = damage;
+        this.knockbackForce = knockbackforce;
     }
 
-
-    void Start()
+    private void OnEnable()
     {
-        Destroy(gameObject, lifeTime);
+        StartCoroutine(DefaultStart());
     }
-
-
-    public LayerMask hitMask;
 
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -36,16 +32,25 @@ public class Bullet : MonoBehaviour
 
         IDamageable damageable = collision.GetComponent<IDamageable>();
 
-
         if ((hitMask.value & (1 << collision.gameObject.layer)) != 0)
         {
-            Destroy(gameObject);
+            ObjectPoolManager.ReturnObjectToPool(gameObject);
         }
 
         if (damageable != null)
         {
             damageable.TakeDamage(damage, direction, knockbackForce);
-            Destroy(gameObject);
+            ObjectPoolManager.ReturnObjectToPool(gameObject);
+        }
+    }
+
+    IEnumerator DefaultStart() 
+    {
+        yield return new WaitForSeconds(lifeTime);
+
+        if (gameObject.activeSelf) 
+        {
+            ObjectPoolManager.ReturnObjectToPool(gameObject);
         }
     }
 }

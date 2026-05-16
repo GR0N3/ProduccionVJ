@@ -171,7 +171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProyectile
   damage: 1
   knockbackForce: 5
-  lifeTime: 5
+  lifeTime: 0.5
   hitMask:
     serializedVersion: 2
     m_Bits: 320

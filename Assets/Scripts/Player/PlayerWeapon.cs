@@ -3,16 +3,19 @@ using UnityEngine.InputSystem;
 
 public class PlayerWeapon : MonoBehaviour
 {
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-    public float bulletSpeed = 10f;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private float bulletLifetime;
+    [SerializeField] private float spreadAngle = 30f;
+    [SerializeField] private int damage;
+    [SerializeField] private float knockbackforce;
 
     private InputSystem_Actions inputActions;
 
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
-    public float spreadAngle = 30f;
 
     void Awake()
     {
@@ -23,29 +26,23 @@ public class PlayerWeapon : MonoBehaviour
     {
         inputActions.Enable();
         inputActions.Player.Attack.performed += OnFire;
+        inputActions.Player.Move.performed += OnMove;
         inputActions.Player.AltAttack.performed += OnAltFire;
-    }                          
-                               
-    private void OnDisable()   
-    {   
-        inputActions.Player.Attack.performed -= OnFire;
-        inputActions.Player.AltAttack.performed -= OnAltFire;
-        inputActions.Disable();
-
     }
 
-    void Update()
+    private void OnDisable()
     {
-        Vector2 dir = GetMouseDirection();
-
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        inputActions.Player.Attack.performed -= OnFire;
+        inputActions.Player.Move.performed -= OnMove;
+        inputActions.Player.AltAttack.performed -= OnAltFire;
+        inputActions.Disable();
     }
 
     private void OnAltFire(InputAction.CallbackContext ctx)
     {
         ShootSpread();
     }
+
     private void OnMove(InputAction.CallbackContext ctx)
     {
         movement = ctx.ReadValue<Vector2>();
@@ -63,17 +60,22 @@ public class PlayerWeapon : MonoBehaviour
 
     void ShootNormal()
     {
-        Vector2 dir = GetMouseDirection();
-        FireBullet(dir);
+        Vector2 baseDir = (movement != Vector2.zero)
+        ? movement.normalized
+        : lastDirection;
+
+        FireBullet(baseDir);
     }
 
     void ShootSpread()
     {
-        Vector2 baseDir = GetMouseDirection();
+        Vector2 baseDir = (movement != Vector2.zero)
+            ? movement.normalized
+            : lastDirection;
 
-        FireBullet(baseDir);
-        FireBullet(Rotate(baseDir, spreadAngle));
-        FireBullet(Rotate(baseDir, -spreadAngle));
+        FireBullet(baseDir); // centro
+        FireBullet(Rotate(baseDir, spreadAngle));   // derecha
+        FireBullet(Rotate(baseDir, -spreadAngle));  // izquierda
     }
 
     Vector2 Rotate(Vector2 direction, float angle)
@@ -84,9 +86,9 @@ public class PlayerWeapon : MonoBehaviour
     void FireBullet(Vector2 dir)
     {
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        GameObject bullet = ObjectPoolManager.SpawnObject(bulletPrefab, firePoint.position, Quaternion.identity);
 
-        bullet.GetComponent<Bullet>().Init(dir);
+        bullet.GetComponent<Bullet>().Init(dir, bulletLifetime, damage, knockbackforce);
 
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         rb.linearVelocity = dir * bulletSpeed;
@@ -94,16 +96,4 @@ public class PlayerWeapon : MonoBehaviour
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
-
-    Vector2 GetMouseDirection()
-    {
-        Vector3 mouseScreen = Mouse.current.position.ReadValue();
-
-        mouseScreen.z = Mathf.Abs(Camera.main.transform.position.z);
-
-        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
-
-        return (mouseWorld - firePoint.position).normalized;
-    }
-
 }

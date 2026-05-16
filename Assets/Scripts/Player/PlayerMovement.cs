@@ -7,14 +7,14 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 10f;
 
     [Header("Border")]
-    public Transform leftBorder;
+    [SerializeField] private Transform leftBorder;
 
     [Header("Ground Check")]
-    public Transform groundCheck;
-    public float groundRadius = 0.2f;
-    public LayerMask groundLayer;
-    public float acceleration = 20f;
-    public float deceleration = 25f;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float acceleration = 20f;
+    [SerializeField] private float deceleration = 25f;
 
     private Rigidbody2D rb;
     private Vector2 movement;
