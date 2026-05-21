@@ -186,11 +186,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3374211931738756783, guid: d55fc4e503914cb47922e32bcc6156f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.801838
+      value: 13.29
       objectReference: {fileID: 0}
     - target: {fileID: 3374211931738756783, guid: d55fc4e503914cb47922e32bcc6156f2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.51846504
+      value: -0.03
       objectReference: {fileID: 0}
     - target: {fileID: 3374211931738756783, guid: d55fc4e503914cb47922e32bcc6156f2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -227,10 +227,6 @@ PrefabInstance:
     - target: {fileID: 4214904499902491054, guid: d55fc4e503914cb47922e32bcc6156f2, type: 3}
       propertyPath: m_Name
       value: Enemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 5544138790687911149, guid: d55fc4e503914cb47922e32bcc6156f2, type: 3}
-      propertyPath: currentHealth
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -41984,6 +41980,7 @@ GameObject:
   - component: {fileID: 1719603403}
   - component: {fileID: 1719603398}
   - component: {fileID: 1719603404}
+  - component: {fileID: 1719603405}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -42171,7 +42168,23 @@ MonoBehaviour:
   bulletLifetime: 0.5
   spreadAngle: 30
   damage: 1
-  knockbackforce: 0
+  knockbackforce: 5
+--- !u!114 &1719603405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719603396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e966ac8996bee54987f654a86f0198d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 256
+  maxHealth: 1
 --- !u!1001 &2045746041
 PrefabInstance:
   m_ObjectHideFlags: 0

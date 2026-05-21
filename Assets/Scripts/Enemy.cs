@@ -32,9 +32,9 @@ public class Enemy : MonoBehaviour, IDamageable
         Destroy(gameObject);
     }
 
-    public bool TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
+    public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
-        if (IsDead) return false;
+        if (IsDead) return;
 
         currentHealth -= damage;
 
@@ -43,9 +43,8 @@ public class Enemy : MonoBehaviour, IDamageable
         if (currentHealth <= 0)
         {
             Die();
-            return true;
         }
 
-        return false;
+
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    private PlayerHealth playerHealth = new();
+    public PlayerHealth playerHealth;
     private PlayerMovement playerMovement;
     private PlayerWeapon playerWeapon;
 
@@ -16,7 +16,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     //considerar un constructor para las clases del player en caso de querer eliminar monobehaviours
-    //player manager deberia ir en player y el player en session?
+    //player manager deberia ir en player y/o el player en session?
 
     //Usar el manager para las mejoras 
 

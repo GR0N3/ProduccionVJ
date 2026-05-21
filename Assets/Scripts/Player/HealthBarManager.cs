@@ -11,14 +11,14 @@ public class HealthBarManager : MonoBehaviour
     private void OnEnable()
     {
         
-        PlayerHealth.OnPlayerDamaged += Drawheartss;
-        PlayerHealth.OnPlayerHealed += Drawheartss;
+        PlayerHealth.OnPlayerDamaged += Drawhearts;
+        PlayerHealth.OnPlayerHealed += Drawhearts;
     }
 
     private void OnDisable()
     {
-        PlayerHealth.OnPlayerDamaged -= Drawheartss;
-        PlayerHealth.OnPlayerHealed -= Drawheartss;
+        PlayerHealth.OnPlayerDamaged -= Drawhearts;
+        PlayerHealth.OnPlayerHealed -= Drawhearts;
 
     }
 
@@ -26,9 +26,9 @@ public class HealthBarManager : MonoBehaviour
     {
         playerHealth = SessionController.Instance.PlayerManager.PlayerHealth;
 
-        Drawheartss();
+        Drawhearts();
     }
-    public void Drawheartss()
+    public void Drawhearts()
     {
         Clearhearts();
 

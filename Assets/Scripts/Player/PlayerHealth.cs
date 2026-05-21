@@ -1,8 +1,9 @@
 using System;
 using UnityEngine;
 
-public class PlayerHealth 
+public class PlayerHealth : MonoBehaviour
 {
+    [SerializeField] private LayerMask hitMask;
     [SerializeField] private int maxHealth = 10;
     private int currentHealth;
 
@@ -11,14 +12,33 @@ public class PlayerHealth
     public static event Action OnPlayerDeath;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
-    public PlayerHealth()
+
+    private Rigidbody2D rb;
+
+    private void Awake()
     {
         currentHealth = maxHealth;
+        rb = GetComponent<Rigidbody2D>();
+        SessionController.Instance.PlayerManager.playerHealth = this;
     }
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
         currentHealth -= damage;
-        OnPlayerDamaged!.Invoke();
+        Debug.Log("took damage: " + currentHealth);
+        //OnPlayerDamaged!.Invoke();
+        ApplyKnockback(hitDirection, knockbackForce);
+
+        if (currentHealth <= 0) 
+        {
+            Death();
+        }
+    }
+
+    void ApplyKnockback(Vector2 direction, float force)
+    {
+        Vector2 finalForce = direction.normalized * force;
+
+        rb.AddForce(finalForce, ForceMode2D.Impulse);
     }
 
     public void GainHealth(int heal)
@@ -38,4 +58,14 @@ public class PlayerHealth
             .WithOverlay()
             .Perfrom();
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    { 
+        if ((hitMask.value & (1 << collision.gameObject.layer)) != 0)
+        {
+            TakeDamage(1,new Vector2(-1,-1), 25f);
+        }
+
+    }
+
 }
