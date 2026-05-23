@@ -24,71 +24,76 @@ public class PlayerMovement : MonoBehaviour
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        inputActions = new InputSystem_Actions();
+        rb = GetComponent<Rigidbody2D>();                                                                   //Monobehauvior
+        inputActions = new InputSystem_Actions();                                                           //Monobehauvior
+    }                                                                                                       //Monobehauvior
+                                                                                                            //Monobehauvior
+    private void OnEnable()                                                                                 //Monobehauvior
+    {                                                                                                       //Monobehauvior
+        inputActions.Enable();                                                                              //Monobehauvior
+                                                                                                            //Monobehauvior
+        inputActions.Player.Move.performed += OnMove;                                                       //Monobehauvior
+        inputActions.Player.Move.canceled += OnMove;                                                        //Monobehauvior
+                                                                                                            //Monobehauvior
+                                                                                                            //Monobehauvior
+        inputActions.Player.Jump.performed += OnJump;                                                       //Monobehauvior
+    }                                                                                                       //Monobehauvior
+                                                                                                            //Monobehauvior
+    private void OnDisable()                                                                                //Monobehauvior
+    {                                                                                                       //Monobehauvior
+        inputActions.Player.Move.performed -= OnMove;                                                       //Monobehauvior
+        inputActions.Player.Move.canceled -= OnMove;                                                        //Monobehauvior
+                                                                                                            //Monobehauvior
+        inputActions.Player.Jump.performed -= OnJump;                                                       //Monobehauvior
+                                                                                                            //Monobehauvior
+        inputActions.Disable();                                                                             //Monobehauvior
+    }                                                                                                       //Monobehauvior
+
+    private void OnMove(InputAction.CallbackContext ctx)                                                    
+    {                                                                                                       
+        movement = ctx.ReadValue<Vector2>();                                                                
+    }                                                                                                       
+                                                                                                            
+    private void OnJump(InputAction.CallbackContext ctx)                                                    
+    {                                                                                                       
+        if (isGrounded)                                                                                     
+        {                                                                                                   
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);                                
+        }                                                                                                   
     }
 
-    private void OnEnable()
+    void ApplyKnockback(Vector2 direction, float force)
     {
-        inputActions.Enable();
+        Vector2 finalForce = direction.normalized * force;
 
-        inputActions.Player.Move.performed += OnMove;
-        inputActions.Player.Move.canceled += OnMove;
-        
-
-        inputActions.Player.Jump.performed += OnJump;
+        rb.AddForce(finalForce, ForceMode2D.Impulse);
     }
 
-    private void OnDisable()
-    {
-        inputActions.Player.Move.performed -= OnMove;
-        inputActions.Player.Move.canceled -= OnMove;
-
-        inputActions.Player.Jump.performed -= OnJump;
-
-        inputActions.Disable();
-    }
-
-    private void OnMove(InputAction.CallbackContext ctx)
-    {
-        movement = ctx.ReadValue<Vector2>();
-    }
-
-    private void OnJump(InputAction.CallbackContext ctx)
-    {
-        if (isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
-    }
-
-
-
-    void Update()
-    {
-        isGrounded = Physics2D.OverlapCircle(
-            groundCheck.position,
-            groundRadius,
-            groundLayer
-        );
-    }
-
-    void FixedUpdate()
-    {
-        float targetSpeed = movement.x * speed;
-
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
-
-        float newVelocityX = Mathf.MoveTowards(
-            rb.linearVelocity.x,
-            targetSpeed,
-            accelRate * Time.fixedDeltaTime
-        );
-
-        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
-
-        LimitLeft();
-
+    void Update()                                                                               //Monobehauvior
+    {                                                                                           //Monobehauvior
+        isGrounded = Physics2D.OverlapCircle(                                                   //Monobehauvior
+            groundCheck.position,                                                               //Monobehauvior
+            groundRadius,                                                                       //Monobehauvior
+            groundLayer                                                                         //Monobehauvior
+        );                                                                                      //Monobehauvior
+    }                                                                                           //Monobehauvior
+                                                                                                //Monobehauvior
+    void FixedUpdate()                                                                          //Monobehauvior
+    {                                                                                           //Monobehauvior
+        float targetSpeed = movement.x * speed;                                                 //Monobehauvior
+                                                                                                //Monobehauvior
+        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;       //Monobehauvior
+                                                                                                //Monobehauvior
+        float newVelocityX = Mathf.MoveTowards(                                                 //Monobehauvior
+            rb.linearVelocity.x,                                                                //Monobehauvior
+            targetSpeed,                                                                        //Monobehauvior
+            accelRate * Time.fixedDeltaTime                                                     //Monobehauvior
+        );                                                                                      //Monobehauvior
+                                                                                                //Monobehauvior
+        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);                     //Monobehauvior
+                                                                                                //Monobehauvior
+        LimitLeft();                                                                            //Monobehauvior
+                                                                                                //Monobehauvior
     }
 
     void LimitLeft()
@@ -105,11 +110,11 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    void OnDrawGizmosSelected()
-    {
-        if (groundCheck == null) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
+    void OnDrawGizmosSelected()                                                                 //Monobehauvior
+    {                                                                                           //Monobehauvior
+        if (groundCheck == null) return;                                                        //Monobehauvior
+                                                                                                //Monobehauvior
+        Gizmos.color = Color.red;                                                               //Monobehauvior
+        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);                              //Monobehauvior
     }
 }

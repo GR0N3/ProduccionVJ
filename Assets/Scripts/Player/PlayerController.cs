@@ -2,21 +2,72 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    //"Health"
+
+    [Header("Health")]
+    PlayerHealth health;
+    public int maxHealth;
     int currentHealth;
-    //"Weapon"
-    int damage;
-    int bulletsCount;
-    float bulletsSpread;
-    float bulletSpeed;
+
+    [Header("Weapon")]
+    PlayerWeapon weapon;
+    [SerializeField] private GameObject bulletPrefab;
+    public GameObject BulletPrefab => bulletPrefab;
+    int damage = 1;
+    public int Damage => damage;
+    int bulletsCount = 1;
+    public int BulletsCount => bulletsCount;
+    float bulletsSpread = 0f;
+    public float BulletSpread => bulletsSpread;
+    float bulletSpeed = 10f;
+    public float BulletSpeed => bulletSpeed;
     float knockbackForce;
-    //"Movement"
+    public float KnockbackForce => knockbackForce;
+    [SerializeField] private Transform firePoint;
+    public Transform FirePoint => firePoint;
+
+    [Header("Movement")]
+    PlayerMovement movement;
     float speed;
     float jumpForce;
+    Rigidbody2D rb;
+
+    private InputSystem_Actions inputActions;
+    public InputSystem_Actions InputActions => inputActions;
+
+    private void Awake()
+    {
+        var DataRef = SessionController.Instance.PlayerManager;
+        inputActions = new();
+        weapon = DataRef.PlayerWeapon;
+        health = DataRef.PlayerHealth;
+        rb = GetComponent<Rigidbody2D>();
+        weapon.Init(this);
+    }
+
+    private void OnEnable()
+    {
+        inputActions.Enable();                                           
+        inputActions.Player.Attack.performed += weapon.OnFire;           
+        inputActions.Player.Move.performed += weapon.OnMove;             
+        inputActions.Player.AltAttack.performed += weapon.OnAltFire;
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Player.Attack.performed -= weapon.OnFire;           
+        inputActions.Player.Move.performed -= weapon.OnMove;             
+        inputActions.Player.AltAttack.performed -= weapon.OnAltFire;     
+        inputActions.Disable();
+    }
 
 
-
-
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if ((8 & (1 << collision.gameObject.layer)) != 0)
+        {
+            health.TakeDamage(1, new Vector2(-1, -1), 25f);
+        }
+    }
 
 
 

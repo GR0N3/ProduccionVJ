@@ -1,49 +1,40 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerWeapon : MonoBehaviour
+public class PlayerWeapon
 {
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private Transform firePoint;
-    [SerializeField] private float bulletSpeed;
-    [SerializeField] private float bulletLifetime;
-    [SerializeField] private float spreadAngle = 30f;
-    [SerializeField] private int damage;
-    [SerializeField] private float knockbackforce;
+    private GameObject bulletPrefab;
+    private Transform firePoint;
+    private float bulletSpeed;
+    private float bulletLifetime = 0.5f;
+    private float bulletSpread;
+    private int damage;
+    private float knockbackforce;
+    private int bulletsCount;
 
     private InputSystem_Actions inputActions;
 
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
-
-    void Awake()
-    {
-        inputActions = new InputSystem_Actions();
+    public void Init(PlayerController player)
+    {                                                                   
+        inputActions = player.InputActions;
+        firePoint = player.FirePoint;
+        damage = player.Damage;
+        knockbackforce = player.KnockbackForce;
+        bulletSpread = player.BulletSpread;
+        bulletSpeed = player.BulletSpeed;
+        bulletsCount = player.BulletsCount;
+        bulletPrefab = player.BulletPrefab;
     }
 
-    private void OnEnable()
-    {
-        inputActions.Enable();
-        inputActions.Player.Attack.performed += OnFire;
-        inputActions.Player.Move.performed += OnMove;
-        inputActions.Player.AltAttack.performed += OnAltFire;
-    }
-
-    private void OnDisable()
-    {
-        inputActions.Player.Attack.performed -= OnFire;
-        inputActions.Player.Move.performed -= OnMove;
-        inputActions.Player.AltAttack.performed -= OnAltFire;
-        inputActions.Disable();
-    }
-
-    private void OnAltFire(InputAction.CallbackContext ctx)
+    public void OnAltFire(InputAction.CallbackContext ctx)
     {
         ShootSpread();
     }
 
-    private void OnMove(InputAction.CallbackContext ctx)
+    public void OnMove(InputAction.CallbackContext ctx)
     {
         movement = ctx.ReadValue<Vector2>();
 
@@ -53,7 +44,7 @@ public class PlayerWeapon : MonoBehaviour
         }
     }
 
-    private void OnFire(InputAction.CallbackContext ctx)
+    public void OnFire(InputAction.CallbackContext ctx)
     {
         ShootNormal();
     }
@@ -73,9 +64,14 @@ public class PlayerWeapon : MonoBehaviour
             ? movement.normalized
             : lastDirection;
 
+        //for (int i =0; i<= bulletsCount; i++)
+        //{
+        //    FireBullet(baseDir);
+        //} Cambiar x formula para los tiros blablabla
+
         FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, spreadAngle));   // derecha
-        FireBullet(Rotate(baseDir, -spreadAngle));  // izquierda
+        FireBullet(Rotate(baseDir, bulletSpread));   // derecha
+        FireBullet(Rotate(baseDir, -bulletSpread));  // izquierda
     }
 
     Vector2 Rotate(Vector2 direction, float angle)
