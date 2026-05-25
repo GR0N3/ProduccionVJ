@@ -1,3 +1,4 @@
+using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.2f;
+    [SerializeField] private float groundCheckDistance = 0.2f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float acceleration = 20f;
     [SerializeField] private float deceleration = 25f;
@@ -22,12 +24,17 @@ public class PlayerMovement : MonoBehaviour
 
     private InputSystem_Actions inputActions;
 
+
+    void Init(PlayerController player)
+    {
+        rb = player.rb;
+        inputActions = new InputSystem_Actions();
+    }
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();                                                                   //Monobehauvior
-        inputActions = new InputSystem_Actions();                                                           //Monobehauvior
-    }                                                                                                       //Monobehauvior
-                                                                                                            //Monobehauvior
+        rb = GetComponent<Rigidbody2D>();
+        inputActions = new InputSystem_Actions();
+    }
     private void OnEnable()                                                                                 //Monobehauvior
     {                                                                                                       //Monobehauvior
         inputActions.Enable();                                                                              //Monobehauvior
@@ -49,12 +56,12 @@ public class PlayerMovement : MonoBehaviour
         inputActions.Disable();                                                                             //Monobehauvior
     }                                                                                                       //Monobehauvior
 
-    private void OnMove(InputAction.CallbackContext ctx)                                                    
+    public void OnMove(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
         movement = ctx.ReadValue<Vector2>();                                                                
     }                                                                                                       
                                                                                                             
-    private void OnJump(InputAction.CallbackContext ctx)                                                    
+    public void OnJump(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
         if (isGrounded)                                                                                     
         {                                                                                                   
@@ -62,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
         }                                                                                                   
     }
 
-    void ApplyKnockback(Vector2 direction, float force)
+    public void ApplyKnockback(Vector2 direction, float force)
     {
         Vector2 finalForce = direction.normalized * force;
 
@@ -71,11 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()                                                                               //Monobehauvior
     {                                                                                           //Monobehauvior
-        isGrounded = Physics2D.OverlapCircle(                                                   //Monobehauvior
-            groundCheck.position,                                                               //Monobehauvior
-            groundRadius,                                                                       //Monobehauvior
-            groundLayer                                                                         //Monobehauvior
-        );                                                                                      //Monobehauvior
+        GroundCheck();
     }                                                                                           //Monobehauvior
                                                                                                 //Monobehauvior
     void FixedUpdate()                                                                          //Monobehauvior
@@ -96,6 +99,20 @@ public class PlayerMovement : MonoBehaviour
                                                                                                 //Monobehauvior
     }
 
+    void GroundCheck()
+    {
+        var ray = new Ray2D(transform.position, -transform.up);
+        if (Physics2D.Raycast(ray.origin,ray.direction, groundCheckDistance + 1, groundLayer))
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
+            Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
+    }
+
     void LimitLeft()
     {
         if (rb.position.x < leftBorder.position.x)
@@ -108,6 +125,8 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
+
 
 
     void OnDrawGizmosSelected()                                                                 //Monobehauvior

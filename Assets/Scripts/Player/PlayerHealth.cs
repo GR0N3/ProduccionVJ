@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class PlayerHealth
 {
-    [SerializeField] private LayerMask hitMask;
-    [SerializeField] private int maxHealth = 10;
+    private int maxHealth = 10;
     private int currentHealth;
 
     public static event Action OnPlayerDamaged;
@@ -12,7 +11,6 @@ public class PlayerHealth
     public static event Action OnPlayerDeath;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
-
 
     private void Init(PlayerController player)
     {
@@ -23,7 +21,7 @@ public class PlayerHealth
     {
         currentHealth -= damage;
         Debug.Log("took damage: " + currentHealth);
-        //OnPlayerDamaged!.Invoke();
+        OnPlayerDamaged!.Invoke();
 
         if (currentHealth <= 0) 
         {

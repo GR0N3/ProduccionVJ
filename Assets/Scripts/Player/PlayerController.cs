@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
     PlayerMovement movement;
     float speed;
     float jumpForce;
-    Rigidbody2D rb;
+    public Rigidbody2D rb;
 
     private InputSystem_Actions inputActions;
     public InputSystem_Actions InputActions => inputActions;
@@ -46,17 +47,27 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-        inputActions.Enable();                                           
+        inputActions.Enable();
+        
         inputActions.Player.Attack.performed += weapon.OnFire;           
         inputActions.Player.Move.performed += weapon.OnMove;             
         inputActions.Player.AltAttack.performed += weapon.OnAltFire;
+
+        inputActions.Player.Move.performed += movement.OnMove;
+        inputActions.Player.Move.canceled += movement.OnMove;
+        inputActions.Player.Jump.performed += movement.OnJump;
     }
 
     private void OnDisable()
     {
         inputActions.Player.Attack.performed -= weapon.OnFire;           
         inputActions.Player.Move.performed -= weapon.OnMove;             
-        inputActions.Player.AltAttack.performed -= weapon.OnAltFire;     
+        inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
+
+        inputActions.Player.Move.performed -= movement.OnMove;
+        inputActions.Player.Move.canceled -= movement.OnMove; 
+        inputActions.Player.Jump.performed -= movement.OnJump;
+
         inputActions.Disable();
     }
 

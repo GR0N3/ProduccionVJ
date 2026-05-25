@@ -41909,6 +41909,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2005810218016150192, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
   m_PrefabInstance: {fileID: 578230426293419499}
   m_PrefabAsset: {fileID: 0}
+--- !u!50 &1719603401 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 6145394705651330535, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
+  m_PrefabInstance: {fileID: 578230426293419499}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2045746041
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42119,6 +42124,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5044738974664881092, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
+      propertyPath: rb
+      value: 
+      objectReference: {fileID: 1719603401}
     - target: {fileID: 7073032776755391138, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
       propertyPath: leftBorder
       value: 
