@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8051857571557647822}
   - component: {fileID: 6145394705651330535}
   - component: {fileID: 5934149911551156151}
-  - component: {fileID: 7073032776755391138}
   - component: {fileID: 5044738974664881092}
   m_Layer: 3
   m_Name: Player
@@ -35,7 +34,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5755955423788210066}
-  - {fileID: 8685662456690081528}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8051857571557647822
@@ -161,28 +159,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.017908573, y: -0.006212683}
   m_Size: {x: 0.9641819, y: 1.0124255}
   m_Direction: 0
---- !u!114 &7073032776755391138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2353863151468287547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f592a5be08fd92f4a935e453e02fc114, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  speed: 7
-  jumpForce: 20
-  leftBorder: {fileID: 0}
-  groundCheck: {fileID: 8685662456690081528}
-  groundRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  acceleration: 60
-  deceleration: 20
 --- !u!114 &5044738974664881092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,37 +174,11 @@ MonoBehaviour:
   maxHealth: 10
   bulletPrefab: {fileID: 4850576100186321916, guid: 5deabbd947bb43e41ae91a0eb0a72bab, type: 3}
   firePoint: {fileID: 5755955423788210066}
---- !u!1 &7170829831666051167
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8685662456690081528}
-  m_Layer: 3
-  m_Name: GrounCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8685662456690081528
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7170829831666051167}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.47, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2005810218016150192}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  rb: {fileID: 6145394705651330535}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  leftBorder: {fileID: 0}
 --- !u!1 &9171208793311548470
 GameObject:
   m_ObjectHideFlags: 0

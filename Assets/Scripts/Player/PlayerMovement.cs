@@ -2,21 +2,19 @@ using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement
 {
     public float speed = 6f;
     public float jumpForce = 10f;
 
     [Header("Border")]
-    [SerializeField] private Transform leftBorder;
+    private Transform leftBorder;
 
     [Header("Ground Check")]
-    [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundRadius = 0.2f;
-    [SerializeField] private float groundCheckDistance = 0.2f;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private float acceleration = 20f;
-    [SerializeField] private float deceleration = 25f;
+    private float groundCheckDistance = 1.2f;
+    private LayerMask groundLayer;
+    private float acceleration = 20f;
+    private float deceleration = 25f;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -25,37 +23,13 @@ public class PlayerMovement : MonoBehaviour
     private InputSystem_Actions inputActions;
 
 
-    void Init(PlayerController player)
+    public void Init(PlayerController player)
     {
         rb = player.rb;
         inputActions = new InputSystem_Actions();
+        leftBorder = player.LeftBorder;
+        groundLayer = player.GroundLayer;
     }
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        inputActions = new InputSystem_Actions();
-    }
-    private void OnEnable()                                                                                 //Monobehauvior
-    {                                                                                                       //Monobehauvior
-        inputActions.Enable();                                                                              //Monobehauvior
-                                                                                                            //Monobehauvior
-        inputActions.Player.Move.performed += OnMove;                                                       //Monobehauvior
-        inputActions.Player.Move.canceled += OnMove;                                                        //Monobehauvior
-                                                                                                            //Monobehauvior
-                                                                                                            //Monobehauvior
-        inputActions.Player.Jump.performed += OnJump;                                                       //Monobehauvior
-    }                                                                                                       //Monobehauvior
-                                                                                                            //Monobehauvior
-    private void OnDisable()                                                                                //Monobehauvior
-    {                                                                                                       //Monobehauvior
-        inputActions.Player.Move.performed -= OnMove;                                                       //Monobehauvior
-        inputActions.Player.Move.canceled -= OnMove;                                                        //Monobehauvior
-                                                                                                            //Monobehauvior
-        inputActions.Player.Jump.performed -= OnJump;                                                       //Monobehauvior
-                                                                                                            //Monobehauvior
-        inputActions.Disable();                                                                             //Monobehauvior
-    }                                                                                                       //Monobehauvior
-
     public void OnMove(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
         movement = ctx.ReadValue<Vector2>();                                                                
@@ -76,43 +50,39 @@ public class PlayerMovement : MonoBehaviour
         rb.AddForce(finalForce, ForceMode2D.Impulse);
     }
 
-    void Update()                                                                               //Monobehauvior
-    {                                                                                           //Monobehauvior
+    public void Tick()                                                                    
+    {                                                                                     
         GroundCheck();
-    }                                                                                           //Monobehauvior
-                                                                                                //Monobehauvior
-    void FixedUpdate()                                                                          //Monobehauvior
-    {                                                                                           //Monobehauvior
-        float targetSpeed = movement.x * speed;                                                 //Monobehauvior
-                                                                                                //Monobehauvior
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;       //Monobehauvior
-                                                                                                //Monobehauvior
-        float newVelocityX = Mathf.MoveTowards(                                                 //Monobehauvior
-            rb.linearVelocity.x,                                                                //Monobehauvior
-            targetSpeed,                                                                        //Monobehauvior
-            accelRate * Time.fixedDeltaTime                                                     //Monobehauvior
-        );                                                                                      //Monobehauvior
-                                                                                                //Monobehauvior
-        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);                     //Monobehauvior
-                                                                                                //Monobehauvior
-        LimitLeft();                                                                            //Monobehauvior
-                                                                                                //Monobehauvior
+        Debug.Log(isGrounded);
+    }                                                                                     
+                                                                                          
+    public void FixedTick()                                                               
+    {                                                                                     
+        float targetSpeed = movement.x * speed;                                           
+                                                                                          
+        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration; 
+                                                                                          
+        float newVelocityX = Mathf.MoveTowards(                                           
+            rb.linearVelocity.x,                                                          
+            targetSpeed,                                                                  
+            accelRate * Time.fixedDeltaTime                                               
+        );                                                                                
+                                                                                          
+        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
+                                                                                          
+        LimitLeft();                                                                      
+                                                                                          
     }
 
     void GroundCheck()
     {
-        var ray = new Ray2D(transform.position, -transform.up);
-        if (Physics2D.Raycast(ray.origin,ray.direction, groundCheckDistance + 1, groundLayer))
-        {
-            isGrounded = true;
-        }
-        else
-        {
-            isGrounded = false;
-        }
-            Debug.DrawRay(ray.origin, ray.direction, Color.yellow);
-    }
+        RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
+        Debug.Log(hit.collider);
+        isGrounded = hit.collider;
 
+        Debug.DrawRay(rb.position,Vector2.down * groundCheckDistance,Color.yellow);
+    }
+    //Cambiar por un raycast
     void LimitLeft()
     {
         if (rb.position.x < leftBorder.position.x)
@@ -126,14 +96,4 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
-
-    void OnDrawGizmosSelected()                                                                 //Monobehauvior
-    {                                                                                           //Monobehauvior
-        if (groundCheck == null) return;                                                        //Monobehauvior
-                                                                                                //Monobehauvior
-        Gizmos.color = Color.red;                                                               //Monobehauvior
-        Gizmos.DrawWireSphere(groundCheck.position, groundRadius);                              //Monobehauvior
-    }
 }

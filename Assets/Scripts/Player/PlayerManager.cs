@@ -18,7 +18,9 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         SessionController.Instance.PlayerManager = this;
-        playerWeapon = new();
+        playerWeapon = new PlayerWeapon();
+        playerHealth = new PlayerHealth();
+        playerMovement = new PlayerMovement();
     }
 
     //considerar un constructor para las clases del player en caso de querer eliminar monobehaviours

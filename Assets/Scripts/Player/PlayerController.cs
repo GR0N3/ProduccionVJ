@@ -31,6 +31,11 @@ public class PlayerController : MonoBehaviour
     float speed;
     float jumpForce;
     public Rigidbody2D rb;
+    [SerializeField] private LayerMask groundLayer;
+    public LayerMask GroundLayer => groundLayer;
+    [Header(" - Border")]
+    [SerializeField] private Transform leftBorder;
+    public Transform LeftBorder => leftBorder;
 
     private InputSystem_Actions inputActions;
     public InputSystem_Actions InputActions => inputActions;
@@ -41,8 +46,10 @@ public class PlayerController : MonoBehaviour
         inputActions = new();
         weapon = DataRef.PlayerWeapon;
         health = DataRef.PlayerHealth;
+        movement = DataRef.PlayerMovement;
         rb = GetComponent<Rigidbody2D>();
         weapon.Init(this);
+        movement.Init(this);
     }
 
     private void OnEnable()
@@ -71,6 +78,15 @@ public class PlayerController : MonoBehaviour
         inputActions.Disable();
     }
 
+    private void Update()
+    {
+        movement.Tick();
+    }
+
+    private void FixedUpdate()
+    {
+        movement.FixedTick();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
