@@ -10,22 +10,27 @@ public class Bullet : MonoBehaviour
 
     private int damage;
     private float knockbackForce;
-    private float lifeTime = 5f;
+    private float lifeTime = 1f;
     private Vector2 direction;
+
+    private Camera cam;
 
     public void Init(Vector2 dir, float lifeTime, int damage, float knockbackforce)
     {
+        cam = Camera.main;
         direction = dir.normalized;
         this.lifeTime = lifeTime;
         this.damage = damage;
         this.knockbackForce = knockbackforce;
     }
 
-    private void OnEnable()
+    private void Update()
     {
-        StartCoroutine(DefaultStart());
+        if (IsOutsideCamera(transform.position)) 
+        {
+            ObjectPoolManager.ReturnObjectToPool(gameObject);
+        }
     }
-
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -44,13 +49,15 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    IEnumerator DefaultStart() 
-    {
-        yield return new WaitForSeconds(lifeTime);
 
-        if (gameObject.activeSelf) 
-        {
-            ObjectPoolManager.ReturnObjectToPool(gameObject);
-        }
+    bool IsOutsideCamera(Vector3 worldPos)
+    {
+        Vector3 vp = cam.WorldToViewportPoint(worldPos);
+
+        return
+            vp.x < 0 || vp.x > 1 ||
+            vp.y < 0 || vp.y > 1 ||
+            vp.z < 0;
     }
+
 }

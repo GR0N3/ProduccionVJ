@@ -2,13 +2,15 @@ using UnityEngine;
 
 public class CameraLeftBorder : MonoBehaviour
 {
-    public Transform player;
-    public Camera cam;
+    private Transform player;
+    private Camera cam;
 
     private float maxX;
 
     void Start()
     {
+        cam = Camera.main;
+        player = SessionController.Instance.PlayerManager.PlayerMovement.CurrentPosition;
         float halfWidth = cam.orthographicSize * cam.aspect;
         maxX = cam.transform.position.x - halfWidth;
     }
@@ -24,11 +26,7 @@ public class CameraLeftBorder : MonoBehaviour
             maxX = playerPushPoint;
         }
 
-        transform.position = new Vector3(
-            maxX,
-            player.position.y,
-            0f
-        );
+        transform.position = new Vector3( maxX, player.position.y, 0f );
     }
 
     void OnDrawGizmos()

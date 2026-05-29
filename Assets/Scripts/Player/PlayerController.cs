@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
     [Header("Health")]
     PlayerHealth health;
     public int maxHealth;
-    int currentHealth;
 
     [Header("Weapon")]
     PlayerWeapon weapon;
@@ -23,19 +22,21 @@ public class PlayerController : MonoBehaviour
     public float BulletSpeed => bulletSpeed;
     float knockbackForce;
     public float KnockbackForce => knockbackForce;
+
     [SerializeField] private Transform firePoint;
     public Transform FirePoint => firePoint;
 
     [Header("Movement")]
-    PlayerMovement movement;
-    float speed;
-    float jumpForce;
+    private PlayerMovement movement;
     public Rigidbody2D rb;
+    [SerializeField] public float speed;
+    [SerializeField] public float jumpForce;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask borderLayer;
     public LayerMask GroundLayer => groundLayer;
+    public LayerMask BorderLayer => borderLayer;
+
     [Header(" - Border")]
-    [SerializeField] private Transform leftBorder;
-    public Transform LeftBorder => leftBorder;
 
     private InputSystem_Actions inputActions;
     public InputSystem_Actions InputActions => inputActions;
@@ -67,8 +68,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
-        inputActions.Player.Attack.performed -= weapon.OnFire;           
-        inputActions.Player.Move.performed -= weapon.OnMove;             
+        inputActions.Player.Attack.performed -= weapon.OnFire;
+        inputActions.Player.Move.performed -= weapon.OnMove;
         inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
 
         inputActions.Player.Move.performed -= movement.OnMove;
@@ -90,12 +91,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if ((8 & (1 << collision.gameObject.layer)) != 0)
+        if ((collision.gameObject.layer == 8))
         {
             health.TakeDamage(1, new Vector2(-1, -1), 25f);
         }
     }
-
-
-
 }

@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    [SerializeField] private int initialHealthPoints = 10;
-
-
+    [SerializeField] private int maxHealthPoints = 10;
 
     private PlayerHealth playerHealth;
     private PlayerMovement playerMovement;
@@ -13,14 +11,17 @@ public class PlayerManager : MonoBehaviour
     public PlayerHealth PlayerHealth => playerHealth;
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
-    public int InitialHealthPoints => initialHealthPoints;
+    public int MaxHealthPoints => maxHealthPoints;
 
     private void Awake()
     {
         SessionController.Instance.PlayerManager = this;
+
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
+
+        playerHealth.Init(maxHealthPoints);
     }
 
     //considerar un constructor para las clases del player en caso de querer eliminar monobehaviours

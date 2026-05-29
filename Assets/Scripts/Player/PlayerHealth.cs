@@ -12,15 +12,17 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    private void Init(PlayerController player)
+    public void Init(int MaxHealth)
     {
-        currentHealth = player.maxHealth;
+        currentHealth = MaxHealth;
     }
 
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
         currentHealth -= damage;
+
         Debug.Log("took damage: " + currentHealth);
+
         OnPlayerDamaged!.Invoke();
 
         if (currentHealth <= 0) 

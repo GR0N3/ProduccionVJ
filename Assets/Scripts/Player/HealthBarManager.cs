@@ -25,7 +25,6 @@ public class HealthBarManager : MonoBehaviour
     void Start()
     {
         playerHealth = SessionController.Instance.PlayerManager.PlayerHealth;
-
         Drawhearts();
     }
     public void Drawhearts()
@@ -34,17 +33,16 @@ public class HealthBarManager : MonoBehaviour
 
         //cuantos corazones hay en total
 
-        float maxHealthRemainder = playerHealth.MaxHealth % 2;
-        int heartssToMake = (int)((playerHealth.MaxHealth / 2) + maxHealthRemainder);
-        for (int i = 0; i < heartssToMake; i++)
+        float maxHealthRemainder = SessionController.Instance.PlayerManager.PlayerHealth.CurrentHealth % 2;
+        int heartsToMake = (int)((SessionController.Instance.PlayerManager.PlayerHealth.MaxHealth / 2) + maxHealthRemainder);
+        for (int i = 0; i < heartsToMake; i++)
         {
             CreateEmptyhearts();
         }
-
         for (int i = 0; i < hearts.Count; i++)
         {
-            int heartssStatusRemainder = Mathf.Clamp(playerHealth.CurrentHealth - (i * 2), 0, 2);
-            hearts[i].SetHeartImage((HeartStatus)heartssStatusRemainder);
+            int heartsStatusRemainder = Mathf.Clamp(playerHealth.CurrentHealth - (i * 2), 0, 2);
+            hearts[i].SetHeartImage((HeartStatus)heartsStatusRemainder);
         }
 
     }
@@ -67,9 +65,5 @@ public class HealthBarManager : MonoBehaviour
             Destroy(t.gameObject);
         }
         hearts = new List<HealthHeart>();
-
     }
-
-
-
 }
