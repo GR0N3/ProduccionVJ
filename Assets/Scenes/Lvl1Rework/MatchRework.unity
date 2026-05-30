@@ -374996,8 +374996,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf5cee30ac8420448a820341b8d9fa26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraLeftBorder
-  player: {fileID: 1719603397}
-  cam: {fileID: 1521700619}
 --- !u!4 &1261373386
 Transform:
   m_ObjectHideFlags: 0
@@ -375503,16 +375501,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f592a5be08fd92f4a935e453e02fc114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  speed: 7
-  jumpForce: 20
-  leftBorder: {fileID: 1261373386}
-  groundCheck: {fileID: 1539335352}
-  groundRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  acceleration: 60
-  deceleration: 20
 --- !u!50 &1719603400
 Rigidbody2D:
   serializedVersion: 5
@@ -375648,13 +375636,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 491bde00254653c41bfbac2c86027008, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerWeapon
-  bulletPrefab: {fileID: 4850576100186321916, guid: 5deabbd947bb43e41ae91a0eb0a72bab, type: 3}
-  firePoint: {fileID: 1427083509}
-  bulletSpeed: 50
-  bulletLifetime: 0.5
-  spreadAngle: 30
-  damage: 1
-  knockbackforce: 0
 --- !u!1001 &2045746041
 PrefabInstance:
   m_ObjectHideFlags: 0
