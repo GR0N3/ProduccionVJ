@@ -4,7 +4,6 @@ using UnityEngine.InputSystem.LowLevel;
 [DefaultExecutionOrder(-99)]
 public class SessionController : MonoBehaviour
 {
-    public static SessionController Instance;
     
     private float points = 0f;
     private float gold = 9999f;
@@ -31,17 +30,7 @@ public class SessionController : MonoBehaviour
 
     private void Awake()
     {
-
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        else
-        {
-            Instance = this;
-        }
-
+        ServiceLocator.Register<SessionController>(this);
     }
 
     private void Start()
@@ -58,6 +47,11 @@ public class SessionController : MonoBehaviour
         points += 10;
         pointsText.text = orignaltext + (points).ToString();
         
+    }
+
+    private void OnDestroy()
+    {
+        ServiceLocator.Unregister<SessionController>();
     }
 
 }

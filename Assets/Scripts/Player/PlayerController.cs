@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public float BulletSpread => bulletsSpread;
     float bulletSpeed = 10f;
     public float BulletSpeed => bulletSpeed;
-    float knockbackForce;
+    float knockbackForce = 10;
     public float KnockbackForce => knockbackForce;
 
     [SerializeField] private Transform firePoint;
@@ -41,13 +41,16 @@ public class PlayerController : MonoBehaviour
     private InputSystem_Actions inputActions;
     public InputSystem_Actions InputActions => inputActions;
 
+    private PlayerManager playerManager;
+
     private void Awake()
     {
-        var DataRef = SessionController.Instance.PlayerManager;
+        playerManager = ServiceLocator.Get<PlayerManager>();
+
         inputActions = new();
-        weapon = DataRef.PlayerWeapon;
-        health = DataRef.PlayerHealth;
-        movement = DataRef.PlayerMovement;
+        weapon = playerManager.PlayerWeapon;
+        health = playerManager.PlayerHealth;
+        movement = playerManager.PlayerMovement;
         rb = GetComponent<Rigidbody2D>();
         weapon.Init(this);
         movement.Init(this);

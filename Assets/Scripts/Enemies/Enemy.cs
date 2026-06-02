@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour, IDamageable
         Vector2 finalForce = direction.normalized * force / knockbackResistance;
 
         rb.AddForce(finalForce, ForceMode2D.Impulse);
+        Debug.Log("enemigo danado");
     }
 
     void Die()

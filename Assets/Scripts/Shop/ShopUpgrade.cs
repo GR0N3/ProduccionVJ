@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
-[CreateAssetMenu(menuName = "Upgrade/")]
+[CreateAssetMenu(fileName = "New Upgrade", menuName = "Upgrades/Shop Upgrade", order = 1)]
 public class ShopUpgrade : ScriptableObject
 {
     public UpgradeType type;
@@ -10,5 +9,4 @@ public class ShopUpgrade : ScriptableObject
     public string description;
     public float multiplier;
     public int level;
-
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    private SessionController sessionController;
+
     [SerializeField] private int maxHealthPoints = 10;
 
     private PlayerHealth playerHealth;
@@ -15,7 +17,11 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        SessionController.Instance.PlayerManager = this;
+        sessionController = ServiceLocator.Get<SessionController>();
+
+        sessionController.PlayerManager = this;
+
+        ServiceLocator.Register<PlayerManager>(this);
 
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
@@ -24,10 +30,11 @@ public class PlayerManager : MonoBehaviour
         playerHealth.Init(maxHealthPoints);
     }
 
-    //considerar un constructor para las clases del player en caso de querer eliminar monobehaviours
-    //player manager deberia ir en player y/o el player en session?
+    private void OnDestroy()
+    {
+        ServiceLocator.Unregister<PlayerManager>();
+    }
 
     //Usar el manager para las mejoras 
-
 
 }

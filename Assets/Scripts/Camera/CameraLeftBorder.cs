@@ -4,13 +4,19 @@ public class CameraLeftBorder : MonoBehaviour
 {
     private Transform player;
     private Camera cam;
+    private PlayerManager playerManager;
 
     private float maxX;
+
+    private void Awake()
+    {
+        playerManager = ServiceLocator.Get<PlayerManager>();    
+    }
 
     void Start()
     {
         cam = Camera.main;
-        player = SessionController.Instance.PlayerManager.PlayerMovement.CurrentPosition;
+        player = playerManager.PlayerMovement.CurrentPosition;
         float halfWidth = cam.orthographicSize * cam.aspect;
         maxX = cam.transform.position.x - halfWidth;
     }

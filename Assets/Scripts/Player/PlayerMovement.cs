@@ -80,15 +80,24 @@ public class PlayerMovement
                                                                                           
     }
 
-    void GroundCheck()
+    public void UpgradeJump(float multiplier)
+    {
+        jumpForce *= multiplier;
+    }
+
+    public void UpgradeSpeed(float multiplier)
+    {
+        speed *= multiplier;
+    }
+
+    private void GroundCheck()
     {
         RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
         isGrounded = hit.collider;
 
         Debug.DrawRay(rb.position,Vector2.down * groundCheckDistance,Color.yellow);
     }
-    //Cambiar por un raycast
-    void LimitLeft()
+    private void LimitLeft()
     {
 
         RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.left, 2, borderLayer);
@@ -109,16 +118,6 @@ public class PlayerMovement
 
         }
         Debug.DrawRay(rb.position, Vector2.left * 2);
-
-        //if (rb.position.x < leftBorder.position.x)
-        //{
-        //    rb.position = new Vector2(leftBorder.position.x, rb.position.y);
-
-        //    if (rb.linearVelocity.x < 0)
-        //    {
-        //        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        //    }
-        //}
     }
 
 }

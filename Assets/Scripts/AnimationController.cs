@@ -19,4 +19,9 @@ public class AnimationController
             animator.CrossFade(animation, crossFade);
         }
     }
+
+    void StopAnimation(string animation) 
+    {
+        
+    }
 }
