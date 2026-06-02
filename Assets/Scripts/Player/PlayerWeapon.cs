@@ -6,19 +6,18 @@ public class PlayerWeapon
     private GameObject bulletPrefab;
     private Transform firePoint;
     private float bulletSpeed;
-    private float bulletLifetime = 0.5f;
+    private float bulletLifetime; // Ya no está hardcodeado
     private float bulletSpread;
     private int damage;
     private float knockbackforce;
     private int bulletsCount;
 
     private InputSystem_Actions inputActions;
-
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
     public void Init(PlayerController player)
-    {                                                                   
+    {
         inputActions = player.InputActions;
         firePoint = player.FirePoint;
         damage = player.Damage;
@@ -27,6 +26,9 @@ public class PlayerWeapon
         bulletSpeed = player.BulletSpeed;
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
+
+        // Tomamos el tiempo de vida (distancia) desde el Inspector del PlayerController
+        bulletLifetime = player.BulletLifetime;
     }
 
     public void OnAltFire(InputAction.CallbackContext ctx)
@@ -37,7 +39,6 @@ public class PlayerWeapon
     public void OnMove(InputAction.CallbackContext ctx)
     {
         movement = ctx.ReadValue<Vector2>();
-
         if (movement != Vector2.zero)
         {
             lastDirection = movement.normalized;
@@ -51,27 +52,17 @@ public class PlayerWeapon
 
     void ShootNormal()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-        ? movement.normalized
-        : lastDirection;
-
+        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
         FireBullet(baseDir);
     }
 
     void ShootSpread()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-            ? movement.normalized
-            : lastDirection;
-
-        //for (int i =0; i<= bulletsCount; i++)
-        //{
-        //    FireBullet(baseDir);
-        //} Cambiar x formula para los tiros blablabla
+        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
 
         FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, bulletSpread));   // derecha
-        FireBullet(Rotate(baseDir, -bulletSpread));  // izquierda
+        FireBullet(Rotate(baseDir, bulletSpread)); // derecha
+        FireBullet(Rotate(baseDir, -bulletSpread)); // izquierda
     }
 
     Vector2 Rotate(Vector2 direction, float angle)
@@ -81,9 +72,7 @@ public class PlayerWeapon
 
     void FireBullet(Vector2 dir)
     {
-
         GameObject bullet = ObjectPoolManager.SpawnObject(bulletPrefab, firePoint.position, Quaternion.identity);
-
         bullet.GetComponent<Bullet>().Init(dir, bulletLifetime, damage, knockbackforce);
 
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();

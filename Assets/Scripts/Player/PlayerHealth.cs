@@ -9,6 +9,7 @@ public class PlayerHealth
     public static event Action OnPlayerDamaged;
     public static event Action OnPlayerHealed;
     public static event Action OnPlayerDeath;
+
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
@@ -20,12 +21,12 @@ public class PlayerHealth
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
         currentHealth -= damage;
-
         Debug.Log("took damage: " + currentHealth);
 
-        OnPlayerDamaged!.Invoke();
+        // FIX: Cambiamos el '!' por un '?' para que no crashee si la UI no está conectada
+        OnPlayerDamaged?.Invoke();
 
-        if (currentHealth <= 0) 
+        if (currentHealth <= 0)
         {
             Death();
         }
@@ -46,7 +47,6 @@ public class PlayerHealth
             .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
             .WithClearUnusedAssets()
             .WithOverlay()
-            .Perfrom();
+            .Perfrom(); // Mantengo tu typo "Perfrom" para no romper tu SceneController
     }
-
 }

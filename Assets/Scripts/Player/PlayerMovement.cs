@@ -1,4 +1,3 @@
-using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,13 +8,14 @@ public class PlayerMovement
 
     [Header("Border")]
     private LayerMask borderLayer;
-    private Transform leftBorder;
 
     [Header("Ground Check")]
     private float groundCheckDistance = 1.2f;
     private LayerMask groundLayer;
-    private float acceleration = 20f;
-    private float deceleration = 25f;
+
+    // Valores de aceleración para que no sea un tanque
+    private float acceleration = 100f;
+    private float deceleration = 120f;
 
     public Transform CurrentPosition => rb.transform;
 
@@ -30,95 +30,67 @@ public class PlayerMovement
     public void Init(PlayerController player)
     {
         rb = player.rb;
-        inputActions = new InputSystem_Actions();
+        inputActions = player.InputActions;
         groundLayer = player.GroundLayer;
         speed = player.speed;
         jumpForce = player.jumpForce;
         borderLayer = player.BorderLayer;
     }
-    public void OnMove(InputAction.CallbackContext ctx)                                                    
-    {                                                                                                       
-        movement = ctx.ReadValue<Vector2>();                                                                
-    }                                                                                                       
-                                                                                                            
-    public void OnJump(InputAction.CallbackContext ctx)                                                    
-    {                                                                                                       
-        if (isGrounded)                                                                                     
-        {                                                                                                   
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);                                
+
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        movement = ctx.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext ctx)
+    {
+        if (isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
 
     public void ApplyKnockback(Vector2 direction, float force)
     {
         Vector2 finalForce = direction.normalized * force;
-
         rb.AddForce(finalForce, ForceMode2D.Impulse);
     }
 
-    public void Tick()                                                                    
-    {                                                                                     
+    public void Tick()
+    {
         GroundCheck();
-        LimitLeft();                 
+        LimitLeft();
     }
-                                                                                          
-    public void FixedTick()                                                               
-    {                                                                                     
-        float targetSpeed = movement.x * speed;                                           
-                                                                                          
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration; 
-                                                                                          
-        float newVelocityX = Mathf.MoveTowards(                                           
-            rb.linearVelocity.x,                                                          
-            targetSpeed,                                                                  
-            accelRate * Time.fixedDeltaTime                                               
-        );                                                                                
-                                                                                          
-        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
-                                                                                          
-        Debug.Log(isInLeft);
-                                                                                          
+
+    public void FixedTick()
+    {
+        float targetSpeed = movement.x * speed;
+        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
+        float newVelocityX = Mathf.MoveTowards(
+            rb.linearVelocity.x,
+            targetSpeed,
+            accelRate * Time.fixedDeltaTime
+        );
+        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
     }
 
     void GroundCheck()
     {
         RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
-        isGrounded = hit.collider;
-
-        Debug.DrawRay(rb.position,Vector2.down * groundCheckDistance,Color.yellow);
+        isGrounded = hit.collider != null;
     }
-    //Cambiar por un raycast
+
     void LimitLeft()
     {
-
-        RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.left, 2, borderLayer);
-
-        isInLeft = hit;
+        RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.left, 1f, borderLayer);
+        isInLeft = hit.collider != null;
 
         if (isInLeft)
         {
-            if (rb.position.x < hit.transform.position.x)
+            if (rb.linearVelocity.x < 0)
             {
-                rb.position = new Vector2(leftBorder.position.x, rb.position.y);
-
-                if (rb.linearVelocity.x < 0)
-                {
-                    rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-                }
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             }
-
         }
-        Debug.DrawRay(rb.position, Vector2.left * 2);
-
-        //if (rb.position.x < leftBorder.position.x)
-        //{
-        //    rb.position = new Vector2(leftBorder.position.x, rb.position.y);
-
-        //    if (rb.linearVelocity.x < 0)
-        //    {
-        //        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        //    }
-        //}
     }
-
 }

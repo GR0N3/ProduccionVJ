@@ -375278,6 +375278,7 @@ MonoBehaviour:
   player: {fileID: 1719603397}
   leftBorder: {fileID: 1261373386}
   followSpeed: 10
+  verticalOffset: 1
 --- !u!114 &1521700621
 MonoBehaviour:
   m_ObjectHideFlags: 0
