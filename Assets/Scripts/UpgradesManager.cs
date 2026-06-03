@@ -13,13 +13,24 @@ public class UpgradesManager : MonoBehaviour
         
     }
 
+    public void Upgrade(ShopUpgrade upgrade)
+    {
+        foreach (var modifier in upgrade.modifiers)
+        {
+            if (modifier.multiplicative)
+            {
+                playerManager.Stats.MultiplyStat(modifier.stat, modifier.value);
+            }
+            else
+            {
+                playerManager.Stats.AddStat(modifier.stat,modifier.value);
+            }
+        }
+    }
     private void OnDestroy()
     {
         ServiceLocator.Unregister<UpgradesManager>();
     }
 
-    public void UpgradeMovementSpeed(ShopUpgrade upgradeData)
-    {
-        playerManager.PlayerMovement.UpgradeSpeed(upgradeData.multiplier);
-    }
+
 }

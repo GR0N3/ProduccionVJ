@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerHealth
 {
-    private int maxHealth = 10;
+    private int maxHealth;
     private int currentHealth;
 
     public static event Action OnPlayerDamaged;
@@ -12,9 +12,10 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    public void Init(int MaxHealth)
+    public void Init(int maxHealth)
     {
-        currentHealth = MaxHealth;
+        this.maxHealth = maxHealth;
+        this.currentHealth = maxHealth;
     }
 
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
@@ -48,5 +49,10 @@ public class PlayerHealth
             .WithOverlay()
             .Perfrom();
     }
+
+    #region Upgrades
+    public void UpgradeMaxHealth(int result) {maxHealth = result;}
+
+    #endregion
 
 }

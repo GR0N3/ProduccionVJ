@@ -3,8 +3,14 @@ using UnityEngine;
 public enum UpgradeType 
 {
     None,
-    Weapon,
-    Health,
-    Movement,
-    Jump
+    MaxHealth,
+    Speed,
+    JumpForce,
+    Deceleration,
+    Acceleration,
+    Damage,
+    BulletSpeed,
+    BullesCount,
+    BulletsSpread,
+    KnockbackForce
 }

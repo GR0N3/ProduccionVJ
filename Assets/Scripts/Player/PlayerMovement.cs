@@ -7,15 +7,13 @@ public class PlayerMovement
     private float speed;
     private float jumpForce;
 
-    [Header("Border")]
     private LayerMask borderLayer;
     private Transform leftBorder;
 
-    [Header("Ground Check")]
     private float groundCheckDistance = 1.2f;
     private LayerMask groundLayer;
-    private float acceleration = 20f;
-    private float deceleration = 25f;
+    private float acceleration;
+    private float deceleration;
 
     public Transform CurrentPosition => rb.transform;
 
@@ -25,15 +23,15 @@ public class PlayerMovement
 
     private InputSystem_Actions inputActions;
 
-    bool isInLeft;
+    private bool isInLeft;
 
     public void Init(PlayerController player)
     {
         rb = player.rb;
-        inputActions = new InputSystem_Actions();
+        inputActions = player.InputActions;
         groundLayer = player.GroundLayer;
-        speed = player.speed;
-        jumpForce = player.jumpForce;
+        speed = player.Speed;
+        jumpForce = player.JumpForce;
         borderLayer = player.BorderLayer;
     }
     public void OnMove(InputAction.CallbackContext ctx)                                                    
@@ -79,17 +77,6 @@ public class PlayerMovement
         Debug.Log(isInLeft);
                                                                                           
     }
-
-    public void UpgradeJump(float multiplier)
-    {
-        jumpForce *= multiplier;
-    }
-
-    public void UpgradeSpeed(float multiplier)
-    {
-        speed *= multiplier;
-    }
-
     private void GroundCheck()
     {
         RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
@@ -120,4 +107,8 @@ public class PlayerMovement
         Debug.DrawRay(rb.position, Vector2.left * 2);
     }
 
+    #region Upgrades
+    public void UpgradeJump(float multiplier) {jumpForce *= multiplier;}
+    public void UpgradeSpeed(float multiplier) {speed *= multiplier;}
+    #endregion
 }

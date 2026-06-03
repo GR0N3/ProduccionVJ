@@ -4,7 +4,7 @@ public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;
 
-    [SerializeField] private int maxHealthPoints = 10;
+    private int maxHealthPoints = 10;
 
     private PlayerHealth playerHealth;
     private PlayerMovement playerMovement;
@@ -15,6 +15,8 @@ public class PlayerManager : MonoBehaviour
     public PlayerWeapon PlayerWeapon => playerWeapon;
     public int MaxHealthPoints => maxHealthPoints;
 
+    public Stats Stats { get; private set; }
+
     private void Awake()
     {
         sessionController = ServiceLocator.Get<SessionController>();
@@ -23,11 +25,31 @@ public class PlayerManager : MonoBehaviour
 
         ServiceLocator.Register<PlayerManager>(this);
 
+        Stats = new Stats();
+
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
+        InitialStats();
+    }
 
-        playerHealth.Init(maxHealthPoints);
+    private void InitialStats() 
+    {
+        Stats.SetStat(UpgradeType.MaxHealth, 10);
+        Stats.SetStat(UpgradeType.Speed, 10);
+        Stats.SetStat(UpgradeType.JumpForce, 10);
+        Stats.SetStat(UpgradeType.Acceleration, 20);
+        Stats.SetStat(UpgradeType.Deceleration, 25);
+        Stats.SetStat(UpgradeType.Damage, 1);
+        Stats.SetStat(UpgradeType.BulletSpeed, 10);
+        Stats.SetStat(UpgradeType.BullesCount, 10);
+        Stats.SetStat(UpgradeType.BulletsSpread, 0);
+        Stats.SetStat(UpgradeType.KnockbackForce, 2);
+
+        playerHealth.Init((int)Stats.GetStat(UpgradeType.MaxHealth));
+
+        Debug.Log("Stats :" + (int)Stats.GetStat(UpgradeType.MaxHealth));
+        Debug.Log("Player health :" + playerHealth.MaxHealth);
     }
 
     private void OnDestroy()

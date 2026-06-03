@@ -5,13 +5,11 @@ using UnityEngine;
 public class HealthBarManager : MonoBehaviour
 {
     public GameObject heartsPrefab;
-    private PlayerHealth playerHealth;
     List<HealthHeart> hearts = new List<HealthHeart>();
     private PlayerManager playerManager;
 
     private void OnEnable()
     {
-        
         PlayerHealth.OnPlayerDamaged += Drawhearts;
         PlayerHealth.OnPlayerHealed += Drawhearts;
     }
@@ -20,17 +18,11 @@ public class HealthBarManager : MonoBehaviour
     {
         PlayerHealth.OnPlayerDamaged -= Drawhearts;
         PlayerHealth.OnPlayerHealed -= Drawhearts;
-
-    }
-
-    private void Awake()
-    {
-        playerManager = ServiceLocator.Get<PlayerManager>();
     }
     void Start()
     {
+        playerManager = ServiceLocator.Get<PlayerManager>();
 
-        playerHealth = playerManager.PlayerHealth;
         Drawhearts();
     }
     public void Drawhearts()
@@ -47,12 +39,11 @@ public class HealthBarManager : MonoBehaviour
         }
         for (int i = 0; i < hearts.Count; i++)
         {
-            int heartsStatusRemainder = Mathf.Clamp(playerHealth.CurrentHealth - (i * 2), 0, 2);
+            int heartsStatusRemainder = Mathf.Clamp(playerManager.PlayerHealth.CurrentHealth - (i * 2), 0, 2);
             hearts[i].SetHeartImage((HeartStatus)heartsStatusRemainder);
         }
 
     }
-
 
     public void CreateEmptyhearts()
     {

@@ -1,12 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[CreateAssetMenu(fileName = "New Upgrade", menuName = "Upgrades/Shop Upgrade", order = 1)]
-public class ShopUpgrade : ScriptableObject
+[CreateAssetMenu(menuName = "Upgrade/Stat Upgrade")]
+
+public abstract class ShopUpgrade : ScriptableObject
 {
-    public UpgradeType type;
+    public List<StatsModifier> modifiers;
     public Image Image;
     public string description;
-    public float multiplier;
+    public float value;
+    public bool isMultiplier;
     public int level;
 }

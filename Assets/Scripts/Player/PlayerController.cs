@@ -5,23 +5,18 @@ public class PlayerController : MonoBehaviour
 {
 
     [Header("Health")]
-    PlayerHealth health;
+    private PlayerHealth health;
     public int maxHealth;
 
     [Header("Weapon")]
-    PlayerWeapon weapon;
+    private PlayerWeapon weapon;
     [SerializeField] private GameObject bulletPrefab;
     public GameObject BulletPrefab => bulletPrefab;
-    int damage = 1;
-    public int Damage => damage;
-    int bulletsCount = 1;
-    public int BulletsCount => bulletsCount;
-    float bulletsSpread = 0f;
-    public float BulletSpread => bulletsSpread;
-    float bulletSpeed = 10f;
-    public float BulletSpeed => bulletSpeed;
-    float knockbackForce = 10;
-    public float KnockbackForce => knockbackForce;
+    public int Damage { get; private set; }
+    public int BulletsCount { get; private set; }
+    public float BulletSpread { get; private set; }
+    public float BulletSpeed { get; private set; }
+    public float KnockbackForce { get; private set; }
 
     [SerializeField] private Transform firePoint;
     public Transform FirePoint => firePoint;
@@ -29,17 +24,13 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     private PlayerMovement movement;
     public Rigidbody2D rb;
-    [SerializeField] public float speed;
-    [SerializeField] public float jumpForce;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private LayerMask borderLayer;
-    public LayerMask GroundLayer => groundLayer;
-    public LayerMask BorderLayer => borderLayer;
+    public float Speed { get; private set; }
+    public float JumpForce { get; private set; }
+    public LayerMask GroundLayer { get; private set; }
+    public LayerMask BorderLayer { get; private set; }
 
     [Header(" - Border")]
-
-    private InputSystem_Actions inputActions;
-    public InputSystem_Actions InputActions => inputActions;
+    public InputSystem_Actions InputActions { get; private set; }
 
     private PlayerManager playerManager;
 
@@ -47,7 +38,7 @@ public class PlayerController : MonoBehaviour
     {
         playerManager = ServiceLocator.Get<PlayerManager>();
 
-        inputActions = new();
+        InputActions = new();
         weapon = playerManager.PlayerWeapon;
         health = playerManager.PlayerHealth;
         movement = playerManager.PlayerMovement;
@@ -58,28 +49,28 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-        inputActions.Enable();
+        InputActions.Enable();
         
-        inputActions.Player.Attack.performed += weapon.OnFire;           
-        inputActions.Player.Move.performed += weapon.OnMove;             
-        inputActions.Player.AltAttack.performed += weapon.OnAltFire;
-
-        inputActions.Player.Move.performed += movement.OnMove;
-        inputActions.Player.Move.canceled += movement.OnMove;
-        inputActions.Player.Jump.performed += movement.OnJump;
+        InputActions.Player.Attack.performed += weapon.OnFire;           
+        InputActions.Player.Move.performed += weapon.OnMove;             
+        InputActions.Player.AltAttack.performed += weapon.OnAltFire;
+            
+        InputActions.Player.Move.performed += movement.OnMove;
+        InputActions.Player.Move.canceled += movement.OnMove;
+        InputActions.Player.Jump.performed += movement.OnJump;
     }
 
     private void OnDisable()
     {
-        inputActions.Player.Attack.performed -= weapon.OnFire;
-        inputActions.Player.Move.performed -= weapon.OnMove;
-        inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
+        InputActions.Player.Attack.performed -= weapon.OnFire;
+        InputActions.Player.Move.performed -= weapon.OnMove;
+        InputActions.Player.AltAttack.performed -= weapon.OnAltFire;
 
-        inputActions.Player.Move.performed -= movement.OnMove;
-        inputActions.Player.Move.canceled -= movement.OnMove; 
-        inputActions.Player.Jump.performed -= movement.OnJump;
+        InputActions.Player.Move.performed -= movement.OnMove;
+        InputActions.Player.Move.canceled -= movement.OnMove; 
+        InputActions.Player.Jump.performed -= movement.OnJump;
 
-        inputActions.Disable();
+        InputActions.Disable();
     }
 
     private void Update()

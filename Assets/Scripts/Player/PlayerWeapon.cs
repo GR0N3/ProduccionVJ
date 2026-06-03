@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements.Experimental;
 
 public class PlayerWeapon
 {
@@ -7,7 +8,7 @@ public class PlayerWeapon
     private Transform firePoint;
     private float bulletSpeed;
     private float bulletLifetime = 0.5f;
-    private float bulletSpread;
+    private float bulletsSpread;
     private int damage;
     private float knockbackforce;
     private int bulletsCount;
@@ -18,12 +19,12 @@ public class PlayerWeapon
     private Vector2 lastDirection = Vector2.right; // default
 
     public void Init(PlayerController player)
-    {                                                                   
+    {
         inputActions = player.InputActions;
         firePoint = player.FirePoint;
         damage = player.Damage;
         knockbackforce = player.KnockbackForce;
-        bulletSpread = player.BulletSpread;
+        bulletsSpread = player.BulletSpread;
         bulletSpeed = player.BulletSpeed;
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
@@ -49,7 +50,7 @@ public class PlayerWeapon
         ShootNormal();
     }
 
-    void ShootNormal()
+    private void ShootNormal()
     {
         Vector2 baseDir = (movement != Vector2.zero)
         ? movement.normalized
@@ -58,7 +59,7 @@ public class PlayerWeapon
         FireBullet(baseDir);
     }
 
-    void ShootSpread()
+    private void ShootSpread()
     {
         Vector2 baseDir = (movement != Vector2.zero)
             ? movement.normalized
@@ -70,16 +71,16 @@ public class PlayerWeapon
         //} Cambiar x formula para los tiros blablabla
 
         FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, bulletSpread));   // derecha
-        FireBullet(Rotate(baseDir, -bulletSpread));  // izquierda
+        FireBullet(Rotate(baseDir, bulletsSpread));   // derecha
+        FireBullet(Rotate(baseDir, -bulletsSpread));  // izquierda
     }
 
-    Vector2 Rotate(Vector2 direction, float angle)
+    private Vector2 Rotate(Vector2 direction, float angle)
     {
         return Quaternion.Euler(0, 0, angle) * direction;
     }
 
-    void FireBullet(Vector2 dir)
+    private void FireBullet(Vector2 dir)
     {
 
         GameObject bullet = ObjectPoolManager.SpawnObject(bulletPrefab, firePoint.position, Quaternion.identity);
@@ -92,4 +93,15 @@ public class PlayerWeapon
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
+
+
+    #region Upgrades
+
+    public void UpgradeDamage(int result) {damage = result;}
+    public void UpgradeBulletSpeed(float result) {bulletSpeed = result;}
+    public void UpgradeBulletsCount(int result) {bulletsCount = result;}
+    public void UpgradeBulletsSpread(float result) {bulletsSpread = result;}
+    public void UpgradeKnockbackForce(float result) {knockbackforce = result;}
+
+    #endregion
 }
