@@ -6,7 +6,7 @@ public class SessionController : MonoBehaviour
 {
     
     private float points = 0f;
-    private float gold = 9999f;
+    private float gold = 0f;
 
     private InputSystem_Actions inputActions;
 

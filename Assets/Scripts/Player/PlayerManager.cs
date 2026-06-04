@@ -44,12 +44,11 @@ public class PlayerManager : MonoBehaviour
         Stats.SetStat(UpgradeType.BulletSpeed, 10);
         Stats.SetStat(UpgradeType.BullesCount, 10);
         Stats.SetStat(UpgradeType.BulletsSpread, 0);
-        Stats.SetStat(UpgradeType.KnockbackForce, 2);
+        Stats.SetStat(UpgradeType.KnockbackForce, 0.5f);
+        Stats.SetStat(UpgradeType.Acceleration, 20);
+        Stats.SetStat(UpgradeType.Deceleration, 25);
 
         playerHealth.Init((int)Stats.GetStat(UpgradeType.MaxHealth));
-
-        Debug.Log("Stats :" + (int)Stats.GetStat(UpgradeType.MaxHealth));
-        Debug.Log("Player health :" + playerHealth.MaxHealth);
     }
 
     private void OnDestroy()

@@ -33,6 +33,8 @@ public class PlayerMovement
         speed = player.Speed;
         jumpForce = player.JumpForce;
         borderLayer = player.BorderLayer;
+        acceleration = player.Acceleration;
+        deceleration = player.Deceleration;
     }
     public void OnMove(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
@@ -108,7 +110,10 @@ public class PlayerMovement
     }
 
     #region Upgrades
-    public void UpgradeJump(float multiplier) {jumpForce *= multiplier;}
-    public void UpgradeSpeed(float multiplier) {speed *= multiplier;}
+    public void UpgradeJump(float result) {jumpForce = result;}
+    public void UpgradeSpeed(float result) {speed = result;}
+    public void UpgradeAcceleration(float result) { acceleration = result; }
+    public void UpgradeDeceleration(float result) { deceleration = result; }
+
     #endregion
 }

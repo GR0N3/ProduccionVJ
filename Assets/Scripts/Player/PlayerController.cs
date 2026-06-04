@@ -4,35 +4,37 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-    [Header("Health")]
+    private PlayerManager playerManager;
+
     private PlayerHealth health;
     public int maxHealth;
 
-    [Header("Weapon")]
     private PlayerWeapon weapon;
     [SerializeField] private GameObject bulletPrefab;
     public GameObject BulletPrefab => bulletPrefab;
-    public int Damage { get; private set; }
-    public int BulletsCount { get; private set; }
-    public float BulletSpread { get; private set; }
-    public float BulletSpeed { get; private set; }
-    public float KnockbackForce { get; private set; }
+    public int Damage => (int)playerManager.Stats.GetStat(UpgradeType.Damage);
+    public int BulletsCount => (int)playerManager.Stats.GetStat(UpgradeType.BullesCount);
+    public float BulletSpread => playerManager.Stats.GetStat(UpgradeType.BulletsSpread);
+    public float BulletSpeed => playerManager.Stats.GetStat(UpgradeType.BulletSpeed);
+    public float KnockbackForce => playerManager.Stats.GetStat(UpgradeType.KnockbackForce);
 
     [SerializeField] private Transform firePoint;
     public Transform FirePoint => firePoint;
 
-    [Header("Movement")]
     private PlayerMovement movement;
     public Rigidbody2D rb;
-    public float Speed { get; private set; }
-    public float JumpForce { get; private set; }
-    public LayerMask GroundLayer { get; private set; }
-    public LayerMask BorderLayer { get; private set; }
+    public float Speed => playerManager.Stats.GetStat(UpgradeType.Speed);
+    public float JumpForce => playerManager.Stats.GetStat(UpgradeType.JumpForce);
+    public float Acceleration => playerManager.Stats.GetStat(UpgradeType.Acceleration);
+    public float Deceleration => playerManager.Stats.GetStat(UpgradeType.Deceleration);
 
-    [Header(" - Border")]
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask borderLayer;
+
+    public LayerMask GroundLayer => groundLayer;
+    public LayerMask BorderLayer => borderLayer;
+
     public InputSystem_Actions InputActions { get; private set; }
-
-    private PlayerManager playerManager;
 
     private void Awake()
     {

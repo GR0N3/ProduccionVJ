@@ -5,7 +5,7 @@ using UnityEngine;
 public class HealthBarManager : MonoBehaviour
 {
     public GameObject heartsPrefab;
-    List<HealthHeart> hearts = new List<HealthHeart>();
+    private List<HealthHeart> hearts = new List<HealthHeart>();
     private PlayerManager playerManager;
 
     private void OnEnable()
