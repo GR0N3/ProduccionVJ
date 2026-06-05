@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd44c07d73441a4b9572d84441a859a, type: 3}
-  m_Name: DamageUpgrade
+  m_Name: BulletSpeedUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::ShopUpgrade
   modifiers:
-  - stat: 6
-    value: 10000
-    multiplicative: 0
+  - stat: 7
+    value: 1.1
+    multiplicative: 1
   Image: {fileID: 21300000, guid: 84880a7b5d24d4849b4003bb077eed1b, type: 3}
-  description: nuclear uograde
+  description: 10% Knife Speed
   level: 1
   cost: 1

@@ -30,6 +30,7 @@ public class PlayerManager : MonoBehaviour
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
+
         InitialStats();
     }
 
@@ -37,7 +38,7 @@ public class PlayerManager : MonoBehaviour
     {
         Stats.SetStat(UpgradeType.MaxHealth, 10);
         Stats.SetStat(UpgradeType.Speed, 10);
-        Stats.SetStat(UpgradeType.JumpForce, 10);
+        Stats.SetStat(UpgradeType.JumpForce, 20);
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 25);
         Stats.SetStat(UpgradeType.Damage, 1);

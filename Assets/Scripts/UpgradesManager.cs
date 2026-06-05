@@ -1,29 +1,58 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class UpgradesManager : MonoBehaviour
 {
+    private SessionController controller;
     private PlayerManager playerManager;
 
     [SerializeField] private int upgradesCant;
-    [SerializeField] private List<GameObject> upgradePrefab;
+    [SerializeField] private GameObject upgradeCardPrefab;
+    [SerializeField] private List<ShopUpgrade> allUpgrades;
     [SerializeField] private GameObject upgradesParent;
+
+    private List<GameObject> upgradesList = new();
+
     private void Awake()
     {
         ServiceLocator.Register<UpgradesManager>(this);
 
+        controller = ServiceLocator.Get<SessionController>();
         playerManager = ServiceLocator.Get<PlayerManager>();
         
     }
-    private void SpawnUpgrades() 
+
+    private void Start()
     {
-        for (int i = 0; i < upgradesCant; i++) 
+        SpawnUpgrades();
+    }
+
+    private void SpawnUpgrades()
+    {
+        ClearUpgrades();
+
+        for (int i = 0; i < upgradesCant; i++)
         {
-            int random = Random.Range(0, upgradesCant);
-            Instantiate(upgradePrefab[random], upgradesParent.transform);
+            int random = Random.Range(0, allUpgrades.Count);
+
+            GameObject card = Instantiate(upgradeCardPrefab);
+            card.transform.SetParent(upgradesParent.transform, false);
+
+            card.GetComponent<Upgrade>().Init(allUpgrades[random]);
+
+            upgradesList.Add(card);
         }
     }
+
+    private void ClearUpgrades()
+    {
+        foreach (Transform t in upgradesParent.transform)
+        {
+            Destroy(t.gameObject);
+        }
+        upgradesList.Clear();
+    }
+
     public void Upgrade(ShopUpgrade upgrade)
     {
         foreach (var modifier in upgrade.modifiers)
@@ -37,7 +66,18 @@ public class UpgradesManager : MonoBehaviour
                 playerManager.Stats.AddStat(modifier.stat,modifier.value);
             }
         }
+
+        int totalGold =  controller.Gold - upgrade.cost;
+
+        controller.ChangeGold(totalGold);
+
     }
+
+    public void RerollUpgrades()
+    {
+        SpawnUpgrades();
+    }
+
     private void OnDestroy()
     {
         ServiceLocator.Unregister<UpgradesManager>();

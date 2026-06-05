@@ -6,24 +6,27 @@ public class SessionController : MonoBehaviour
 {
     
     private float points = 0f;
-    private float gold = 0f;
+    private int gold = 0;
 
     private InputSystem_Actions inputActions;
 
     private void OnEnable()
     {
         Enemy.OnEnemyDeath += UpdateScoreUI;
+        Enemy.OnEnemyDeath += AddGold;
     }
     private void OnDisable()
     {
         Enemy.OnEnemyDeath -= UpdateScoreUI;
+        Enemy.OnEnemyDeath -= AddGold;
     }
 
     private string orignaltext;
+    private string goldOriginalText;
 
     public PlayerManager PlayerManager;
     public float Points => points;
-    public float Gold => gold;
+    public int Gold => gold;
 
     [SerializeField] private TMP_Text pointsText; 
     [SerializeField] private TMP_Text goldText;
@@ -36,6 +39,7 @@ public class SessionController : MonoBehaviour
     private void Start()
     {
         orignaltext = pointsText.text;
+        goldOriginalText = goldText.text;
 
         pointsText.text += points.ToString();
         goldText.text += gold.ToString();
@@ -47,6 +51,23 @@ public class SessionController : MonoBehaviour
         points += 10;
         pointsText.text = orignaltext + (points).ToString();
         
+    }
+
+    private void AddGold()
+    {
+        gold += 1;
+        UpdateGoldUI();
+    }
+
+    public void UpdateGoldUI()
+    {
+        goldText.text = goldOriginalText + (gold).ToString();
+    }
+
+    public void ChangeGold(int result)
+    {
+        gold = result;
+        UpdateGoldUI();
     }
 
     private void OnDestroy()

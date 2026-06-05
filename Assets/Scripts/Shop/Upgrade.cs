@@ -1,20 +1,53 @@
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-public class Upgrade : MonoBehaviour
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+public class Upgrade : MonoBehaviour, IPointerEnterHandler,IPointerExitHandler
 {
-    private Image image;
+    private ShopUpgrade upgrade;
+
+    private UpgradesManager upgradeManager;
+
+    private SessionController sessionController;
+
     private string description;
-
-
-    public void Init(ShopUpgrade upgradeData)
+    [SerializeField] private Image image;
+    [SerializeField] private TMP_Text Ui_Text;
+    [SerializeField] private GameObject togglePanel;
+    private void Awake()
     {
-        image = GetComponent<Image>();
-        image = upgradeData.Image;
+        upgradeManager = ServiceLocator.Get<UpgradesManager>();
+        sessionController = ServiceLocator.Get<SessionController>();
+    }
 
-        var text = GetComponent<TMP_Text>();
-        description = upgradeData.description;
-        text.text = description;
+    private void Start()
+    {
+        togglePanel.SetActive(false);
+    }
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        togglePanel.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        togglePanel.SetActive(false);
+    }
+    public void Init(ShopUpgrade data)
+    {
+        upgrade = data;
+
+        image.sprite = upgrade.Image;
+        description = upgrade.description + "\n Cost:" + upgrade.cost;
+
+        Ui_Text.text = description;
+    }
+
+    public void SelectUpgrade()
+    {
+        if (upgrade.cost < sessionController.Gold)
+            upgradeManager.Upgrade(upgrade);
     }
 }

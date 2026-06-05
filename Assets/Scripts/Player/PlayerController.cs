@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     private PlayerManager playerManager;
 
     private PlayerHealth health;
-    public int maxHealth;
+    public int maxHealth => (int)playerManager.Stats.GetStat(UpgradeType.MaxHealth);
 
     private PlayerWeapon weapon;
     [SerializeField] private GameObject bulletPrefab;

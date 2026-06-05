@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class ShopUpgrade : ScriptableObject
 {
     public List<StatsModifier> modifiers;
-    public Image Image;
+    public Sprite Image;
     public string description;
-    public bool isMultiplier;
     public int level;
+    public int cost;
 }

@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public bool IsDead => currentHealth <= 0;
 
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -24,7 +25,6 @@ public class Enemy : MonoBehaviour, IDamageable
         Vector2 finalForce = direction.normalized * force / knockbackResistance;
 
         rb.AddForce(finalForce, ForceMode2D.Impulse);
-        Debug.Log("enemigo danado");
     }
 
     void Die()
@@ -40,6 +40,8 @@ public class Enemy : MonoBehaviour, IDamageable
         currentHealth -= damage;
 
         ApplyKnockback(hitDirection, knockbackForce);
+
+
 
         if (currentHealth <= 0)
         {
