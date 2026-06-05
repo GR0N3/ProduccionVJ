@@ -156,8 +156,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.006471489, y: 0.008514031}
-  m_Size: {x: 0.51126915, y: 0.72770965}
+  m_Offset: {x: 0.006471489, y: -0.13551004}
+  m_Size: {x: 0.51126915, y: 0.43965948}
   m_Direction: 0
 --- !u!114 &5044738974664881092
 MonoBehaviour:
@@ -171,12 +171,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6084004f03019dd4d94de4bcd9e2c6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  maxHealth: 10
   bulletPrefab: {fileID: 4850576100186321916, guid: 5deabbd947bb43e41ae91a0eb0a72bab, type: 3}
   firePoint: {fileID: 5755955423788210066}
   rb: {fileID: 6145394705651330535}
-  speed: 15
-  jumpForce: 15
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

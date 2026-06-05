@@ -1,24 +1,37 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.Rendering;
 [DefaultExecutionOrder(-99)]
 public class SessionController : MonoBehaviour
 {
     
     private float points = 0f;
-    private int gold = 0;
+    private int gold = 1;
 
     private InputSystem_Actions inputActions;
+
+    private int sceneIndex;
+
+    [SerializeField] private List<SceneAsset> sceneAssets;
+    public SceneAsset CurrentScene {  get; private set; }
 
     private void OnEnable()
     {
         Enemy.OnEnemyDeath += UpdateScoreUI;
         Enemy.OnEnemyDeath += AddGold;
+        Door.OnLevelCompleted += LevelCompleted;
+        PlayerHealth.OnPlayerDeath += ResetLevel;
     }
     private void OnDisable()
     {
         Enemy.OnEnemyDeath -= UpdateScoreUI;
         Enemy.OnEnemyDeath -= AddGold;
+        Door.OnLevelCompleted -= LevelCompleted;
+        PlayerHealth.OnPlayerDeath -= ResetLevel;
     }
 
     private string orignaltext;
@@ -34,6 +47,7 @@ public class SessionController : MonoBehaviour
     private void Awake()
     {
         ServiceLocator.Register<SessionController>(this);
+        sceneIndex = 0;
     }
 
     private void Start()
@@ -44,13 +58,29 @@ public class SessionController : MonoBehaviour
         pointsText.text += points.ToString();
         goldText.text += gold.ToString();
 
+        CurrentScene = sceneAssets[sceneIndex];
+
     }
 
-    public void UpdateScoreUI()
+    private void ResetLevel()
     {
-        points += 10;
-        pointsText.text = orignaltext + (points).ToString();
-        
+        sceneIndex = 0;
+        CurrentScene = sceneAssets[sceneIndex];
+    }
+
+    private void LevelCompleted()
+    {
+        sceneIndex++;
+        if (sceneIndex > sceneAssets.Count - 1)
+        {
+            ResetLevel();
+        }
+        else
+        {
+            CurrentScene = sceneAssets[sceneIndex];
+        }
+
+        Debug.Log(sceneIndex);
     }
 
     private void AddGold()
@@ -59,6 +89,12 @@ public class SessionController : MonoBehaviour
         UpdateGoldUI();
     }
 
+    public void UpdateScoreUI()
+    {
+        points += 10;
+        pointsText.text = orignaltext + (points).ToString();
+        
+    }
     public void UpdateGoldUI()
     {
         goldText.text = goldOriginalText + (gold).ToString();

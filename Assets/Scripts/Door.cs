@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class Door : MonoBehaviour
 {
+    public static event Action OnLevelCompleted;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -13,6 +16,9 @@ public class Door : MonoBehaviour
                 .WithOverlay()
                 .Unload(SceneDataBase.Slots.SessionContent)
                 .Perfrom();
+
+            OnLevelCompleted?.Invoke();
+
         }
     }
 }

@@ -47,7 +47,7 @@ public class Upgrade : MonoBehaviour, IPointerEnterHandler,IPointerExitHandler
 
     public void SelectUpgrade()
     {
-        if (upgrade.cost < sessionController.Gold)
+        if (upgrade.cost <= sessionController.Gold)
             upgradeManager.Upgrade(upgrade);
     }
 }
