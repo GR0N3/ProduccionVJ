@@ -18,7 +18,20 @@ public class UpgradesManager : MonoBehaviour
         ServiceLocator.Register<UpgradesManager>(this);
 
         controller = ServiceLocator.Get<SessionController>();
-        playerManager = ServiceLocator.Get<PlayerManager>();
+
+        if (ServiceLocator.TryGet(out PlayerManager registeredPlayerManager))
+        {
+            playerManager = registeredPlayerManager;
+        }
+        else
+        {
+            playerManager = FindAnyObjectByType<PlayerManager>();
+
+            if (playerManager != null)
+            {
+                ServiceLocator.Register(playerManager);
+            }
+        }
         
     }
 

@@ -5,6 +5,7 @@ public class PlayerHealth
 {
     private int maxHealth;
     private int currentHealth;
+    private bool isDead;
 
     public static event Action OnPlayerDamaged;
     public static event Action OnPlayerHealed;
@@ -15,16 +16,22 @@ public class PlayerHealth
     public void Init(int maxHealth)
     {
         this.maxHealth = maxHealth;
-        this.currentHealth = maxHealth;
+        currentHealth = maxHealth;
+        isDead = false;
     }
 
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
+        if (isDead)
+        {
+            return;
+        }
+
         currentHealth -= damage;
 
         Debug.Log("took damage: " + currentHealth);
 
-        OnPlayerDamaged!.Invoke();
+        OnPlayerDamaged?.Invoke();
 
         if (currentHealth <= 0) 
         {
@@ -40,14 +47,13 @@ public class PlayerHealth
 
     public void Death()
     {
-        SceneController.Instance
-            .NewTransition()
-            .Unload(SceneDataBase.Scenes.Match)
-            .Unload(SceneDataBase.Scenes.Session)
-            .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
-            .WithClearUnusedAssets()
-            .WithOverlay()
-            .Perfrom();
+        if (isDead)
+        {
+            return;
+        }
+
+        isDead = true;
+        OnPlayerDeath?.Invoke();
     }
 
     #region Upgrades

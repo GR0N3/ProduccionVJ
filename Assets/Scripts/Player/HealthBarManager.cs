@@ -21,12 +21,34 @@ public class HealthBarManager : MonoBehaviour
     }
     void Start()
     {
-        playerManager = ServiceLocator.Get<PlayerManager>();
+        if (ServiceLocator.TryGet(out PlayerManager registeredPlayerManager))
+        {
+            playerManager = registeredPlayerManager;
+        }
+        else
+        {
+            playerManager = FindAnyObjectByType<PlayerManager>();
+
+            if (playerManager != null)
+            {
+                ServiceLocator.Register(playerManager);
+            }
+        }
+
+        if (playerManager == null)
+        {
+            return;
+        }
 
         Drawhearts();
     }
     public void Drawhearts()
     {
+        if (playerManager == null)
+        {
+            return;
+        }
+
         Clearhearts();
 
         //cuantos corazones hay en total

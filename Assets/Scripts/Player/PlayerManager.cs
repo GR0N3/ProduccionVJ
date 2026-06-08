@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-98)]
 public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;

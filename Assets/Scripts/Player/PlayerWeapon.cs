@@ -6,6 +6,7 @@ public class PlayerWeapon
 {
     private GameObject bulletPrefab;
     private Transform firePoint;
+    private PlayerController playerController;
     private float bulletSpeed;
     private float bulletLifetime = 0.5f;
     private float bulletsSpread;
@@ -20,7 +21,7 @@ public class PlayerWeapon
 
     public void Init(PlayerController player)
     {
-        inputActions = player.InputActions;
+        playerController = player;
         firePoint = player.FirePoint;
         damage = player.Damage;
         knockbackforce = player.KnockbackForce;
@@ -30,14 +31,9 @@ public class PlayerWeapon
         bulletPrefab = player.BulletPrefab;
     }
 
-    public void OnAltFire(InputAction.CallbackContext ctx)
+    public void SetMoveInput(Vector2 input)
     {
-        ShootSpread();
-    }
-
-    public void OnMove(InputAction.CallbackContext ctx)
-    {
-        movement = ctx.ReadValue<Vector2>();
+        movement = input;
 
         if (movement != Vector2.zero)
         {
@@ -45,9 +41,31 @@ public class PlayerWeapon
         }
     }
 
-    public void OnFire(InputAction.CallbackContext ctx)
+    public void Fire()
     {
         ShootNormal();
+        playerController.PlayAttackAnimation();
+    }
+
+    public void AltFire()
+    {
+        ShootSpread();
+        playerController.PlayAttackAnimation();
+    }
+
+    public void OnAltFire(InputAction.CallbackContext ctx)
+    {
+        AltFire();
+    }
+
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        SetMoveInput(ctx.ReadValue<Vector2>());
+    }
+
+    public void OnFire(InputAction.CallbackContext ctx)
+    {
+        Fire();
     }
 
     private void ShootNormal()

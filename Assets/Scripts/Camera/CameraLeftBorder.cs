@@ -10,11 +10,27 @@ public class CameraLeftBorder : MonoBehaviour
 
     private void Awake()
     {
-        playerManager = ServiceLocator.Get<PlayerManager>();    
+        if (ServiceLocator.TryGet(out PlayerManager registeredPlayerManager))
+        {
+            playerManager = registeredPlayerManager;
+            return;
+        }
+
+        playerManager = FindAnyObjectByType<PlayerManager>();
+
+        if (playerManager != null)
+        {
+            ServiceLocator.Register(playerManager);
+        }
     }
 
     void Start()
     {
+        if (playerManager == null)
+        {
+            return;
+        }
+
         cam = Camera.main;
         player = playerManager.PlayerMovement.CurrentPosition;
         float halfWidth = cam.orthographicSize * cam.aspect;
@@ -23,6 +39,11 @@ public class CameraLeftBorder : MonoBehaviour
 
     void LateUpdate()
     {
+        if (player == null || cam == null)
+        {
+            return;
+        }
+
         float halfWidth = cam.orthographicSize * cam.aspect;
 
         float playerPushPoint = player.position.x - halfWidth;
