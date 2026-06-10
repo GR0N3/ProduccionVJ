@@ -5,18 +5,16 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Health")]
     PlayerHealth health;
-    public int maxHealth;
+    public int maxHealth = 10;
 
     [Header("Weapon Settings")]
     PlayerWeapon weapon;
     [SerializeField] private GameObject bulletPrefab;
     public GameObject BulletPrefab => bulletPrefab;
 
-    [Tooltip("Tiempo en segundos antes de que la daga desaparezca. A mayor tiempo, más distancia recorre.")]
     [SerializeField] private float bulletLifetime = 1.5f;
     public float BulletLifetime => bulletLifetime;
 
-    [Tooltip("Velocidad a la que viaja la daga.")]
     [SerializeField] private float bulletSpeed = 15f;
     public float BulletSpeed => bulletSpeed;
 
@@ -35,18 +33,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform firePoint;
     public Transform FirePoint => firePoint;
 
-    [Header("Movement")]
+    [Header("Movement Settings")]
     private PlayerMovement movement;
     public Rigidbody2D rb;
+
+    // NUEVO: Variable para controlar las animaciones
+    public Animator animator;
+
     [SerializeField] public float speed = 15f;
     [SerializeField] public float jumpForce = 12f;
+    [SerializeField] public float jumpCutMultiplier = 0.5f;
 
+    [Header("Layers")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask borderLayer;
     public LayerMask GroundLayer => groundLayer;
     public LayerMask BorderLayer => borderLayer;
 
-    [Header(" - Border")]
     private InputSystem_Actions inputActions;
     public InputSystem_Actions InputActions => inputActions;
 
@@ -54,6 +57,9 @@ public class PlayerController : MonoBehaviour
     {
         inputActions = new InputSystem_Actions();
         rb = GetComponent<Rigidbody2D>();
+
+        // NUEVO: Agarramos el Animator de tu personaje
+        animator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -75,16 +81,15 @@ public class PlayerController : MonoBehaviour
 
             inputActions.Player.Move.performed += movement.OnMove;
             inputActions.Player.Move.canceled += movement.OnMove;
+
             inputActions.Player.Jump.performed += movement.OnJump;
+            inputActions.Player.Jump.canceled += movement.OnJumpCanceled;
         }
     }
 
     private void OnEnable()
     {
-        if (inputActions != null)
-        {
-            inputActions.Enable();
-        }
+        if (inputActions != null) inputActions.Enable();
     }
 
     private void OnDisable()
@@ -97,7 +102,9 @@ public class PlayerController : MonoBehaviour
 
             inputActions.Player.Move.performed -= movement.OnMove;
             inputActions.Player.Move.canceled -= movement.OnMove;
+
             inputActions.Player.Jump.performed -= movement.OnJump;
+            inputActions.Player.Jump.canceled -= movement.OnJumpCanceled;
 
             inputActions.Disable();
         }
@@ -120,6 +127,19 @@ public class PlayerController : MonoBehaviour
             if (health != null)
             {
                 health.TakeDamage(1, new Vector2(-1, -1), 25f);
+                if (health.CurrentHealth > 0) movement.RespawnAtSafePosition();
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if ((collision.gameObject.layer == 8))
+        {
+            if (health != null)
+            {
+                health.TakeDamage(1, new Vector2(-1, -1), 25f);
+                if (health.CurrentHealth > 0) movement.RespawnAtSafePosition();
             }
         }
     }

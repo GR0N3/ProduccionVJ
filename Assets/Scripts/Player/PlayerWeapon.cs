@@ -6,15 +6,14 @@ public class PlayerWeapon
     private GameObject bulletPrefab;
     private Transform firePoint;
     private float bulletSpeed;
-    private float bulletLifetime; // Ya no está hardcodeado
+    private float bulletLifetime;
     private float bulletSpread;
     private int damage;
     private float knockbackforce;
     private int bulletsCount;
 
     private InputSystem_Actions inputActions;
-    private Vector2 movement;
-    private Vector2 lastDirection = Vector2.right; // default
+    private Vector2 lastDirection = Vector2.right;
 
     public void Init(PlayerController player)
     {
@@ -26,8 +25,6 @@ public class PlayerWeapon
         bulletSpeed = player.BulletSpeed;
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
-
-        // Tomamos el tiempo de vida (distancia) desde el Inspector del PlayerController
         bulletLifetime = player.BulletLifetime;
     }
 
@@ -36,13 +33,13 @@ public class PlayerWeapon
         ShootSpread();
     }
 
+    // AHORA LEE SOLO IZQUIERDA Y DERECHA
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        movement = ctx.ReadValue<Vector2>();
-        if (movement != Vector2.zero)
-        {
-            lastDirection = movement.normalized;
-        }
+        Vector2 input = ctx.ReadValue<Vector2>();
+
+        if (input.x > 0.1f) lastDirection = Vector2.right;
+        else if (input.x < -0.1f) lastDirection = Vector2.left;
     }
 
     public void OnFire(InputAction.CallbackContext ctx)
@@ -52,17 +49,14 @@ public class PlayerWeapon
 
     void ShootNormal()
     {
-        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
-        FireBullet(baseDir);
+        FireBullet(lastDirection);
     }
 
     void ShootSpread()
     {
-        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
-
-        FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, bulletSpread)); // derecha
-        FireBullet(Rotate(baseDir, -bulletSpread)); // izquierda
+        FireBullet(lastDirection);
+        FireBullet(Rotate(lastDirection, bulletSpread));
+        FireBullet(Rotate(lastDirection, -bulletSpread));
     }
 
     Vector2 Rotate(Vector2 direction, float angle)

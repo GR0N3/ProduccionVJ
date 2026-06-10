@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
-//https://www.youtube.com/watch?v=oejg12YyYyI&t=182s <-- TUTORIAL
+using System.Linq;
 
 public class SceneController : MonoBehaviour
 {
@@ -23,7 +22,7 @@ public class SceneController : MonoBehaviour
 
     [SerializeField] private LoadingOverlay loadingOverlay;
 
-    private Dictionary<string, string> loadedSceneBySlot = new();
+    private Dictionary<string, string> loadedSceneBySlot = new Dictionary<string, string>();
 
     private bool isBusy = false;
 
@@ -35,7 +34,7 @@ public class SceneController : MonoBehaviour
 
     private Coroutine ExecutePlan(SceneTransitionPlan plan)
     {
-        if (isBusy) 
+        if (isBusy)
         {
             Debug.LogWarning("Escena cambiando en progreso");
             return null;
@@ -46,16 +45,19 @@ public class SceneController : MonoBehaviour
 
     private IEnumerator ChangeSceneCoroutine(SceneTransitionPlan plan)
     {
-        if (plan.Overlay)
+        if (plan.Overlay && loadingOverlay != null)
         {
             yield return loadingOverlay.FadeInBlack();
             yield return new WaitForSeconds(0.5f);
         }
-        foreach (var slotkey in plan.ScenesToUnload) 
+
+        foreach (var slotkey in plan.ScenesToUnload)
         {
             yield return UnloadSceneRoutine(slotkey);
         }
+
         if (plan.ClearUnusedAssets) yield return CleanupUnusedAssetsRoutine();
+
         foreach (var kvp in plan.ScenesToLoad)
         {
             if (loadedSceneBySlot.ContainsKey(kvp.Key))
@@ -64,7 +66,8 @@ public class SceneController : MonoBehaviour
             }
             yield return LoadAdditiveRoutine(kvp.Key, kvp.Value, plan.ActiveSceneName == kvp.Value);
         }
-        if (plan.Overlay)
+
+        if (plan.Overlay && loadingOverlay != null)
         {
             yield return loadingOverlay.FadeOutBlack();
         }
@@ -75,12 +78,14 @@ public class SceneController : MonoBehaviour
     {
         AsyncOperation loadOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         if (loadOp == null) yield break;
+
         loadOp.allowSceneActivation = false;
         while (loadOp.progress < 0.9f)
         {
             yield return null;
         }
         loadOp.allowSceneActivation = true;
+
         while (!loadOp.isDone)
         {
             yield return null;
@@ -97,19 +102,36 @@ public class SceneController : MonoBehaviour
         loadedSceneBySlot[slotKey] = sceneName;
     }
 
-    private IEnumerator UnloadSceneRoutine(string slotKey)
+    private IEnumerator UnloadSceneRoutine(string keyToUnload)
     {
-        if (!loadedSceneBySlot.TryGetValue(slotKey, out string sceneName)) yield break;
-        if(string.IsNullOrEmpty(sceneName)) yield break;
-        AsyncOperation unloadOP = SceneManager.UnloadSceneAsync(sceneName);
-        if (unloadOP != null) 
+        string sceneName = "";
+        string slotKey = keyToUnload;
+
+        if (!loadedSceneBySlot.TryGetValue(slotKey, out sceneName))
         {
-            while (unloadOP.isDone)
+            var match = loadedSceneBySlot.FirstOrDefault(x => x.Value == keyToUnload);
+            if (match.Key != null)
+            {
+                slotKey = match.Key;
+                sceneName = match.Value;
+            }
+            else
+            {
+                yield break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(sceneName)) yield break;
+
+        AsyncOperation unloadOP = SceneManager.UnloadSceneAsync(sceneName);
+        if (unloadOP != null)
+        {
+            while (!unloadOP.isDone)
             {
                 yield return null;
             }
         }
-            loadedSceneBySlot.Remove(slotKey);
+        loadedSceneBySlot.Remove(slotKey);
     }
 
     private IEnumerator CleanupUnusedAssetsRoutine()
@@ -123,8 +145,8 @@ public class SceneController : MonoBehaviour
 
     public class SceneTransitionPlan
     {
-        public Dictionary<string, string> ScenesToLoad { get; } = new();
-        public List<string> ScenesToUnload { get; } = new();
+        public Dictionary<string, string> ScenesToLoad { get; } = new Dictionary<string, string>();
+        public List<string> ScenesToUnload { get; } = new List<string>();
         public string ActiveSceneName { get; private set; } = "";
         public bool ClearUnusedAssets { get; private set; } = false;
         public bool Overlay { get; private set; } = false;
@@ -136,16 +158,18 @@ public class SceneController : MonoBehaviour
             return this;
         }
 
-        public SceneTransitionPlan Unload(string slotKey)
+        public SceneTransitionPlan Unload(string slotOrSceneName)
         {
-            ScenesToUnload.Add(slotKey);
+            ScenesToUnload.Add(slotOrSceneName);
             return this;
         }
+
         public SceneTransitionPlan WithOverlay()
         {
             Overlay = true;
             return this;
         }
+
         public SceneTransitionPlan WithClearUnusedAssets()
         {
             ClearUnusedAssets = true;
@@ -156,7 +180,5 @@ public class SceneController : MonoBehaviour
         {
             return SceneController.Instance.ExecutePlan(this);
         }
-
     }
 }
-   

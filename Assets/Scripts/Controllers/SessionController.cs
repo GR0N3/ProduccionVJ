@@ -34,7 +34,6 @@ public class SessionController : MonoBehaviour
 
     private void Start()
     {
-        // Chequeos de seguridad por si olvidaste asignar la UI en el Inspector
         if (pointsText != null)
         {
             orignaltext = pointsText.text;
