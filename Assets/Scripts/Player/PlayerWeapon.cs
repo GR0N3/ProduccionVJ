@@ -12,6 +12,10 @@ public class PlayerWeapon
     private float knockbackforce;
     private int bulletsCount;
 
+    // NUEVO: Variables para el control de tiempo (Cooldown)
+    private float fireCooldown;
+    private float nextFireTime = 0f;
+
     private InputSystem_Actions inputActions;
     private Vector2 lastDirection = Vector2.right;
 
@@ -26,14 +30,21 @@ public class PlayerWeapon
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
         bulletLifetime = player.BulletLifetime;
+
+        // Recibimos el valor desde el Inspector
+        fireCooldown = player.FireCooldown;
     }
 
     public void OnAltFire(InputAction.CallbackContext ctx)
     {
-        ShootSpread();
+        // Solo dispara si el tiempo actual superó el tiempo de espera
+        if (Time.time >= nextFireTime)
+        {
+            ShootSpread();
+            nextFireTime = Time.time + fireCooldown; // Calculamos la hora del próximo tiro permitido
+        }
     }
 
-    // AHORA LEE SOLO IZQUIERDA Y DERECHA
     public void OnMove(InputAction.CallbackContext ctx)
     {
         Vector2 input = ctx.ReadValue<Vector2>();
@@ -44,7 +55,12 @@ public class PlayerWeapon
 
     public void OnFire(InputAction.CallbackContext ctx)
     {
-        ShootNormal();
+        // Solo dispara si el tiempo actual superó el tiempo de espera
+        if (Time.time >= nextFireTime)
+        {
+            ShootNormal();
+            nextFireTime = Time.time + fireCooldown; // Calculamos la hora del próximo tiro permitido
+        }
     }
 
     void ShootNormal()

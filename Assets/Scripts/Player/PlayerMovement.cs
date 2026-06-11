@@ -11,7 +11,7 @@ public class PlayerMovement
     private LayerMask borderLayer;
 
     [Header("Ground Check")]
-    private float groundCheckDistance = 1.2f;
+    private float groundCheckDistance = 1.8f;
     private LayerMask groundLayer;
 
     private float acceleration = 100f;
@@ -25,18 +25,11 @@ public class PlayerMovement
 
     private InputSystem_Actions inputActions;
     bool isInLeft;
+
+    // Aquí se guardará la posición del último checkpoint que tocaste
     private Vector2 lastSafePosition;
-
-    // NUEVAS VARIABLES PARA ANIMACIÓN
-    private Animator animator;
     private Transform playerTransform;
-    private string currentState;
-
-    // Nombres exactos de las animaciones que creaste
-    const string PLAYER_IDLE = "Player_Idle";
-    const string PLAYER_RUN = "Player_Run";
-    const string PLAYER_JUMP = "Player_Jump";
-    const string PLAYER_FALL = "Player_Fall";
+    private Vector3 originalScale;
 
     public void Init(PlayerController player)
     {
@@ -47,11 +40,12 @@ public class PlayerMovement
         jumpForce = player.jumpForce;
         borderLayer = player.BorderLayer;
         jumpCutMultiplier = player.jumpCutMultiplier;
+
+        // Al empezar el nivel, tu primer checkpoint por defecto es donde spawneas
         lastSafePosition = rb.position;
 
-        // NUEVO: Asignamos el animator y el transform para poder rotarlo
-        animator = player.animator;
         playerTransform = player.transform;
+        originalScale = playerTransform.localScale;
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
@@ -85,9 +79,7 @@ public class PlayerMovement
     {
         GroundCheck();
         LimitLeft();
-
-        // NUEVO: Llamamos a la función que actualiza los gráficos
-        UpdateAnimations();
+        FlipSprite();
     }
 
     public void FixedTick()
@@ -107,10 +99,7 @@ public class PlayerMovement
         RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
         isGrounded = hit.collider != null;
 
-        if (isGrounded && Mathf.Abs(rb.linearVelocity.y) < 0.1f)
-        {
-            lastSafePosition = rb.position;
-        }
+        // REMOVIDO: Ya no guardamos la posición aquí automáticamente
     }
 
     void LimitLeft()
@@ -127,49 +116,28 @@ public class PlayerMovement
         }
     }
 
+    // NUEVO: Esta función será llamada solo cuando toques un Checkpoint físico
+    public void UpdateCheckpoint(Vector2 newCheckpointPos)
+    {
+        lastSafePosition = newCheckpointPos;
+    }
+
     public void RespawnAtSafePosition()
     {
+        // Te teletransporta exactamente a la posición del checkpoint (un poquito levantado para no trabarte)
         rb.position = lastSafePosition + new Vector2(0f, 0.5f);
         rb.linearVelocity = Vector2.zero;
     }
 
-    // NUEVO: Lógica de animaciones y volteo del sprite
-    private void UpdateAnimations()
+    private void FlipSprite()
     {
-        if (animator == null) return;
-
-        // 1. VOLTEAR EL PERSONAJE Y EL ARMA
-        // Si nos movemos a la derecha, la escala X es 1. Si vamos a la izquierda, es -1.
         if (rb.linearVelocity.x > 0.1f)
         {
-            playerTransform.localScale = new Vector3(1, 1, 1);
+            playerTransform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
         }
         else if (rb.linearVelocity.x < -0.1f)
         {
-            playerTransform.localScale = new Vector3(-1, 1, 1);
+            playerTransform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
         }
-
-        // 2. DECIDIR QUÉ ANIMACIÓN MOSTRAR
-        if (!isGrounded)
-        {
-            // Si estamos en el aire
-            if (rb.linearVelocity.y > 0.1f) ChangeAnimationState(PLAYER_JUMP);
-            else ChangeAnimationState(PLAYER_FALL);
-        }
-        else
-        {
-            // Si estamos pisando el suelo
-            if (Mathf.Abs(rb.linearVelocity.x) > 0.1f) ChangeAnimationState(PLAYER_RUN);
-            else ChangeAnimationState(PLAYER_IDLE);
-        }
-    }
-
-    // Función auxiliar para no reiniciar la misma animación en bucle constantemente
-    private void ChangeAnimationState(string newState)
-    {
-        if (currentState == newState) return;
-
-        animator.Play(newState);
-        currentState = newState;
     }
 }
