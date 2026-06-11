@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -12,7 +11,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     public GameObject BulletPrefab => bulletPrefab;
 
-    [Tooltip("Tiempo de espera en segundos para poder lanzar otro cuchillo.")]
     [SerializeField] private float fireCooldown = 0.5f;
     public float FireCooldown => fireCooldown;
 
@@ -41,6 +39,8 @@ public class PlayerController : MonoBehaviour
     private PlayerMovement movement;
     public Rigidbody2D rb;
 
+    public Animator animator;
+
     [SerializeField] public float speed = 15f;
     [SerializeField] public float jumpForce = 12f;
     [SerializeField] public float jumpCutMultiplier = 0.5f;
@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
     {
         inputActions = new InputSystem_Actions();
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -70,6 +71,7 @@ public class PlayerController : MonoBehaviour
             health = DataRef.PlayerHealth;
             movement = DataRef.PlayerMovement;
 
+            if (health != null) health.Init(maxHealth);
             if (weapon != null) weapon.Init(this);
             if (movement != null) movement.Init(this);
 
@@ -120,33 +122,53 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 8)
+        if (movement == null) return;
+
+        // Choque con el vacío (Capa 11)
+        if (collision.gameObject.layer == 11)
         {
             if (health != null)
             {
-                health.TakeDamage(1, new Vector2(-1, 1), 25f);
+                health.TakeDamage(1, new Vector2(-1, -1), 25f);
+                if (health.CurrentHealth > 0) movement.RespawnAtSafePosition();
             }
+            else movement.RespawnAtSafePosition();
+        }
+
+        // Choque con bandera sólida (A prueba de errores de tag)
+        string objName = collision.gameObject.name.ToLower();
+        string objTag = collision.gameObject.tag.ToLower();
+
+        if (objName.Contains("checkpoint") || objTag.Contains("checkpoint"))
+        {
+            movement.SetRespawnPoint(collision.transform.position);
+            Debug.Log("¡Checkpoint guardado!");
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        
-        if (collision.CompareTag("Vacio"))
+        if (movement == null) return;
+
+        // Choque con el vacío invisible (Capa 11)
+        if (collision.gameObject.layer == 11)
         {
             if (health != null)
             {
-                health.TakeDamage(1, Vector2.zero, 0f);
+                health.TakeDamage(1, new Vector2(-1, -1), 25f);
                 if (health.CurrentHealth > 0) movement.RespawnAtSafePosition();
             }
+            else movement.RespawnAtSafePosition();
         }
 
-        
-        if (collision.CompareTag("Checkpoint"))
+        // Choque con bandera invisible/Trigger (A prueba de errores de tag)
+        string objName = collision.gameObject.name.ToLower();
+        string objTag = collision.gameObject.tag.ToLower();
+
+        if (objName.Contains("checkpoint") || objTag.Contains("checkpoint"))
         {
-            
-            movement.UpdateCheckpoint(collision.transform.position);
-            Debug.Log("¡Punto de control guardado!");
+            movement.SetRespawnPoint(collision.transform.position);
+            Debug.Log("¡Checkpoint guardado!");
         }
     }
 }
