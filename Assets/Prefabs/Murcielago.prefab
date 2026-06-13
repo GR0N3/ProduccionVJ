@@ -124,7 +124,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -184,6 +184,11 @@ MonoBehaviour:
   patrolDistance: 4
   diveSpeed: 4
   detectionRadius: 6
+  loseInterestRadius: 12
   knockbackForce: 12
   attackCooldown: 1.2
   hoverHeight: 2.5
+  capaObstaculos:
+    serializedVersion: 2
+    m_Bits: 64
+  distanciaEvasion: 1

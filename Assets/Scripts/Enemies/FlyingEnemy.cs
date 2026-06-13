@@ -12,34 +12,49 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     [Header("Ataque (Picada)")]
     public float diveSpeed = 6f;
     public float detectionRadius = 6f;
+    public float loseInterestRadius = 12f;
     public float knockbackForce = 12f;
 
-    // --- NUEVO: SISTEMA DE ENFRIAMIENTO (COOLDOWN) ---
     [Header("Enfriamiento (Cooldown)")]
-    [Tooltip("Segundos que espera antes de volver a atacar")]
     public float attackCooldown = 2f;
-    [Tooltip("Altura a la que vuela sobre el jugador mientras espera")]
     public float hoverHeight = 2.5f;
+
+    [Header("Detección de Paredes")]
+    [Tooltip("Capa que el murciélago detectará como pared (Ej: Ground)")]
+    public LayerMask capaObstaculos;
+    [Tooltip("Largo del sensor láser para detectar y esquivar")]
+    public float distanciaEvasion = 1f;
 
     private float cooldownTimer;
     private Vector2 startPos;
     private bool movingRight = true;
     private Transform playerTransform;
+    private Rigidbody2D rb;
 
-    // Cambiamos 'Regresando' por 'Recuperando'
-    private enum BatState { Patrullando, Atacando, Recuperando }
+    private enum BatState { Patrullando, Atacando, Recuperando, Regresando }
     private BatState estadoActual = BatState.Patrullando;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         startPos = transform.position;
+
         PlayerController player = FindAnyObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (playerTransform == null) return;
+
+        if (estadoActual == BatState.Atacando || estadoActual == BatState.Recuperando)
+        {
+            float distanciaAlJugador = Vector2.Distance(transform.position, playerTransform.position);
+            if (distanciaAlJugador > loseInterestRadius)
+            {
+                estadoActual = BatState.Regresando;
+            }
+        }
 
         switch (estadoActual)
         {
@@ -53,6 +68,10 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
             case BatState.Recuperando:
                 Recuperarse();
                 break;
+            case BatState.Regresando:
+                RegresarACasa();
+                BuscarJugador(); // CORRECCIÓN: Permite detectar al jugador en el trayecto de regreso
+                break;
         }
     }
 
@@ -61,15 +80,21 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         float limiteDer = startPos.x + patrolDistance;
         float limiteIzq = startPos.x - patrolDistance;
 
+        Vector2 direccionMirada = movingRight ? Vector2.right : Vector2.left;
+        if (Physics2D.Raycast(transform.position, direccionMirada, distanciaEvasion, capaObstaculos))
+        {
+            movingRight = !movingRight;
+        }
+
         if (movingRight)
         {
-            transform.Translate(Vector2.right * patrolSpeed * Time.deltaTime);
+            rb.linearVelocity = new Vector2(patrolSpeed, 0);
             transform.localScale = new Vector3(-1, 1, 1);
             if (transform.position.x >= limiteDer) movingRight = false;
         }
         else
         {
-            transform.Translate(Vector2.left * patrolSpeed * Time.deltaTime);
+            rb.linearVelocity = new Vector2(-patrolSpeed, 0);
             transform.localScale = new Vector3(1, 1, 1);
             if (transform.position.x <= limiteIzq) movingRight = true;
         }
@@ -86,57 +111,108 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     void Abalanzarse()
     {
-        transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, diveSpeed * Time.deltaTime);
+        Vector2 direccion = (playerTransform.position - transform.position).normalized;
+        rb.linearVelocity = direccion * diveSpeed;
 
-        // Mirar al jugador mientras baja
         if (playerTransform.position.x > transform.position.x) transform.localScale = new Vector3(-1, 1, 1);
         else transform.localScale = new Vector3(1, 1, 1);
+    }
 
-        // Si falla el ataque y pasa de largo hacia el piso, se pone a recuperarse
-        if (transform.position.y < playerTransform.position.y - 0.5f)
+    void Recuperarse()
+    {
+        cooldownTimer -= Time.fixedDeltaTime;
+
+        Vector2 hoverPosition = new Vector2(playerTransform.position.x, playerTransform.position.y + hoverHeight);
+        Vector2 direccionDeseada = (hoverPosition - (Vector2)transform.position).normalized;
+
+        direccionDeseada = CalcularEvasion(direccionDeseada);
+
+        rb.linearVelocity = direccionDeseada * patrolSpeed;
+
+        if (direccionDeseada.x > 0) transform.localScale = new Vector3(-1, 1, 1);
+        else transform.localScale = new Vector3(1, 1, 1);
+
+        if (cooldownTimer <= 0) estadoActual = BatState.Atacando;
+    }
+
+    void RegresarACasa()
+    {
+        Vector2 direccionDeseada = (startPos - (Vector2)transform.position).normalized;
+        direccionDeseada = CalcularEvasion(direccionDeseada);
+
+        rb.linearVelocity = direccionDeseada * patrolSpeed;
+
+        if (direccionDeseada.x > 0) transform.localScale = new Vector3(-1, 1, 1);
+        else transform.localScale = new Vector3(1, 1, 1);
+
+        if (Vector2.Distance(transform.position, startPos) < 0.5f)
         {
-            IniciarRecuperacion();
+            estadoActual = BatState.Patrullando;
         }
     }
 
-    // --- NUEVA FUNCIÓN: ESPERAR 2 SEGUNDOS ---
-    void Recuperarse()
+    Vector2 CalcularEvasion(Vector2 direccionDeseada)
     {
-        cooldownTimer -= Time.deltaTime; // Descontamos el tiempo
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direccionDeseada, distanciaEvasion, capaObstaculos);
 
-        // Mientras espera, lo hacemos volar y seguirte un poco por encima de tu cabeza
-        Vector2 hoverPosition = new Vector2(playerTransform.position.x, playerTransform.position.y + hoverHeight);
-        transform.position = Vector2.MoveTowards(transform.position, hoverPosition, patrolSpeed * Time.deltaTime);
-
-        // Que te siga mirando mientras vuela sobre vos
-        if (playerTransform.position.x > transform.position.x) transform.localScale = new Vector3(-1, 1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
-
-        // Si se le acabó el tiempo, ¡vuelve a atacar!
-        if (cooldownTimer <= 0)
+        if (hit.collider != null)
         {
-            estadoActual = BatState.Atacando;
+            Vector2 normal = hit.normal;
+            Vector2 direccionTangente = direccionDeseada - Vector2.Dot(direccionDeseada, normal) * normal;
+
+            if (direccionTangente.magnitude < 0.1f)
+            {
+                direccionTangente = new Vector2(-normal.y, normal.x);
+                if (direccionTangente.y < 0) direccionTangente = -direccionTangente;
+            }
+
+            return (direccionTangente.normalized + normal * 0.5f).normalized;
         }
+
+        return direccionDeseada;
     }
 
     void IniciarRecuperacion()
     {
         estadoActual = BatState.Recuperando;
-        cooldownTimer = attackCooldown; // Configuramos los 2 segundos
+        cooldownTimer = attackCooldown;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        PlayerController player = collision.GetComponent<PlayerController>();
+        PlayerController player = collision.gameObject.GetComponent<PlayerController>();
 
-        if (player != null && estadoActual == BatState.Atacando)
+        if (player != null)
         {
             Vector2 direccionEmpuje = (player.transform.position - transform.position).normalized;
             direccionEmpuje.y = 0.5f;
 
             player.TakeDamage(1, direccionEmpuje, knockbackForce);
+            IniciarRecuperacion();
+        }
+        else
+        {
+            if (estadoActual == BatState.Atacando) IniciarRecuperacion();
+        }
+    }
 
-            
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (estadoActual == BatState.Atacando && collision.gameObject.GetComponent<PlayerController>() == null)
+        {
+            IniciarRecuperacion();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        PlayerController player = collision.GetComponent<PlayerController>();
+        if (player != null)
+        {
+            Vector2 direccionEmpuje = (player.transform.position - transform.position).normalized;
+            direccionEmpuje.y = 0.5f;
+
+            player.TakeDamage(1, direccionEmpuje, knockbackForce);
             IniciarRecuperacion();
         }
     }
@@ -144,7 +220,9 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     public bool TakeDamage(int damage, Vector2 direction, float knockback)
     {
         health -= damage;
-        transform.position = new Vector2(transform.position.x + direction.x * 0.2f, transform.position.y + direction.y * 0.2f);
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(direction * knockback, ForceMode2D.Impulse);
+
         if (health <= 0) Destroy(gameObject);
         return true;
     }
@@ -153,5 +231,11 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(startPos != Vector2.zero ? startPos : (Vector2)transform.position, detectionRadius);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(startPos != Vector2.zero ? startPos : (Vector2)transform.position, loseInterestRadius);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, distanciaEvasion);
     }
 }
