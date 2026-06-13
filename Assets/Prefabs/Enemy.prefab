@@ -214,6 +214,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 3
   knockbackResistance: 0.1
+  damageToPlayer: 1
+  knockbackToPlayer: 20
+  stunDuration: 2
+  isStunned: 0
   currentHealth: 10
 --- !u!114 &-7482093177545304678
 MonoBehaviour:

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Vacio
   - Checkpoint
+  - Enemigo
   layers:
   - Default
   - TransparentFX
