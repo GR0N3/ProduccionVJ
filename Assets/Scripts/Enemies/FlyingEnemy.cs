@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class FlyingEnemy : MonoBehaviour, IDamageable
@@ -9,20 +10,30 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     public float patrolSpeed = 2f;
     public float patrolDistance = 4f;
 
-    [Header("Ataque (Picada)")]
+    [Header("Persecución")]
     public float diveSpeed = 6f;
     public float detectionRadius = 6f;
     public float loseInterestRadius = 12f;
+
+    [Header("Ataque (Sin Daño de Contacto)")]
+    public int attackDamage = 1;
+    [Tooltip("Distancia a la que se frena para intentar morderte")]
+    public float attackRange = 1.5f;
+    [Tooltip("Fracción de segundo que tarda la animación en dar el golpe (para esquivarlo)")]
+    public float attackDelay = 0.3f;
     public float knockbackForce = 12f;
 
     [Header("Enfriamiento (Cooldown)")]
     public float attackCooldown = 2f;
     public float hoverHeight = 2.5f;
 
+    [Header("Efecto de Muerte")]
+    [Tooltip("Tiempo en segundos que tardará el enemigo en desaparecer por completo.")]
+    public float duracionDesvanecimiento = 1f;
+
     [Header("Detección de Paredes")]
     [Tooltip("Capa que el murciélago detectará como pared (Ej: Ground)")]
     public LayerMask capaObstaculos;
-    [Tooltip("Largo del sensor láser para detectar y esquivar")]
     public float distanciaEvasion = 1f;
 
     private float cooldownTimer;
@@ -30,13 +41,25 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     private bool movingRight = true;
     private Transform playerTransform;
     private Rigidbody2D rb;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer; // Referencia para controlar la opacidad
+    private bool isAttacking = false;
+    private bool isDead = false; // Bloqueo de seguridad para el estado de muerte
 
-    private enum BatState { Patrullando, Atacando, Recuperando, Regresando }
+    private enum BatState { Patrullando, Persiguiendo, Recuperando, Regresando }
     private BatState estadoActual = BatState.Patrullando;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+
+        // Se busca el SpriteRenderer en el objeto o en sus componentes hijos
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        if (rb != null) rb.gravityScale = 0f;
+
         startPos = transform.position;
 
         PlayerController player = FindAnyObjectByType<PlayerController>();
@@ -45,9 +68,12 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-        if (playerTransform == null) return;
+        // Si el enemigo está muerto o no hay jugador, se interrumpe toda la ejecución física e IA
+        if (isDead || playerTransform == null) return;
 
-        if (estadoActual == BatState.Atacando || estadoActual == BatState.Recuperando)
+        if (isAttacking) return;
+
+        if (estadoActual == BatState.Persiguiendo || estadoActual == BatState.Recuperando)
         {
             float distanciaAlJugador = Vector2.Distance(transform.position, playerTransform.position);
             if (distanciaAlJugador > loseInterestRadius)
@@ -60,23 +86,28 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         {
             case BatState.Patrullando:
                 Patrullar();
-                BuscarJugador();
                 break;
-            case BatState.Atacando:
-                Abalanzarse();
+            case BatState.Persiguiendo:
+                EjecutarPersecucion();
                 break;
             case BatState.Recuperando:
                 Recuperarse();
                 break;
             case BatState.Regresando:
                 RegresarACasa();
-                BuscarJugador(); // CORRECCIÓN: Permite detectar al jugador en el trayecto de regreso
                 break;
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("IsMoving", rb.linearVelocity.magnitude > 0.1f);
         }
     }
 
     void Patrullar()
     {
+        BuscarJugador();
+
         float limiteDer = startPos.x + patrolDistance;
         float limiteIzq = startPos.x - patrolDistance;
 
@@ -89,13 +120,13 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         if (movingRight)
         {
             rb.linearVelocity = new Vector2(patrolSpeed, 0);
-            transform.localScale = new Vector3(-1, 1, 1);
+            transform.localScale = new Vector3(1, 1, 1);
             if (transform.position.x >= limiteDer) movingRight = false;
         }
         else
         {
             rb.linearVelocity = new Vector2(-patrolSpeed, 0);
-            transform.localScale = new Vector3(1, 1, 1);
+            transform.localScale = new Vector3(-1, 1, 1);
             if (transform.position.x <= limiteIzq) movingRight = true;
         }
     }
@@ -103,19 +134,59 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     void BuscarJugador()
     {
         float distancia = Vector2.Distance(transform.position, playerTransform.position);
-        if (distancia <= detectionRadius && playerTransform.position.y < transform.position.y)
+        if (distancia <= detectionRadius)
         {
-            estadoActual = BatState.Atacando;
+            estadoActual = BatState.Persiguiendo;
         }
     }
 
-    void Abalanzarse()
+    void EjecutarPersecucion()
     {
-        Vector2 direccion = (playerTransform.position - transform.position).normalized;
-        rb.linearVelocity = direccion * diveSpeed;
+        float distanciaAlJugador = Vector2.Distance(transform.position, playerTransform.position);
 
-        if (playerTransform.position.x > transform.position.x) transform.localScale = new Vector3(-1, 1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
+        if (distanciaAlJugador <= attackRange)
+        {
+            StartCoroutine(RutinaAtaque());
+        }
+        else
+        {
+            Vector2 direccion = (playerTransform.position - transform.position).normalized;
+            rb.linearVelocity = direccion * diveSpeed;
+
+            if (playerTransform.position.x > transform.position.x) transform.localScale = new Vector3(1, 1, 1);
+            else transform.localScale = new Vector3(-1, 1, 1);
+        }
+    }
+
+    private IEnumerator RutinaAtaque()
+    {
+        isAttacking = true;
+        rb.linearVelocity = Vector2.zero;
+
+        if (animator != null) animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(attackDelay);
+
+        if (playerTransform != null && !isDead)
+        {
+            float distanciaAlJugador = Vector2.Distance(transform.position, playerTransform.position);
+
+            if (distanciaAlJugador <= attackRange)
+            {
+                PlayerController player = playerTransform.GetComponent<PlayerController>();
+                if (player != null && !player.isDead)
+                {
+                    Vector2 direccionEmpuje = (player.transform.position - transform.position).normalized;
+                    direccionEmpuje.y = 0.5f;
+                    player.TakeDamage(attackDamage, direccionEmpuje, knockbackForce);
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        isAttacking = false;
+        if (!isDead) IniciarRecuperacion();
     }
 
     void Recuperarse()
@@ -127,23 +198,25 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         direccionDeseada = CalcularEvasion(direccionDeseada);
 
-        rb.linearVelocity = direccionDeseada * patrolSpeed;
+        rb.linearVelocity = direccionDeseada * (diveSpeed * 0.6f);
 
-        if (direccionDeseada.x > 0) transform.localScale = new Vector3(-1, 1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
+        if (direccionDeseada.x > 0) transform.localScale = new Vector3(1, 1, 1);
+        else transform.localScale = new Vector3(-1, 1, 1);
 
-        if (cooldownTimer <= 0) estadoActual = BatState.Atacando;
+        if (cooldownTimer <= 0) estadoActual = BatState.Persiguiendo;
     }
 
     void RegresarACasa()
     {
+        BuscarJugador();
+
         Vector2 direccionDeseada = (startPos - (Vector2)transform.position).normalized;
         direccionDeseada = CalcularEvasion(direccionDeseada);
 
         rb.linearVelocity = direccionDeseada * patrolSpeed;
 
-        if (direccionDeseada.x > 0) transform.localScale = new Vector3(-1, 1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
+        if (direccionDeseada.x > 0) transform.localScale = new Vector3(1, 1, 1);
+        else transform.localScale = new Vector3(-1, 1, 1);
 
         if (Vector2.Distance(transform.position, startPos) < 0.5f)
         {
@@ -178,53 +251,55 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         cooldownTimer = attackCooldown;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        PlayerController player = collision.gameObject.GetComponent<PlayerController>();
-
-        if (player != null)
-        {
-            Vector2 direccionEmpuje = (player.transform.position - transform.position).normalized;
-            direccionEmpuje.y = 0.5f;
-
-            player.TakeDamage(1, direccionEmpuje, knockbackForce);
-            IniciarRecuperacion();
-        }
-        else
-        {
-            if (estadoActual == BatState.Atacando) IniciarRecuperacion();
-        }
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (estadoActual == BatState.Atacando && collision.gameObject.GetComponent<PlayerController>() == null)
-        {
-            IniciarRecuperacion();
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        PlayerController player = collision.GetComponent<PlayerController>();
-        if (player != null)
-        {
-            Vector2 direccionEmpuje = (player.transform.position - transform.position).normalized;
-            direccionEmpuje.y = 0.5f;
-
-            player.TakeDamage(1, direccionEmpuje, knockbackForce);
-            IniciarRecuperacion();
-        }
-    }
-
     public bool TakeDamage(int damage, Vector2 direction, float knockback)
     {
+        if (isDead) return false;
+
         health -= damage;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockback, ForceMode2D.Impulse);
 
-        if (health <= 0) Destroy(gameObject);
+        if (health <= 0)
+        {
+            StartCoroutine(SecuenciaMuerteEnemigo());
+        }
         return true;
+    }
+
+    // --- NUEVA CORRUTINA DE DESVANECIMIENTO ---
+    private IEnumerator SecuenciaMuerteEnemigo()
+    {
+        isDead = true;
+
+        // Detiene el movimiento por completo y lo desvincula de las fuerzas físicas aplicadas
+        rb.linearVelocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+
+        // Desactiva el colisionador para que el jugador pase a través del sprite inerte
+        Collider2D colisionador = GetComponent<Collider2D>();
+        if (colisionador != null) colisionador.enabled = false;
+
+        // Si existe un trigger "Death" en el Animator, se ejecuta aquí
+        if (animator != null) animator.SetTrigger("Death");
+
+        if (spriteRenderer != null)
+        {
+            Color colorInicial = spriteRenderer.color;
+            float tiempoTranscurrido = 0f;
+
+            // Bucle de interpolación lineal para reducir el canal alpha
+            while (tiempoTranscurrido < duracionDesvanecimiento)
+            {
+                tiempoTranscurrido += Time.deltaTime;
+                float nuevoAlpha = Mathf.Lerp(1f, 0f, tiempoTranscurrido / duracionDesvanecimiento);
+
+                spriteRenderer.color = new Color(colorInicial.r, colorInicial.g, colorInicial.b, nuevoAlpha);
+                yield return null; // Espera al siguiente fotograma
+            }
+        }
+
+        // Una vez alcanzada la opacidad cero, se elimina el objeto de la memoria de la escena
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmosSelected()
@@ -237,5 +312,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, distanciaEvasion);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

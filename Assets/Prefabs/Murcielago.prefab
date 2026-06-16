@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7162293995442988579}
   - component: {fileID: 8850557121490009366}
   - component: {fileID: 414021258820023118}
+  - component: {fileID: 4857552724747712583}
   m_Layer: 8
   m_Name: Murcielago
   m_TagString: Enemigo
@@ -84,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: 827538889749247048, guid: 36f8e1b1c1866f645a3a161d7af07a59, type: 3}
   m_Color: {r: 0.2672659, g: 0.735849, b: 0.73096794, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -128,17 +129,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.21133333}
+  m_Offset: {x: 0.037319183, y: -0.37008774}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.28866667}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.5625, y: 1.40625}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.8376541, y: 0.78470826}
   m_EdgeRadius: 0
 --- !u!50 &8850557121490009366
 Rigidbody2D:
@@ -180,11 +181,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemy
   health: 3
-  patrolSpeed: 2
+  patrolSpeed: 6
   patrolDistance: 4
-  diveSpeed: 4
+  diveSpeed: 6
   detectionRadius: 6
   loseInterestRadius: 12
+  attackDamage: 1
+  attackRange: 2.2
+  attackDelay: 0.3
   knockbackForce: 12
   attackCooldown: 1.2
   hoverHeight: 2.5
@@ -192,3 +196,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   distanciaEvasion: 1
+--- !u!95 &4857552724747712583
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 660390094996908886}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ccaae8cfa8c6cff438fc2ec0653e34fd, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

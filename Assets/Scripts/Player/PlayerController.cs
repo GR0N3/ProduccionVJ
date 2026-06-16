@@ -1,4 +1,4 @@
-using System.Collections; // Necesario para las Corrutinas
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,15 +6,24 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Salud y Reaparición")]
     PlayerHealth health;
-    public int maxHealth = 10;
+    public int maxHealth = 6; // Ajustado a 6 (3 corazones x 2 mitades)
     public int currentHealth;
     public Vector2 ultimoCheckpoint;
 
-    // --- NUEVO: PANTALLA DE MUERTE ---
+    [Header("UI de Corazones")]
+    public Image[] corazonesUI;
+    public Sprite corazonLleno;
+    public Sprite corazonMitad;
+    public Sprite corazonVacio;
+
     [Header("Efectos de Muerte")]
-    [Tooltip("Arrastrá acá la imagen negra de tu Canvas")]
     public Image pantallaNegra;
-    public bool isDead = false; // Bloquea todo mientras estás muriendo
+    public bool isDead = false;
+    [Tooltip("Tiempo que espera el código para mostrar la pantalla negra tras morir.")]
+    public float duracionAnimacionMuerte = 1f;
+
+    [Header("Bloqueos de Estado")]
+    private bool isAttacking = false;
 
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
@@ -26,6 +35,10 @@ public class PlayerController : MonoBehaviour
     [Header("Game Feel")]
     public float coyoteTime = 0.2f;
     private float coyoteTimeCounter;
+
+    [Header("Sincronización de Ataque")]
+    [Tooltip("Tiempo en segundos que tarda la animación en soltar la flecha/golpe")]
+    public float delayDisparo = 0.3f;
 
     [Header("Sistema de Estamina y Escalada")]
     public float maxStamina = 100f;
@@ -83,7 +96,7 @@ public class PlayerController : MonoBehaviour
     [Header("Sensores (Raycasts)")]
     public Transform controladorSuelo;
     public Transform controladorPared;
-    public float distanciaSuelo = 0.2f;
+    public float distanciaSuelo = 0.3f;
     public float distanciaPared = 0.2f;
     public LayerMask capaSuelo;
 
@@ -108,6 +121,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
+        ActualizarCorazones();
         ultimoCheckpoint = transform.position;
         originalGravityScale = rb.gravityScale;
         currentStamina = maxStamina;
@@ -119,7 +133,6 @@ public class PlayerController : MonoBehaviour
             barraEstamina.gameObject.SetActive(false);
         }
 
-        // Aseguramos que la pantalla negra empiece transparente e invisible
         if (pantallaNegra != null)
         {
             pantallaNegra.color = new Color(0, 0, 0, 0);
@@ -138,7 +151,8 @@ public class PlayerController : MonoBehaviour
             if (weapon != null) weapon.Init(this);
             if (movement != null) movement.Init(this);
 
-            inputActions.Player.Attack.performed += weapon.OnFire;
+            inputActions.Player.Attack.performed += AnimarAtaque;
+
             inputActions.Player.Move.performed += weapon.OnMove;
             inputActions.Player.AltAttack.performed += weapon.OnAltFire;
 
@@ -156,7 +170,8 @@ public class PlayerController : MonoBehaviour
     {
         if (inputActions != null && weapon != null && movement != null)
         {
-            inputActions.Player.Attack.performed -= weapon.OnFire;
+            inputActions.Player.Attack.performed -= AnimarAtaque;
+
             inputActions.Player.Move.performed -= weapon.OnMove;
             inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
             inputActions.Player.Move.performed -= movement.OnMove;
@@ -169,7 +184,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (isDead) return; // SI ESTÁ MUERTO, IGNORAMOS TODO EL UPDATE
+        if (isDead) return;
 
         if (movement != null && !isGrabbingWall) movement.Tick();
 
@@ -183,6 +198,37 @@ public class PlayerController : MonoBehaviour
             float direccionMiradaX = transform.localScale.x > 0 ? 1 : -1;
             Vector2 direccionMirada = new Vector2(direccionMiradaX, 0);
             tocandoPared = Physics2D.Raycast(controladorPared.position, direccionMirada, distanciaPared, capaSuelo);
+        }
+
+        if (!isGrabbingWall)
+        {
+            float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
+
+            if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
+
+            if (inputX > 0.1f) transform.localScale = new Vector3(1, 1, 1);
+            else if (inputX < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            if (animator != null) animator.SetFloat("Movement", 0f);
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("IsGrounded", enSuelo);
+            animator.SetBool("IsGrabbing", isGrabbingWall);
+            animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
+
+            if (isGrabbingWall)
+            {
+                float velocidadNormalizada = Mathf.Abs(rb.linearVelocity.y) / climbSpeed;
+                animator.SetFloat("ClimbSpeed", velocidadNormalizada);
+            }
+            else
+            {
+                animator.SetFloat("ClimbSpeed", 1f);
+            }
         }
 
         bool presionaGanchos = false;
@@ -254,7 +300,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isDead) return; // BLOQUEO DE FÍSICAS AL MORIR
+        if (isDead) return;
 
         if (isGrabbingWall)
         {
@@ -297,9 +343,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void AnimarAtaque(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        if (isDead || isAttacking || isGrabbingWall) return;
+
+        isAttacking = true;
+        if (animator != null) animator.SetTrigger("Attack");
+        StartCoroutine(RutinaDisparoSincronizado(context));
+    }
+
+    private IEnumerator RutinaDisparoSincronizado(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        yield return new WaitForSeconds(delayDisparo);
+        if (weapon != null) weapon.OnFire(context);
+
+        float tiempoRestante = fireCooldown - delayDisparo;
+        if (tiempoRestante > 0) yield return new WaitForSeconds(tiempoRestante);
+
+        if (animator != null) animator.ResetTrigger("Attack");
+        isAttacking = false;
+    }
+
     private void IntentarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        if (isDead) return; // NO PUEDE SALTAR MUERTO
+        if (isDead) return;
 
         if (isGrabbingWall)
         {
@@ -314,6 +381,12 @@ public class PlayerController : MonoBehaviour
 
             rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, jumpForce);
 
+            if (animator != null)
+            {
+                animator.ResetTrigger("JumpTrigger");
+                animator.SetTrigger("JumpTrigger");
+            }
+
             DesactivarAgarre();
             coyoteTimeCounter = 0f;
             wallJumpTimer = wallJumpCooldown;
@@ -324,6 +397,12 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             coyoteTimeCounter = 0f;
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("JumpTrigger");
+                animator.SetTrigger("JumpTrigger");
+            }
         }
     }
 
@@ -339,9 +418,11 @@ public class PlayerController : MonoBehaviour
         if (isInvincible || isDead) return;
         currentHealth -= damageAmount;
 
+        ActualizarCorazones();
+
         if (currentHealth <= 0)
         {
-            StartCoroutine(SecuenciaMuerte()); // INICIAMOS LA CINEMÁTICA DE MUERTE
+            StartCoroutine(SecuenciaMuerte());
         }
         else
         {
@@ -355,32 +436,25 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // --- LA MAGIA DE LA NUEVA MUERTE ---
     private IEnumerator SecuenciaMuerte()
     {
-        // 1. Bloqueamos al jugador en el aire para que no se mueva ni caiga
         isDead = true;
+        isAttacking = false;
         inputActions.Disable();
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f;
         DesactivarAgarre();
 
-        // 2. Desvanecer el Sprite lentamente (Medio segundo)
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+        if (animator != null) animator.SetTrigger("Death");
+
+        yield return new WaitForSeconds(duracionAnimacionMuerte);
+
         float duracionFade = 0.5f;
         float tiempo = 0f;
-        while (tiempo < duracionFade)
-        {
-            tiempo += Time.deltaTime;
-            float alphaSprite = Mathf.Lerp(1f, 0f, tiempo / duracionFade);
-            if (spriteRenderer != null) spriteRenderer.color = new Color(colorOriginal.r, colorOriginal.g, colorOriginal.b, alphaSprite);
-            yield return null; // Espera al siguiente frame
-        }
 
-        // 3. Oscurecer la pantalla
         if (pantallaNegra != null)
         {
             pantallaNegra.gameObject.SetActive(true);
-            tiempo = 0f;
             while (tiempo < duracionFade)
             {
                 tiempo += Time.deltaTime;
@@ -390,17 +464,25 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // 4. Pausa dramática en negro (Un segundito, como pediste)
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.2f);
 
-        // 5. Teletransporte y curación (El jugador no ve esto porque la pantalla está negra)
         transform.position = ultimoCheckpoint;
         currentHealth = maxHealth;
+
+        ActualizarCorazones();
+
         currentStamina = maxStamina;
         if (health != null) health.Init(maxHealth);
-        if (spriteRenderer != null) spriteRenderer.color = colorOriginal; // Devolvemos el color original al sprite
 
-        // 6. Aclarar la pantalla
+        if (animator != null)
+        {
+            animator.Rebind();
+            animator.Update(0f);
+            animator.SetBool("IsGrounded", true);
+            animator.SetFloat("Movement", 0f);
+            animator.SetFloat("VerticalVelocity", 0f);
+        }
+
         if (pantallaNegra != null)
         {
             tiempo = 0f;
@@ -414,12 +496,9 @@ public class PlayerController : MonoBehaviour
             pantallaNegra.gameObject.SetActive(false);
         }
 
-        // 7. Devolverle el control al jugador
-        rb.gravityScale = originalGravityScale;
         inputActions.Enable();
         isDead = false;
 
-        // Le damos unos iframes para que no lo maten apenas aparece
         isInvincible = true;
         invincibilityTimer = invincibilityDuration;
     }
@@ -433,6 +512,9 @@ public class PlayerController : MonoBehaviour
         if (objetoTocado.layer == 11)
         {
             currentHealth -= 1;
+
+            ActualizarCorazones();
+
             if (currentHealth <= 0) StartCoroutine(SecuenciaMuerte());
             else
             {
@@ -447,6 +529,27 @@ public class PlayerController : MonoBehaviour
         {
             ultimoCheckpoint = objetoTocado.transform.position;
             movement.SetRespawnPoint(objetoTocado.transform.position);
+        }
+    }
+
+    private void ActualizarCorazones()
+    {
+        for (int i = 0; i < corazonesUI.Length; i++)
+        {
+            int valorDeEsteCorazon = (i + 1) * 2;
+
+            if (currentHealth >= valorDeEsteCorazon)
+            {
+                corazonesUI[i].sprite = corazonLleno;
+            }
+            else if (currentHealth == valorDeEsteCorazon - 1)
+            {
+                corazonesUI[i].sprite = corazonMitad;
+            }
+            else
+            {
+                corazonesUI[i].sprite = corazonVacio;
+            }
         }
     }
 
