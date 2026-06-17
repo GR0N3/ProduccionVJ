@@ -86,7 +86,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 827538889749247048, guid: 36f8e1b1c1866f645a3a161d7af07a59, type: 3}
-  m_Color: {r: 0.2672659, g: 0.735849, b: 0.73096794, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -187,11 +187,12 @@ MonoBehaviour:
   detectionRadius: 6
   loseInterestRadius: 12
   attackDamage: 1
-  attackRange: 2.2
+  attackRange: 1.7
   attackDelay: 0.3
   knockbackForce: 12
   attackCooldown: 1.2
   hoverHeight: 2.5
+  duracionDesvanecimiento: 1
   capaObstaculos:
     serializedVersion: 2
     m_Bits: 64

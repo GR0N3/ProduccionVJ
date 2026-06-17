@@ -136,6 +136,11 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 320
+  radioDeteccion: 7
+  velocidadGiro: 10
+  capaEnemigos:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!61 &-4605492532262984603
 BoxCollider2D:
   m_ObjectHideFlags: 0

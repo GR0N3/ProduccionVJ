@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 3402383210270320032}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.019, y: -0.155, z: 0}
+  m_LocalPosition: {x: 0.093, y: -0.106, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 389599942464470757}
   - component: {fileID: 5544138790687911149}
   - component: {fileID: -7482093177545304678}
+  - component: {fileID: 1474747446662804939}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -62,7 +63,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 21.34, y: -2.993, z: 0}
-  m_LocalScale: {x: 1.3978, y: 1.5305009, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5170453407035919687}
@@ -117,8 +118,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.9350033, g: 0, b: 1, a: 1}
+  m_Sprite: {fileID: 4723107735738678597, guid: 1018b0ba13578bf459bd254ae1a2be99, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -139,7 +140,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 10
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
@@ -153,7 +154,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &389599942464470757
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -188,17 +189,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.11006677, y: -0.0021442175}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 3.5714285, y: 3.5714285}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.7577174, y: 1.2594154}
   m_EdgeRadius: 0
 --- !u!114 &5544138790687911149
 MonoBehaviour:
@@ -213,11 +214,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 3
-  knockbackResistance: 0.1
+  knockbackResistance: 2
   damageToPlayer: 1
   knockbackToPlayer: 20
-  stunDuration: 2
+  stunDuration: 1
+  fadeDuration: 1.1
   isStunned: 0
+  isBlocking: 0
   currentHealth: 10
 --- !u!114 &-7482093177545304678
 MonoBehaviour:
@@ -232,9 +235,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   patrolSpeed: 2
-  chaseSpeed: 4
-  patrolRange: 5
-  detectionRange: 5
+  chaseSpeed: 2
+  patrolRange: 6
+  detectionRange: 8
   playerLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -244,9 +247,43 @@ MonoBehaviour:
   groundCheckDistance: 0.5
   wallCheckDistance: 0.5
   sensorOrigin: {fileID: 5170453407035919687}
+  horizontalHitboxSize: {x: 2.8, y: 1}
+  horizontalHitboxOffset: {x: 1, y: 0}
+  attack1Delay: 0.45
+  attack1Duration: 3.6
+  omniHitboxRadius: 2.8
+  omniHitboxOffset: {x: 0, y: 0}
+  attack2Delay: 0.45
+  attack2Duration: 3.6
+  attackTriggerDistance: 2.2
+  shieldDropRecovery: 0.3
+  postAttackPause: 0.8
+  attackCooldown: 0.4
   rb: {fileID: 0}
   player: {fileID: 0}
   startPosition: {x: 0, y: 0}
   movingRight: 1
   lastTurnTime: 0
   turnCooldown: 0.5
+--- !u!95 &1474747446662804939
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4214904499902491054}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4f064b0846ddcc94fbb74a785f7c352a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

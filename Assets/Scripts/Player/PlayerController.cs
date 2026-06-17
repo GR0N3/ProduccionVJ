@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Salud y Reaparición")]
     PlayerHealth health;
-    public int maxHealth = 6; // Ajustado a 6 (3 corazones x 2 mitades)
+    public int maxHealth = 6;
     public int currentHealth;
     public Vector2 ultimoCheckpoint;
 
@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviour
     private float coyoteTimeCounter;
 
     [Header("Sincronización de Ataque")]
-    [Tooltip("Tiempo en segundos que tarda la animación en soltar la flecha/golpe")]
     public float delayDisparo = 0.3f;
 
     [Header("Sistema de Estamina y Escalada")]
@@ -47,6 +46,10 @@ public class PlayerController : MonoBehaviour
     public float staminaDrainClimb = 20f;
     public float staminaJumpCost = 30f;
     public float climbSpeed = 5f;
+
+    // --- NUEVA VARIABLE ---
+    [Tooltip("Fuerza del salto exclusivamente al despegarse de una pared")]
+    public float wallJumpForce = 16f;
     public float wallJumpCooldown = 0.2f;
     private float wallJumpTimer;
 
@@ -57,6 +60,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrabbingWall = false;
     private bool canGrab = true;
     private float originalGravityScale;
+    private Color colorOriginalBarra;
 
     [Header("Weapon Settings")]
     PlayerWeapon weapon;
@@ -131,6 +135,12 @@ public class PlayerController : MonoBehaviour
             barraEstamina.maxValue = maxStamina;
             barraEstamina.value = maxStamina;
             barraEstamina.gameObject.SetActive(false);
+
+            Image fillImage = barraEstamina.fillRect.GetComponent<Image>();
+            if (fillImage != null)
+            {
+                colorOriginalBarra = fillImage.color;
+            }
         }
 
         if (pantallaNegra != null)
@@ -232,8 +242,19 @@ public class PlayerController : MonoBehaviour
         }
 
         bool presionaGanchos = false;
-        if (UnityEngine.InputSystem.Keyboard.current != null)
-            presionaGanchos = UnityEngine.InputSystem.Keyboard.current.eKey.isPressed;
+
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed)
+        {
+            presionaGanchos = true;
+        }
+
+        if (UnityEngine.InputSystem.Gamepad.current != null)
+        {
+            if (UnityEngine.InputSystem.Gamepad.current.rightTrigger.ReadValue() > 0.1f)
+            {
+                presionaGanchos = true;
+            }
+        }
 
         if (wallJumpTimer > 0) wallJumpTimer -= Time.deltaTime;
 
@@ -332,11 +353,15 @@ public class PlayerController : MonoBehaviour
                 {
                     float frecuenciaParpadeo = Mathf.PingPong(Time.time * 15f, 1f);
                     fillImage.color = Color.Lerp(Color.red, new Color(0.3f, 0f, 0f), frecuenciaParpadeo);
-                    if (spriteRenderer != null) spriteRenderer.color = Color.Lerp(colorOriginal, Color.red, 0.4f);
+
+                    if (isGrabbingWall && spriteRenderer != null && !isInvincible)
+                    {
+                        spriteRenderer.color = Color.Lerp(colorOriginal, Color.red, 0.4f);
+                    }
                 }
                 else
                 {
-                    fillImage.color = Color.green;
+                    fillImage.color = colorOriginalBarra;
                     if (spriteRenderer != null && !isInvincible) spriteRenderer.color = colorOriginal;
                 }
             }
@@ -379,7 +404,8 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(inputX) > 0.1f) direccionSaltoX = Mathf.Sign(inputX);
             else direccionSaltoX = transform.localScale.x > 0 ? 1 : -1;
 
-            rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, jumpForce);
+            // --- ACÁ APLICAMOS LA FUERZA ESPECIAL DE PARED ---
+            rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, wallJumpForce);
 
             if (animator != null)
             {

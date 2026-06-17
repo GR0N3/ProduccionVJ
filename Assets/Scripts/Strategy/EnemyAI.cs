@@ -11,6 +11,7 @@ public class EnemyAI : MonoBehaviour
     [Header("Detección General")]
     public float detectionRange = 5f;
     public LayerMask playerLayer;
+    [Tooltip("Asegurate de poner acá la capa de tus paredes/suelo para que bloqueen la visión")]
     public LayerMask groundLayer;
 
     [Header("Sensores Espaciales")]
@@ -18,23 +19,22 @@ public class EnemyAI : MonoBehaviour
     public float wallCheckDistance = 0.5f;
     public Transform sensorOrigin;
 
-    [Header("Mecánica de Escudo")]
-    public float shieldDuration = 2f;
-    public float shieldCooldown = 6f;
-    private float lastShieldTime = -100f;
-
     [Header("Ataque 1: Horizontal")]
     public Vector2 horizontalHitboxSize = new Vector2(2f, 1f);
     public Vector2 horizontalHitboxOffset = new Vector2(1f, 0f);
-    public float attack1Delay = 0.5f;
+    public float attack1Delay = 0.3f;
+    public float attack1Duration = 0.2f;
 
     [Header("Ataque 2: Omnidireccional (X e Y)")]
     public float omniHitboxRadius = 2.5f;
     public Vector2 omniHitboxOffset = new Vector2(0f, 0f);
-    public float attack2Delay = 0.7f;
+    public float attack2Delay = 0.3f;
+    public float attack2Duration = 0.2f;
 
     [Header("Tiempos de Combate")]
-    public float attackTriggerDistance = 1.8f;
+    public float attackTriggerDistance = 1.5f;
+    public float shieldDropRecovery = 0.6f;
+    public float postAttackPause = 0.8f;
     public float attackCooldown = 2f;
 
     [HideInInspector] public Rigidbody2D rb;
@@ -52,6 +52,7 @@ public class EnemyAI : MonoBehaviour
 
     private bool isAttacking = false;
     private float lastAttackTime = -100f;
+    private float lastShieldDropTime = -100f;
 
     private void Awake()
     {
@@ -74,26 +75,40 @@ public class EnemyAI : MonoBehaviour
     {
         if (enemyComponent != null && (enemyComponent.IsDead || enemyComponent.isStunned))
         {
-            if (enemyComponent.isStunned && !enemyComponent.IsDead && !enemyComponent.isBlocking)
-            {
-                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            }
+            if (animator != null) animator.SetBool("IsMoving", false);
             return;
         }
 
-        // Si el enemigo está en medio de un ataque o cubriéndose con el escudo, se pausa la IA
-        if (isAttacking || enemyComponent.isBlocking) return;
+        if (isAttacking)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            if (animator != null) animator.SetBool("IsMoving", false);
+            return;
+        }
 
         DetectPlayerAndDecideAction();
 
-        if (!isAttacking && !enemyComponent.isBlocking && currentStrategy != null)
+        if (enemyComponent.isBlocking || currentStrategy == null)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            GirarHaciaElJugador();
+        }
+        else if (currentStrategy != null)
         {
             currentStrategy.Execute(this);
         }
+
+        if (animator != null && !enemyComponent.isBlocking && !isAttacking && currentStrategy != null)
+        {
+            bool seMueve = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+            animator.SetBool("IsMoving", seMueve);
+        }
     }
 
+    // --- SISTEMA DE VISIÓN ACTUALIZADO CON RAYCAST ---
     private void DetectPlayerAndDecideAction()
     {
+        // 1. El radar circular detecta si estás a menos de X metros
         Collider2D playerCollider = Physics2D.OverlapCircle(transform.position, detectionRange, playerLayer);
 
         if (playerCollider != null)
@@ -101,118 +116,185 @@ public class EnemyAI : MonoBehaviour
             player = playerCollider.transform;
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-            // 1. Prioridad Máxima: Atacar si está en rango y el cooldown lo permite
-            if (distanceToPlayer <= attackTriggerDistance && Time.time >= lastAttackTime + attackCooldown)
-            {
-                StartCoroutine(AttackDecisionRoutine());
-                return; // Corta la ejecución para no evaluar el escudo ni la persecución
-            }
+            // 2. Lanza el láser visual hacia tu personaje
+            Vector2 direccionAlJugador = (player.position - transform.position).normalized;
+            RaycastHit2D paredEnElMedio = Physics2D.Raycast(transform.position, direccionAlJugador, distanceToPlayer, groundLayer);
 
-            // 2. Prioridad Secundaria: Si está cerca pero no puede atacar, evalúa usar el escudo
-            if (Time.time >= lastShieldTime + shieldCooldown)
+            // 3. Si el láser NO choca contra una pared, te está viendo
+            if (paredEnElMedio.collider == null)
             {
-                StartCoroutine(ShieldRoutine());
-                return;
-            }
+                // ZONA DE COMBATE (Estás Cerca)
+                if (distanceToPlayer <= attackTriggerDistance)
+                {
+                    if (enemyComponent.isBlocking)
+                    {
+                        DesactivarEscudo();
+                        lastShieldDropTime = Time.time;
+                    }
 
-            // 3. Prioridad Base: Perseguir
-            currentStrategy = chaseStrategy;
+                    if (Time.time < lastShieldDropTime + shieldDropRecovery)
+                    {
+                        currentStrategy = null;
+                    }
+                    else
+                    {
+                        if (Time.time >= lastAttackTime + attackCooldown)
+                        {
+                            StartCoroutine(AttackDecisionRoutine());
+                        }
+                        else
+                        {
+                            currentStrategy = chaseStrategy;
+                        }
+                    }
+                }
+                // ZONA DE DEFENSA (Estás lejos)
+                else
+                {
+                    ActivarEscudo();
+                    currentStrategy = null;
+                }
+            }
+            // 4. Si el láser chocó con una pared (hay un obstáculo en el medio)
+            else
+            {
+                // Actúa como si no existieras, sigue su patrulla normal
+                player = null;
+                DesactivarEscudo();
+                currentStrategy = patrolStrategy;
+            }
         }
         else
         {
+            // ZONA PACÍFICA (Saliste de su radar)
             player = null;
+            DesactivarEscudo();
             currentStrategy = patrolStrategy;
         }
     }
 
-    // --- RUTINA DE DEFENSA (ESCUDO) ---
-    private IEnumerator ShieldRoutine()
+    private void ActivarEscudo()
     {
-        enemyComponent.isBlocking = true;
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-
-        if (animator != null) animator.SetBool("IsBlocking", true);
-
-        // Espera el tiempo configurado para la duración del escudo
-        yield return new WaitForSeconds(shieldDuration);
-
-        // Limpieza de estado
-        if (animator != null) animator.SetBool("IsBlocking", false);
-        enemyComponent.isBlocking = false;
-        lastShieldTime = Time.time;
+        if (!enemyComponent.isBlocking)
+        {
+            enemyComponent.isBlocking = true;
+            if (animator != null) animator.SetBool("IsBlocking", true);
+        }
     }
 
-    // --- RUTINA DE ATAQUE (CON VARIANTES) ---
+    private void DesactivarEscudo()
+    {
+        if (enemyComponent.isBlocking)
+        {
+            enemyComponent.isBlocking = false;
+            if (animator != null) animator.SetBool("IsBlocking", false);
+        }
+    }
+
+    private void GirarHaciaElJugador()
+    {
+        if (player != null)
+        {
+            if ((player.position.x > transform.position.x && !movingRight) ||
+                (player.position.x < transform.position.x && movingRight))
+            {
+                Flip();
+            }
+        }
+    }
+
     private IEnumerator AttackDecisionRoutine()
     {
         isAttacking = true;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        if (animator != null) animator.SetBool("IsMoving", false);
 
-        // Asegurar que mire al jugador antes de bloquear sus movimientos
-        if ((player.position.x > transform.position.x && !movingRight) ||
-            (player.position.x < transform.position.x && movingRight))
-        {
-            Flip();
-        }
+        GirarHaciaElJugador();
 
-        // Selección aleatoria: 0 para Horizontal, 1 para Omnidireccional
         int tipoAtaque = Random.Range(0, 2);
 
         if (tipoAtaque == 0)
         {
             if (animator != null) animator.SetTrigger("AttackHorizontal");
             yield return new WaitForSeconds(attack1Delay);
-            ProcesarImpactoHorizontal();
+            yield return StartCoroutine(ProcesarImpactoHorizontalContinuo(attack1Duration));
         }
         else
         {
             if (animator != null) animator.SetTrigger("AttackOmni");
             yield return new WaitForSeconds(attack2Delay);
-            ProcesarImpactoOmnidireccional();
+            yield return StartCoroutine(ProcesarImpactoOmniContinuo(attack2Duration));
         }
 
-        yield return new WaitForSeconds(0.2f); // Pausa visual de finalización
+        if (animator != null)
+        {
+            animator.ResetTrigger("AttackHorizontal");
+            animator.ResetTrigger("AttackOmni");
+        }
+
+        yield return new WaitForSeconds(postAttackPause);
 
         lastAttackTime = Time.time;
         isAttacking = false;
     }
 
-    // --- CÁLCULO DE ÁREA HORIZONTAL ---
-    private void ProcesarImpactoHorizontal()
+    private IEnumerator ProcesarImpactoHorizontalContinuo(float duracionDelGolpe)
     {
-        if (enemyComponent.IsDead || enemyComponent.isStunned) return;
+        float tiempo = 0f;
+        bool yaGolpeo = false;
 
-        float multiplicadorDireccion = movingRight ? 1f : -1f;
-        Vector2 centroCaja = (Vector2)transform.position + new Vector2(horizontalHitboxOffset.x * multiplicadorDireccion, horizontalHitboxOffset.y);
-
-        Collider2D impacto = Physics2D.OverlapBox(centroCaja, horizontalHitboxSize, 0f, playerLayer);
-
-        AplicarDanoSiImpacta(impacto);
-    }
-
-    // --- CÁLCULO DE ÁREA OMNIDIRECCIONAL (X e Y) ---
-    private void ProcesarImpactoOmnidireccional()
-    {
-        if (enemyComponent.IsDead || enemyComponent.isStunned) return;
-
-        Vector2 centroCirculo = (Vector2)transform.position + omniHitboxOffset;
-
-        Collider2D impacto = Physics2D.OverlapCircle(centroCirculo, omniHitboxRadius, playerLayer);
-
-        AplicarDanoSiImpacta(impacto);
-    }
-
-    private void AplicarDanoSiImpacta(Collider2D impacto)
-    {
-        if (impacto != null)
+        while (tiempo < duracionDelGolpe && !yaGolpeo)
         {
-            PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
-            if (playerCtrl != null && !playerCtrl.isDead)
+            if (enemyComponent.IsDead || enemyComponent.isStunned) yield break;
+
+            float multiplicadorDireccion = movingRight ? 1f : -1f;
+            Vector2 centroCaja = (Vector2)transform.position + new Vector2(horizontalHitboxOffset.x * multiplicadorDireccion, horizontalHitboxOffset.y);
+
+            Collider2D impacto = Physics2D.OverlapBox(centroCaja, horizontalHitboxSize, 0f, playerLayer);
+
+            if (impacto != null)
             {
-                Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
-                direccionEmpuje.y = 0.5f;
-                playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                if (playerCtrl != null && !playerCtrl.isDead)
+                {
+                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                    direccionEmpuje.y = 0.5f;
+                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                    yaGolpeo = true;
+                }
             }
+
+            tiempo += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private IEnumerator ProcesarImpactoOmniContinuo(float duracionDelGolpe)
+    {
+        float tiempo = 0f;
+        bool yaGolpeo = false;
+
+        while (tiempo < duracionDelGolpe && !yaGolpeo)
+        {
+            if (enemyComponent.IsDead || enemyComponent.isStunned) yield break;
+
+            Vector2 centroCirculo = (Vector2)transform.position + omniHitboxOffset;
+            Collider2D impacto = Physics2D.OverlapCircle(centroCirculo, omniHitboxRadius, playerLayer);
+
+            if (impacto != null)
+            {
+                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                if (playerCtrl != null && !playerCtrl.isDead)
+                {
+                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                    direccionEmpuje.y = 0.5f;
+                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                    yaGolpeo = true;
+                }
+            }
+
+            tiempo += Time.deltaTime;
+            yield return null;
         }
     }
 
@@ -224,23 +306,19 @@ public class EnemyAI : MonoBehaviour
         transform.localScale = scaler;
     }
 
-    // --- DIBUJADO DE GIZMOS PARA CONFIGURACIÓN VISUAL ---
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // Radio de activación (Cuándo decide frenar y tirar un ataque)
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, attackTriggerDistance);
 
-        // Visualización del Ataque Horizontal (Caja Azul)
         Gizmos.color = new Color(0f, 0.5f, 1f, 0.5f);
         float moveDir = movingRight ? 1f : -1f;
         Vector2 boxCenter = (Vector2)transform.position + new Vector2(horizontalHitboxOffset.x * moveDir, horizontalHitboxOffset.y);
         Gizmos.DrawWireCube(boxCenter, horizontalHitboxSize);
 
-        // Visualización del Ataque Omnidireccional (Círculo Magenta)
         Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
         Vector2 circleCenter = (Vector2)transform.position + omniHitboxOffset;
         Gizmos.DrawWireSphere(circleCenter, omniHitboxRadius);

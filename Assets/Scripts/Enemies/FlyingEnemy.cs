@@ -17,9 +17,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     [Header("Ataque (Sin Daño de Contacto)")]
     public int attackDamage = 1;
-    [Tooltip("Distancia a la que se frena para intentar morderte")]
     public float attackRange = 1.5f;
-    [Tooltip("Fracción de segundo que tarda la animación en dar el golpe (para esquivarlo)")]
     public float attackDelay = 0.3f;
     public float knockbackForce = 12f;
 
@@ -28,11 +26,10 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     public float hoverHeight = 2.5f;
 
     [Header("Efecto de Muerte")]
-    [Tooltip("Tiempo en segundos que tardará el enemigo en desaparecer por completo.")]
     public float duracionDesvanecimiento = 1f;
 
-    [Header("Detección de Paredes")]
-    [Tooltip("Capa que el murciélago detectará como pared (Ej: Ground)")]
+    [Header("Detección de Paredes y Visión")]
+    [Tooltip("Asegurate de que esta capa tenga tildado 'Ground' o las paredes, sino tendrá visión de rayos X")]
     public LayerMask capaObstaculos;
     public float distanciaEvasion = 1f;
 
@@ -42,9 +39,13 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     private Transform playerTransform;
     private Rigidbody2D rb;
     private Animator animator;
-    private SpriteRenderer spriteRenderer; // Referencia para controlar la opacidad
+
+    private SpriteRenderer spriteRenderer;
+    private Color colorOriginal = Color.white;
+    private Coroutine flashCoroutine;
+
     private bool isAttacking = false;
-    private bool isDead = false; // Bloqueo de seguridad para el estado de muerte
+    private bool isDead = false;
 
     private enum BatState { Patrullando, Persiguiendo, Recuperando, Regresando }
     private BatState estadoActual = BatState.Patrullando;
@@ -54,9 +55,9 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // Se busca el SpriteRenderer en el objeto o en sus componentes hijos
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer != null) colorOriginal = spriteRenderer.color;
 
         if (rb != null) rb.gravityScale = 0f;
 
@@ -68,7 +69,6 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     void FixedUpdate()
     {
-        // Si el enemigo está muerto o no hay jugador, se interrumpe toda la ejecución física e IA
         if (isDead || playerTransform == null) return;
 
         if (isAttacking) return;
@@ -131,12 +131,23 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         }
     }
 
+    // --- NUEVO SISTEMA DE VISIÓN ---
     void BuscarJugador()
     {
         float distancia = Vector2.Distance(transform.position, playerTransform.position);
+
+        // 1. Primero verifica si estás dentro del círculo de radar
         if (distancia <= detectionRadius)
         {
-            estadoActual = BatState.Persiguiendo;
+            // 2. Tira el láser invisible (Raycast) hacia vos
+            Vector2 direccionAlJugador = (playerTransform.position - transform.position).normalized;
+            RaycastHit2D paredEnElMedio = Physics2D.Raycast(transform.position, direccionAlJugador, distancia, capaObstaculos);
+
+            // 3. Si el láser NO chocó con ninguna pared (collider == null), entonces te está viendo
+            if (paredEnElMedio.collider == null)
+            {
+                estadoActual = BatState.Persiguiendo;
+            }
         }
     }
 
@@ -259,46 +270,69 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockback, ForceMode2D.Impulse);
 
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+
         if (health <= 0)
         {
             StartCoroutine(SecuenciaMuerteEnemigo());
         }
+        else
+        {
+            flashCoroutine = StartCoroutine(RutinaParpadeo());
+        }
+
         return true;
     }
 
-    // --- NUEVA CORRUTINA DE DESVANECIMIENTO ---
+    private IEnumerator RutinaParpadeo()
+    {
+        float tiempo = 0f;
+        bool colorCambiado = false;
+
+        while (tiempo < 0.5f)
+        {
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = colorCambiado ? colorOriginal : new Color(1f, 0.4f, 0.4f, 0.8f);
+                colorCambiado = !colorCambiado;
+            }
+
+            tiempo += 0.1f;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (spriteRenderer != null) spriteRenderer.color = colorOriginal;
+    }
+
     private IEnumerator SecuenciaMuerteEnemigo()
     {
         isDead = true;
 
-        // Detiene el movimiento por completo y lo desvincula de las fuerzas físicas aplicadas
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        // Desactiva el colisionador para que el jugador pase a través del sprite inerte
         Collider2D colisionador = GetComponent<Collider2D>();
         if (colisionador != null) colisionador.enabled = false;
 
-        // Si existe un trigger "Death" en el Animator, se ejecuta aquí
         if (animator != null) animator.SetTrigger("Death");
 
         if (spriteRenderer != null)
         {
-            Color colorInicial = spriteRenderer.color;
+            spriteRenderer.color = colorOriginal;
             float tiempoTranscurrido = 0f;
 
-            // Bucle de interpolación lineal para reducir el canal alpha
             while (tiempoTranscurrido < duracionDesvanecimiento)
             {
                 tiempoTranscurrido += Time.deltaTime;
                 float nuevoAlpha = Mathf.Lerp(1f, 0f, tiempoTranscurrido / duracionDesvanecimiento);
 
-                spriteRenderer.color = new Color(colorInicial.r, colorInicial.g, colorInicial.b, nuevoAlpha);
-                yield return null; // Espera al siguiente fotograma
+                spriteRenderer.color = new Color(colorOriginal.r, colorOriginal.g, colorOriginal.b, nuevoAlpha);
+                yield return null;
             }
         }
 
-        // Una vez alcanzada la opacidad cero, se elimina el objeto de la memoria de la escena
         Destroy(gameObject);
     }
 

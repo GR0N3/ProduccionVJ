@@ -2,47 +2,55 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [Header("Seguimiento")]
-    [Tooltip("El Player a seguir. Si lo dejas vacío, lo busca automáticamente.")]
-    public Transform target;
+    [Header("Objetivo")]
+    [Tooltip("Arrastrá acá a tu Jugador desde la Jerarquía")]
+    public Transform jugador;
 
-    [Tooltip("Tiempo que tarda la cámara en acomodarse (menor = más rápido)")]
-    public float smoothTime = 0.25f;
+    [Header("Configuración Base")]
+    [Tooltip("Velocidad con la que la cámara persigue al jugador (Ej: 5)")]
+    public float suavizado = 5f;
+    [Tooltip("Posición base de la cámara. La Z DEBE ser -10 para que se vea el juego.")]
     public Vector3 offset = new Vector3(0f, 1f, -10f);
 
-    [Header("Adelanto (Look Ahead)")]
-    [Tooltip("Qué tan lejos mira la cámara hacia la dirección en la que caminas")]
-    public float lookAheadDistance = 3f;
-    [Tooltip("Velocidad con la que la cámara cambia de lado al darte vuelta")]
-    public float lookAheadSpeed = 3f;
+    [Header("Visión de Aterrizaje")]
+    [Tooltip("Cuántas unidades bajará la cámara cuando el jugador esté cayendo (Ej: -4)")]
+    public float offsetAbajo = -4f;
+    [Tooltip("Qué tan rápido hace el paneo para mirar hacia abajo y volver a subir")]
+    public float velocidadPaneo = 3f;
 
-    private Vector3 velocity = Vector3.zero;
-    private float currentLookAheadX;
+    private Rigidbody2D rbJugador;
+    private float currentYOffset;
 
-    private void Start()
+    void Start()
     {
-        
-        if (target == null)
+        if (jugador != null)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null) target = playerObj.transform;
+            rbJugador = jugador.GetComponent<Rigidbody2D>();
         }
+        currentYOffset = offset.y; // Inicia con la altura normal
     }
 
-    private void LateUpdate()
+    
+    void LateUpdate()
     {
-        if (target == null) return;
+        if (jugador == null) return;
 
         
-        float targetLookAheadX = (target.localScale.x > 0) ? lookAheadDistance : -lookAheadDistance;
+        float targetYOffset = offset.y;
 
         
-        currentLookAheadX = Mathf.Lerp(currentLookAheadX, targetLookAheadX, Time.deltaTime * lookAheadSpeed);
+        if (rbJugador != null && rbJugador.linearVelocity.y < -1f)
+        {
+            targetYOffset = offset.y + offsetAbajo;
+        }
 
-        
-        Vector3 targetPosition = target.position + new Vector3(currentLookAheadX, offset.y, offset.z);
+       
+        currentYOffset = Mathf.Lerp(currentYOffset, targetYOffset, Time.deltaTime * velocidadPaneo);
 
-        
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+       
+        Vector3 posicionDeseada = jugador.position + new Vector3(offset.x, currentYOffset, offset.z);
+
+       
+        transform.position = Vector3.Lerp(transform.position, posicionDeseada, Time.deltaTime * suavizado);
     }
 }

@@ -1,226 +1,196 @@
 using System.Collections;
 using UnityEngine;
 
-public class RangedEnemy : MonoBehaviour, IDamageable
+public class RangedEnemyAI : MonoBehaviour
 {
-    [Header("Estadísticas")]
-    public int health = 3;
-
-    [Header("Patrulla")]
+    [Header("Configuración de Movimiento")]
     public float patrolSpeed = 2f;
-    public float patrolDistance = 4f;
-    public LayerMask capaObstaculos;
-    public float distanciaEvasion = 1f;
+    public float patrolDistance = 5f;
+    public float distanciaEvasionPared = 0.5f;
 
-    [Header("Detección y Rango")]
-    public float detectionRadius = 8f;
-    public float loseInterestRadius = 14f;
+    [Header("Detección y Visión")]
+    [Tooltip("Distancia a la que te detecta. Ponelo en 8 o 10.")]
+    public float attackRange = 8f;
+    public LayerMask playerLayer;
+    [Tooltip("Capas de paredes y piso para que no te vea a través de ellas.")]
+    public LayerMask groundLayer;
 
     [Header("Ataque a Distancia")]
-    public GameObject bulletPrefab;
+    public GameObject projectilePrefab;
+    [Tooltip("Un objeto vacío hijo del enemigo, ubicado en su mano o arco.")]
     public Transform firePoint;
-    public float bulletSpeed = 2f;
-    public int shotsPerBurst = 3; // Disparos al hilo
-    public float timeBetweenShots = 0.5f; // Tiempo entre bala y bala
+    public float projectileSpeed = 10f;
 
-    [Header("Retroceso Táctico")]
-    public float retreatSpeed = 3f;
-    public float retreatDuration = 1.5f; // Tiempo que pasa caminando hacia atrás
+    [Header("Game Feel (Tiempos de Animación)")]
+    [Tooltip("Cuánto tarda en salir la flecha desde que empieza la animación.")]
+    public float attackAnticipation = 0.4f;
+    [Tooltip("Cuánto tiempo se queda quieto después de disparar.")]
+    public float postAttackPause = 1f;
+    public float attackCooldown = 3f;
 
-    private Vector2 startPos;
-    private bool movingRight = true;
-    private Transform playerTransform;
     private Rigidbody2D rb;
+    private Animator animator;
+    private Enemy enemyComponent;
+    private Transform player;
 
-    private bool estaDisparando = false;
-    private float tiempoRetrocesoActual;
+    private Vector2 startPosition;
+    private bool movingRight = true;
+    private bool isAttacking = false;
+    private float lastAttackTime = -100f;
 
-    private enum RangedState { Patrullando, Atacando, Retrocediendo, Regresando }
-    private RangedState estadoActual = RangedState.Patrullando;
-
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        startPos = transform.position;
+        animator = GetComponent<Animator>();
+        enemyComponent = GetComponent<Enemy>();
+        startPosition = transform.position;
 
-        PlayerController player = FindAnyObjectByType<PlayerController>();
-        if (player != null) playerTransform = player.transform;
+        // Esto arregla el bug de la visión ciega
+        Physics2D.queriesStartInColliders = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        if (playerTransform == null) return;
-
-        // Comprobación para ver si el jugador huyó muy lejos
-        if (estadoActual == RangedState.Atacando || estadoActual == RangedState.Retrocediendo)
+        if (enemyComponent != null && (enemyComponent.IsDead || enemyComponent.isStunned))
         {
-            if (Vector2.Distance(transform.position, playerTransform.position) > loseInterestRadius)
+            if (animator != null) animator.SetBool("IsMoving", false);
+            return;
+        }
+
+        if (isAttacking)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            if (animator != null) animator.SetBool("IsMoving", false);
+            return;
+        }
+
+        BuscarJugador();
+
+        if (player == null) Patrullar();
+
+        if (animator != null)
+        {
+            bool seMueve = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+            animator.SetBool("IsMoving", seMueve);
+        }
+    }
+
+    private void BuscarJugador()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
+
+        if (hit != null)
+        {
+            Vector2 direccionAlJugador = (hit.transform.position - transform.position).normalized;
+            float distancia = Vector2.Distance(transform.position, hit.transform.position);
+            RaycastHit2D paredEnElMedio = Physics2D.Raycast(transform.position, direccionAlJugador, distancia, groundLayer);
+
+            if (paredEnElMedio.collider == null)
             {
-                if (!estaDisparando) estadoActual = RangedState.Regresando;
+                player = hit.transform;
+                GirarHaciaJugador();
+
+                if (Time.time >= lastAttackTime + attackCooldown)
+                {
+                    StartCoroutine(RutinaDisparo());
+                }
+                else
+                {
+                    rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                }
+            }
+            else
+            {
+                player = null;
+            }
+        }
+        else
+        {
+            player = null;
+        }
+    }
+
+    private IEnumerator RutinaDisparo()
+    {
+        isAttacking = true;
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+        Vector3 posicionObjetivo = player.position;
+
+        if (animator != null) animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(attackAnticipation);
+
+        // --- CREACIÓN DEL PROYECTIL ---
+        if (enemyComponent != null && !enemyComponent.IsDead && projectilePrefab != null)
+        {
+            // Si te olvidaste el FirePoint, lo tira desde el centro de su cuerpo para que no se rompa el juego
+            Vector3 puntoDeDisparo = firePoint != null ? firePoint.position : transform.position;
+
+            Vector2 direccionDisparo = (posicionObjetivo - puntoDeDisparo).normalized;
+
+            GameObject bala = Instantiate(projectilePrefab, puntoDeDisparo, Quaternion.identity);
+
+            float angulo = Mathf.Atan2(direccionDisparo.y, direccionDisparo.x) * Mathf.Rad2Deg;
+            bala.transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
+
+            Rigidbody2D rbBala = bala.GetComponent<Rigidbody2D>();
+            if (rbBala != null)
+            {
+                rbBala.linearVelocity = direccionDisparo * projectileSpeed;
             }
         }
 
-        switch (estadoActual)
-        {
-            case RangedState.Patrullando:
-                Patrullar();
-                BuscarJugador();
-                break;
-            case RangedState.Atacando:
-                if (!estaDisparando)
-                {
-                    StartCoroutine(RutinaDisparoRafaga());
-                }
-                break;
-            case RangedState.Retrocediendo:
-                RetrocederTacticamente();
-                break;
-            case RangedState.Regresando:
-                RegresarACasa();
-                BuscarJugador();
-                break;
-        }
+        yield return new WaitForSeconds(postAttackPause);
+
+        lastAttackTime = Time.time;
+        isAttacking = false;
     }
 
-    void Patrullar()
+    private void Patrullar()
     {
-        float limiteDer = startPos.x + patrolDistance;
-        float limiteIzq = startPos.x - patrolDistance;
+        float limiteDer = startPosition.x + patrolDistance;
+        float limiteIzq = startPosition.x - patrolDistance;
 
         Vector2 direccionMirada = movingRight ? Vector2.right : Vector2.left;
-        if (Physics2D.Raycast(transform.position, direccionMirada, distanciaEvasion, capaObstaculos))
-        {
-            movingRight = !movingRight;
-        }
+        bool chocaPared = Physics2D.Raycast(transform.position, direccionMirada, distanciaEvasionPared, groundLayer);
 
-        if (movingRight)
+        if (chocaPared) Flip();
+        else if (movingRight)
         {
             rb.linearVelocity = new Vector2(patrolSpeed, rb.linearVelocity.y);
-            transform.localScale = new Vector3(-1, 1, 1); // Mirar Derecha
-            if (transform.position.x >= limiteDer) movingRight = false;
+            if (transform.position.x >= limiteDer) Flip();
         }
         else
         {
             rb.linearVelocity = new Vector2(-patrolSpeed, rb.linearVelocity.y);
-            transform.localScale = new Vector3(1, 1, 1); // Mirar Izquierda
-            if (transform.position.x <= limiteIzq) movingRight = true;
+            if (transform.position.x <= limiteIzq) Flip();
         }
     }
 
-    void BuscarJugador()
+    private void GirarHaciaJugador()
     {
-        if (Vector2.Distance(transform.position, playerTransform.position) <= detectionRadius)
+        if (player != null)
         {
-            estadoActual = RangedState.Atacando;
-        }
-    }
-
-    // --- LA MAGIA DE LA RÁFAGA (CORRUTINA) ---
-    IEnumerator RutinaDisparoRafaga()
-    {
-        estaDisparando = true;
-
-        // Frena al enemigo en el lugar para poder disparar cómodo
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-
-        // Breve pausa para que el jugador reaccione antes del primer tiro
-        yield return new WaitForSeconds(0.4f);
-
-        for (int i = 0; i < shotsPerBurst; i++)
-        {
-            MirarAlJugador();
-
-            if (bulletPrefab != null && firePoint != null)
+            if ((player.position.x > transform.position.x && !movingRight) ||
+                (player.position.x < transform.position.x && movingRight))
             {
-                // Instancia la bala
-                GameObject bala = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-
-                // Determina la dirección (En tu juego: escala x < 0 es derecha)
-                int dirAtaque = transform.localScale.x < 0 ? 1 : -1;
-                bala.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(dirAtaque * bulletSpeed, 0);
+                Flip();
             }
-
-            // Espera el tiempo entre disparos
-            yield return new WaitForSeconds(timeBetweenShots);
-        }
-
-        // Terminó de disparar la ráfaga. Prepara el reloj de retroceso.
-        tiempoRetrocesoActual = retreatDuration;
-        estadoActual = RangedState.Retrocediendo;
-        estaDisparando = false;
-    }
-
-    // --- EL PASO HACIA ATRÁS ---
-    void RetrocederTacticamente()
-    {
-        MirarAlJugador(); // Retrocede pero sin darte la espalda
-        tiempoRetrocesoActual -= Time.fixedDeltaTime;
-
-        // Calcula hacia dónde es "atrás"
-        float direccionHuir = transform.position.x > playerTransform.position.x ? 1f : -1f;
-
-        // Verifica si hay pared atrás para no quedarse caminando contra la pared
-        Vector2 direccionRayo = new Vector2(direccionHuir, 0);
-        bool paredAtras = Physics2D.Raycast(transform.position, direccionRayo, distanciaEvasion, capaObstaculos);
-
-        if (!paredAtras)
-        {
-            rb.linearVelocity = new Vector2(direccionHuir * retreatSpeed, rb.linearVelocity.y);
-        }
-        else
-        {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // Se clava en la pared
-        }
-
-        // Si se le acaba el tiempo de retroceder, frena y vuelve a disparar
-        if (tiempoRetrocesoActual <= 0)
-        {
-            estadoActual = RangedState.Atacando;
         }
     }
 
-    void RegresarACasa()
+    private void Flip()
     {
-        MirarHacia(startPos.x);
-        float direccion = startPos.x > transform.position.x ? 1f : -1f;
-        rb.linearVelocity = new Vector2(direccion * patrolSpeed, rb.linearVelocity.y);
-
-        if (Vector2.Distance(transform.position, startPos) < 0.5f)
-        {
-            estadoActual = RangedState.Patrullando;
-        }
-    }
-
-    void MirarAlJugador() { MirarHacia(playerTransform.position.x); }
-
-    void MirarHacia(float objetivoX)
-    {
-        if (objetivoX > transform.position.x) transform.localScale = new Vector3(-1, 1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
-    }
-
-    public bool TakeDamage(int damageTaken, Vector2 direction, float knockback)
-    {
-        health -= damageTaken;
-        rb.linearVelocity = Vector2.zero;
-        rb.AddForce(direction * knockback, ForceMode2D.Impulse);
-
-        // Si le pegas, interrumpimos todo y lo forzamos a retroceder para que se defienda
-        if (!estaDisparando)
-        {
-            tiempoRetrocesoActual = retreatDuration / 2f;
-            estadoActual = RangedState.Retrocediendo;
-        }
-
-        if (health <= 0) Destroy(gameObject);
-        return true;
+        movingRight = !movingRight;
+        Vector3 scaler = transform.localScale;
+        scaler.x *= -1;
+        transform.localScale = scaler;
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(startPos != Vector2.zero ? startPos : (Vector2)transform.position, detectionRadius);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(startPos != Vector2.zero ? startPos : (Vector2)transform.position, loseInterestRadius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
