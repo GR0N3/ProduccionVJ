@@ -6,7 +6,10 @@ public class RangedEnemyAI : MonoBehaviour
     [Header("Configuración de Movimiento")]
     public float patrolSpeed = 2f;
     public float patrolDistance = 5f;
-    public float distanciaEvasionPared = 0.5f;
+    [Tooltip("Distancia a la que detecta la pared para darse vuelta")]
+    public float distanciaEvasionPared = 1f;
+    [Tooltip("Altura desde los pies de donde sale el sensor (Ej: 0.5 es la cintura)")]
+    public float alturaSensorPared = 0.5f;
 
     [Header("Detección y Visión")]
     [Tooltip("Distancia a la que te detecta. Ponelo en 8 o 10.")]
@@ -22,9 +25,7 @@ public class RangedEnemyAI : MonoBehaviour
     public float projectileSpeed = 10f;
 
     [Header("Game Feel (Tiempos de Animación)")]
-    [Tooltip("Cuánto tarda en salir la flecha desde que empieza la animación.")]
     public float attackAnticipation = 0.4f;
-    [Tooltip("Cuánto tiempo se queda quieto después de disparar.")]
     public float postAttackPause = 1f;
     public float attackCooldown = 3f;
 
@@ -45,7 +46,6 @@ public class RangedEnemyAI : MonoBehaviour
         enemyComponent = GetComponent<Enemy>();
         startPosition = transform.position;
 
-        // Esto arregla el bug de la visión ciega
         Physics2D.queriesStartInColliders = false;
     }
 
@@ -121,15 +121,20 @@ public class RangedEnemyAI : MonoBehaviour
 
         yield return new WaitForSeconds(attackAnticipation);
 
-        // --- CREACIÓN DEL PROYECTIL ---
         if (enemyComponent != null && !enemyComponent.IsDead && projectilePrefab != null)
         {
-            // Si te olvidaste el FirePoint, lo tira desde el centro de su cuerpo para que no se rompa el juego
             Vector3 puntoDeDisparo = firePoint != null ? firePoint.position : transform.position;
-
             Vector2 direccionDisparo = (posicionObjetivo - puntoDeDisparo).normalized;
 
             GameObject bala = Instantiate(projectilePrefab, puntoDeDisparo, Quaternion.identity);
+
+            Collider2D colBala = bala.GetComponent<Collider2D>();
+            Collider2D colArquero = GetComponent<Collider2D>();
+
+            if (colBala != null && colArquero != null)
+            {
+                Physics2D.IgnoreCollision(colBala, colArquero);
+            }
 
             float angulo = Mathf.Atan2(direccionDisparo.y, direccionDisparo.x) * Mathf.Rad2Deg;
             bala.transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
@@ -147,15 +152,23 @@ public class RangedEnemyAI : MonoBehaviour
         isAttacking = false;
     }
 
+    // --- NUEVA LÓGICA DE PATRULLAJA ANTICHOQUES ---
     private void Patrullar()
     {
         float limiteDer = startPosition.x + patrolDistance;
         float limiteIzq = startPosition.x - patrolDistance;
 
+        // Levantamos el láser para que salga del pecho/cintura y no de los pies
+        Vector2 origenRayo = new Vector2(transform.position.x, transform.position.y + alturaSensorPared);
         Vector2 direccionMirada = movingRight ? Vector2.right : Vector2.left;
-        bool chocaPared = Physics2D.Raycast(transform.position, direccionMirada, distanciaEvasionPared, groundLayer);
 
-        if (chocaPared) Flip();
+        // Dispara el láser a ver si hay pared
+        bool chocaPared = Physics2D.Raycast(origenRayo, direccionMirada, distanciaEvasionPared, groundLayer);
+
+        if (chocaPared)
+        {
+            Flip();
+        }
         else if (movingRight)
         {
             rb.linearVelocity = new Vector2(patrolSpeed, rb.linearVelocity.y);
@@ -188,9 +201,17 @@ public class RangedEnemyAI : MonoBehaviour
         transform.localScale = scaler;
     }
 
+    // Dibuja las líneas en el editor para que puedas configurarlo fácil
     private void OnDrawGizmosSelected()
     {
+        // Radar de visión (Amarillo)
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        // Sensor de Paredes (Azul)
+        Gizmos.color = Color.cyan;
+        Vector2 origenRayo = new Vector2(transform.position.x, transform.position.y + alturaSensorPared);
+        Vector2 direccionMirada = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+        Gizmos.DrawRay(origenRayo, direccionMirada * distanciaEvasionPared);
     }
 }

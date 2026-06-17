@@ -1,17 +1,17 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [Header("Colisiones B·sicas")]
+    [Header("Colisiones B√°sicas")]
     [SerializeField] private LayerMask hitMask;
 
     [Header("Autoseguimiento (Modo Misil)")]
-    [Tooltip("Hacelo bien grande (Ej: 8 o 10) para que fije la mira apenas dispar·s")]
+    [Tooltip("Hacelo bien grande (Ej: 8 o 10) para que fije la mira apenas dispar√°s")]
     public float radioDeteccion = 10f;
-    [Tooltip("Velocidad de giro. Arriba de 15 es pr·cticamente inesquivable.")]
+    [Tooltip("Velocidad de giro. Arriba de 15 es pr√°cticamente inesquivable.")]
     public float velocidadGiro = 20f;
-    [Tooltip("°MUY IMPORTANTE! Si esto dice 'Nothing', nunca va a seguir a nadie. PonÈ tu capa de enemigos.")]
+    [Tooltip("¬°MUY IMPORTANTE! Si esto dice 'Nothing', nunca va a seguir a nadie. Pon√© tu capa de enemigos.")]
     public LayerMask capaEnemigos;
 
     private int damage;
@@ -61,24 +61,24 @@ public class Bullet : MonoBehaviour
 
         if (objetivoActual == null)
         {
-            BuscarVoladorCercano();
+            BuscarEnemigoCercano();
         }
         else
         {
-            // Si el murciÈlago se muriÛ, dejamos de seguirlo
+            // Si el enemigo se muri√≥ o desapareci√≥, dejamos de seguirlo
             if (!objetivoActual.gameObject.activeInHierarchy)
             {
                 objetivoActual = null;
                 return;
             }
 
-            // 1. DirecciÛn exacta hacia el murciÈlago
+            // 1. Direcci√≥n exacta hacia el enemigo
             Vector2 direccionDeseada = (objetivoActual.position - transform.position).normalized;
 
-            // 2. MATEM¡TICA AGRESIVA: Obliga a la bala a doblar bruscamente hacia el objetivo
+            // 2. MATEM√ÅTICA AGRESIVA: Obliga a la bala a doblar bruscamente hacia el objetivo
             Vector2 nuevaDireccion = Vector2.Lerp(rb.linearVelocity.normalized, direccionDeseada, Time.fixedDeltaTime * velocidadGiro).normalized;
 
-            // 3. Mantiene la velocidad pero con la nueva direcciÛn
+            // 3. Mantiene la velocidad pero con la nueva direcci√≥n
             rb.linearVelocity = nuevaDireccion * currentSpeed;
         }
 
@@ -87,7 +87,7 @@ public class Bullet : MonoBehaviour
         transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
     }
 
-    void BuscarVoladorCercano()
+    void BuscarEnemigoCercano()
     {
         Collider2D[] enemigosCercanos = Physics2D.OverlapCircleAll(transform.position, radioDeteccion, capaEnemigos);
         float distanciaMasCorta = Mathf.Infinity;
@@ -95,7 +95,8 @@ public class Bullet : MonoBehaviour
 
         foreach (Collider2D enemigo in enemigosCercanos)
         {
-            if (enemigo.GetComponent<FlyingEnemy>() != null)
+            // üî• AHORA PERSIGUE A CUALQUIERA QUE TENGA EL TAG "Enemy" üî•
+            if (enemigo.CompareTag("Enemy"))
             {
                 float distancia = Vector2.Distance(transform.position, enemigo.transform.position);
                 if (distancia < distanciaMasCorta)
