@@ -237,7 +237,7 @@ MonoBehaviour:
   patrolSpeed: 2
   chaseSpeed: 2
   patrolRange: 6
-  detectionRange: 8
+  detectionRange: 12
   playerLayer:
     serializedVersion: 2
     m_Bits: 8

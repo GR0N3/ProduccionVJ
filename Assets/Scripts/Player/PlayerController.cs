@@ -4,6 +4,17 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Efectos de Sonido (SFX)")]
+    public AudioSource audioSource;
+    public AudioClip sfxSalto;
+    public AudioClip sfxDisparo;
+    public AudioClip sfxCaidaOMuerte;
+    public AudioClip sfxCheckpoint;
+    public AudioClip sfxPasos;
+    [Tooltip("Tiempo entre cada sonido de paso al correr")]
+    public float tiempoEntrePasos = 0.3f;
+    private float timerPasos;
+
     [Header("Salud y Reaparición")]
     PlayerHealth health;
     public int maxHealth = 6;
@@ -47,7 +58,6 @@ public class PlayerController : MonoBehaviour
     public float staminaJumpCost = 30f;
     public float climbSpeed = 5f;
 
-    // --- NUEVA VARIABLE ---
     [Tooltip("Fuerza del salto exclusivamente al despegarse de una pared")]
     public float wallJumpForce = 16f;
     public float wallJumpCooldown = 0.2f;
@@ -120,6 +130,8 @@ public class PlayerController : MonoBehaviour
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         if (spriteRenderer != null) colorOriginal = spriteRenderer.color;
+
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -218,6 +230,16 @@ public class PlayerController : MonoBehaviour
 
             if (inputX > 0.1f) transform.localScale = new Vector3(1, 1, 1);
             else if (inputX < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
+
+            // --- SISTEMA DE PASOS ---
+            if (enSuelo && Mathf.Abs(inputX) > 0.1f)
+            {
+                if (Time.time >= timerPasos)
+                {
+                    ReproducirSonido(sfxPasos, 0.5f); // 0.5f es el volumen de los pasos para que no aturdan
+                    timerPasos = Time.time + tiempoEntrePasos;
+                }
+            }
         }
         else
         {
@@ -373,13 +395,22 @@ public class PlayerController : MonoBehaviour
         if (isDead || isAttacking || isGrabbingWall) return;
 
         isAttacking = true;
+
+        // --- AQUÍ EL SONIDO FUE ELIMINADO Y MOVIDO A LA RUTINA ---
+
         if (animator != null) animator.SetTrigger("Attack");
         StartCoroutine(RutinaDisparoSincronizado(context));
     }
 
     private IEnumerator RutinaDisparoSincronizado(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
+        // 1. Esperamos a que la animación tense el arco/arma
         yield return new WaitForSeconds(delayDisparo);
+
+        // 2. --- SONIDO DE DISPARO EXACTO CON LA FLECHA ---
+        ReproducirSonido(sfxDisparo);
+
+        // 3. Sale el proyectil
         if (weapon != null) weapon.OnFire(context);
 
         float tiempoRestante = fireCooldown - delayDisparo;
@@ -404,8 +435,10 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(inputX) > 0.1f) direccionSaltoX = Mathf.Sign(inputX);
             else direccionSaltoX = transform.localScale.x > 0 ? 1 : -1;
 
-            // --- ACÁ APLICAMOS LA FUERZA ESPECIAL DE PARED ---
             rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, wallJumpForce);
+
+            // --- SONIDO DE SALTO (En Pared) ---
+            ReproducirSonido(sfxSalto);
 
             if (animator != null)
             {
@@ -423,6 +456,9 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             coyoteTimeCounter = 0f;
+
+            // --- SONIDO DE SALTO (Normal) ---
+            ReproducirSonido(sfxSalto);
 
             if (animator != null)
             {
@@ -445,6 +481,9 @@ public class PlayerController : MonoBehaviour
         currentHealth -= damageAmount;
 
         ActualizarCorazones();
+
+        // --- SONIDO AL RECIBIR DAÑO ---
+        ReproducirSonido(sfxCaidaOMuerte);
 
         if (currentHealth <= 0)
         {
@@ -538,8 +577,10 @@ public class PlayerController : MonoBehaviour
         if (objetoTocado.layer == 11)
         {
             currentHealth -= 1;
-
             ActualizarCorazones();
+
+            // --- SONIDO AL CAERSE EN TRAMPAS ---
+            ReproducirSonido(sfxCaidaOMuerte);
 
             if (currentHealth <= 0) StartCoroutine(SecuenciaMuerte());
             else
@@ -553,8 +594,13 @@ public class PlayerController : MonoBehaviour
 
         if (objName.Contains("checkpoint") || objTag.Contains("checkpoint"))
         {
-            ultimoCheckpoint = objetoTocado.transform.position;
-            movement.SetRespawnPoint(objetoTocado.transform.position);
+            // Solo suena si tocás un checkpoint en el que no estabas parado antes
+            if (ultimoCheckpoint != (Vector2)objetoTocado.transform.position)
+            {
+                ReproducirSonido(sfxCheckpoint);
+                ultimoCheckpoint = objetoTocado.transform.position;
+                movement.SetRespawnPoint(objetoTocado.transform.position);
+            }
         }
     }
 
@@ -581,4 +627,21 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision) { ProcesarChoques(collision.gameObject); }
     private void OnTriggerEnter2D(Collider2D collision) { ProcesarChoques(collision.gameObject); }
+
+    // --- FUNCIÓN HELPER PARA LOS SONIDOS ---
+    private void ReproducirSonido(AudioClip clip, float volumen = 1f)
+    {
+        if (audioSource != null && clip != null)
+        {
+            float volumenFinal = volumen;
+
+            // Si el menú existe, le aplicamos el porcentaje de la barrita de SFX
+            if (MusicManager.instance != null)
+            {
+                volumenFinal = volumen * MusicManager.instance.volumenSFXActual;
+            }
+
+            audioSource.PlayOneShot(clip, volumenFinal);
+        }
+    }
 }

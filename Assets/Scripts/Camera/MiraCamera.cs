@@ -1,46 +1,65 @@
 ﻿using UnityEngine;
 
-public class MiraCamara : MonoBehaviour
+public class CameraScanner : MonoBehaviour
 {
-    [Header("Configuración")]
-    [Tooltip("El Rigidbody de tu jugador (si lo dejás vacío, lo busca solo)")]
-    public Rigidbody2D rbJugador;
+    [Header("Referencias")]
+    [Tooltip("¡OJO! Volvé a arrastrar a tu Jugador acá desde la Jerarquía")]
+    public PlayerController jugador;
+    [Tooltip("Tu capa de piso y paredes (Ground)")]
+    public LayerMask capaSuelo;
 
-    [Tooltip("Cuánto baja la cámara al caer (Ej: -4)")]
-    public float offsetAbajo = -4f;
+    [Header("Láser Buscador")]
+    [Tooltip("Cuántos metros hacia adelante mira el láser")]
+    public float distanciaAdelante = 4f;
+    [Tooltip("Poné un número un poco mayor a tu salto máximo (Ej: 8)")]
+    public float distanciaAbajo = 8f;
 
-    [Tooltip("Qué tan rápido baja y sube la cámara")]
-    public float velocidad = 3f;
-
-    private Vector3 posicionOriginal;
-
-    void Start()
-    {
-        // Guardamos su posición inicial (normalmente 0,0,0)
-        posicionOriginal = transform.localPosition;
-
-        // Si te olvidaste de asignar al jugador, lo busca automáticamente en el objeto "Padre"
-        if (rbJugador == null)
-        {
-            rbJugador = GetComponentInParent<Rigidbody2D>();
-        }
-    }
+    [Header("Ajustes de Cámara")]
+    [Tooltip("Velocidad con la que se mueve la cámara (3 a 5 es ideal)")]
+    public float suavidad = 4f;
 
     void Update()
     {
-        if (rbJugador == null) return;
+        if (jugador == null) return;
 
-        // Por defecto, queremos que el señuelo esté en el pecho/centro del jugador
-        float destinoY = posicionOriginal.y;
+        // 1. ¿Para dónde está mirando el jugador? (Para disparar el láser)
+        float direccionX = jugador.transform.localScale.x > 0 ? 1f : -1f;
 
-        // Si el jugador está cayendo (velocidad negativa), bajamos el señuelo
-        if (rbJugador.linearVelocity.y < -1f)
+        // 2. Vector del láser
+        Vector2 vectorBusqueda = new Vector2(direccionX * distanciaAdelante, -distanciaAbajo);
+
+        // 3. Disparamos el láser
+        RaycastHit2D hit = Physics2D.Raycast(jugador.transform.position, vectorBusqueda.normalized, vectorBusqueda.magnitude, capaSuelo);
+
+        Vector3 posicionDeseada;
+
+        // ¿El jugador está saltando hacia arriba?
+        bool estaSaltandoHaciaArriba = jugador.rb.linearVelocity.y > 0.1f && !jugador.enSuelo;
+
+        if (hit.collider != null || estaSaltandoHaciaArriba)
         {
-            destinoY = posicionOriginal.y + offsetAbajo;
+            // 🔥 EL ARREGLO ESTÁ ACÁ 🔥
+            // Ahora X y Y son EXACTAMENTE la posición del jugador. Cero asomo a los costados.
+            posicionDeseada = new Vector3(jugador.transform.position.x, jugador.transform.position.y, 0f);
+        }
+        else
+        {
+            // POZO CIEGO: El láser no detectó nada (estás cayendo al vacío).
+            // La cámara baja en línea recta (solo afectamos el eje Y) para mostrarte el fondo.
+            posicionDeseada = new Vector3(jugador.transform.position.x, jugador.transform.position.y - distanciaAbajo, 0f);
         }
 
-        // Movemos el señuelo SUAVEMENTE arriba o abajo
-        Vector3 posicionDeseada = new Vector3(posicionOriginal.x, destinoY, posicionOriginal.z);
-        transform.localPosition = Vector3.Lerp(transform.localPosition, posicionDeseada, Time.deltaTime * velocidad);
+        // 4. Movemos el señuelo (la cámara) con fluidez
+        transform.position = Vector3.Lerp(transform.position, posicionDeseada, Time.deltaTime * suavidad);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (jugador == null) return;
+        float direccionX = jugador.transform.localScale.x > 0 ? 1f : -1f;
+        Vector2 vectorBusqueda = new Vector2(direccionX * distanciaAdelante, -distanciaAbajo);
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawRay(jugador.transform.position, vectorBusqueda);
     }
 }
