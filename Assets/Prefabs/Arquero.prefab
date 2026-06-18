@@ -228,7 +228,7 @@ MonoBehaviour:
   firePoint: {fileID: 9147672743830146171}
   projectileSpeed: 15
   attackAnticipation: 0.4
-  postAttackPause: 1
+  postAttackPause: 0.2
   attackCooldown: 0.8
 --- !u!95 &599939198750812274
 Animator:

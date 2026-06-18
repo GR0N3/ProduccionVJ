@@ -422,7 +422,6 @@ public class PlayerController : MonoBehaviour
 
                     proy.SendMessage("ResetLife", SendMessageOptions.DontRequireReceiver);
 
-                    // El sonido solo se procesa si se detecta y modifica un proyectil válido
                     if (sfxParry != null)
                     {
                         if (retrasoSonidoParry > 0f)
@@ -586,6 +585,9 @@ public class PlayerController : MonoBehaviour
             currentHealth += cantidad;
             if (currentHealth > maxHealth) currentHealth = maxHealth;
             ActualizarCorazones();
+
+            // 🔥 SOLUCIÓN 1: Mantiene sincronizado al script oculto para que no muera en falso
+            if (health != null) health.Init(maxHealth);
         }
     }
 
@@ -605,7 +607,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (health != null) health.TakeDamage(damageAmount, knockbackDir, knockbackForceValue);
+            if (health != null)
+            {
+                // 🔥 SOLUCIÓN 2: Try-Catch protector para enemigos normales
+                try { health.TakeDamage(damageAmount, knockbackDir, knockbackForceValue); }
+                catch (System.Exception e) { Debug.LogWarning("Se evitó error de PlayerHealth: " + e.Message); }
+            }
+
             isInvincible = true;
             invincibilityTimer = invincibilityDuration;
 
@@ -694,19 +702,37 @@ public class PlayerController : MonoBehaviour
 
         if (objetoTocado.layer == 11)
         {
+            // 🔥 SOLUCIÓN 3: Evitar bofetadas dobles en la trampa en el mismo segundo
+            if (isInvincible || isDead) return;
+
             currentHealth -= 1;
             ActualizarCorazones();
 
             ReproducirSonido(sfxCaidaOMuerte);
 
-            if (currentHealth <= 0) StartCoroutine(SecuenciaMuerte());
+            if (currentHealth <= 0)
+            {
+                StartCoroutine(SecuenciaMuerte());
+            }
             else
             {
-                if (health != null) health.TakeDamage(1, Vector2.zero, 0f);
+                // Damos invulnerabilidad primero
+                isInvincible = true;
+                invincibilityTimer = invincibilityDuration;
+
+                // 🔥 SOLUCIÓN 4: Teletransportamos ANTES de comunicarnos con el script frágil
                 transform.position = ultimoCheckpoint;
                 DesactivarAgarre();
                 rb.linearVelocity = Vector2.zero;
+
+                if (health != null)
+                {
+                    try { health.TakeDamage(1, Vector2.zero, 0f); }
+                    catch { /* Se ahoga el crasheo para no frenar el teleport */ }
+                }
             }
+
+            return; // Corta la ejecución limpia acá
         }
 
         if (objName.Contains("checkpoint") || objTag.Contains("checkpoint"))

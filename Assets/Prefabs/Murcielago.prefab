@@ -181,9 +181,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemy
   health: 3
-  patrolSpeed: 6
+  patrolSpeed: 5
   patrolDistance: 4
-  diveSpeed: 6
+  diveSpeed: 5
   detectionRadius: 6
   loseInterestRadius: 7
   attackDamage: 1
