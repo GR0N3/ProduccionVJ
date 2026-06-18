@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour
     public AudioClip sfxCheckpoint;
     public AudioClip sfxPasos;
     public AudioClip sfxParry;
-    [Tooltip("Tiempo entre cada sonido de paso al correr")]
     public float tiempoEntrePasos = 0.3f;
     private float timerPasos;
 
@@ -24,8 +23,18 @@ public class PlayerController : MonoBehaviour
     public float parryCooldown = 1f;
     [Tooltip("Radio del escudo invisible que detecta la flecha")]
     public float radioParry = 1.5f;
-    [Tooltip("¡IMPORTANTE! Capa donde están las balas/flechas de los enemigos")]
+    [Tooltip("Capa donde están las balas/flechas de los enemigos")]
     public LayerMask capaProyectiles;
+
+    [Space(5)]
+    [Header("Control de Sonido y Sincronización del Parry")]
+    [HideInInspector] public AudioClip sfxInicioParry;
+    [HideInInspector] public float volumenInicioParry = 0.7f;
+    [Range(0f, 1f)]
+    [Tooltip("Volumen del sonido de éxito (cuando desvía el proyectil)")]
+    public float volumenParry = 1f;
+    [Tooltip("Tiempo de retraso en segundos para el sonido de éxito (0 = instantáneo al chocar)")]
+    public float retrasoSonidoParry = 0f;
 
     private bool isParrying = false;
     private float parryTimer = 0f;
@@ -50,16 +59,19 @@ public class PlayerController : MonoBehaviour
     [Header("Bloqueos de Estado")]
     private bool isAttacking = false;
 
+    [Header("Game Feel")]
+    public float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
+    public float knockbackStunDuration = 0.25f;
+    private float knockbackStunTimer;
+    private Vector3 escalaAlRecibirDaño;
+
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
     private float invincibilityTimer;
     private bool isInvincible;
     private SpriteRenderer spriteRenderer;
     private Color colorOriginal;
-
-    [Header("Game Feel")]
-    public float coyoteTime = 0.2f;
-    private float coyoteTimeCounter;
 
     [Header("Sincronización de Ataque")]
     public float delayDisparo = 0.3f;
@@ -187,13 +199,10 @@ public class PlayerController : MonoBehaviour
             if (movement != null) movement.Init(this);
 
             inputActions.Player.Attack.performed += AnimarAtaque;
-
             inputActions.Player.Move.performed += weapon.OnMove;
             inputActions.Player.AltAttack.performed += weapon.OnAltFire;
-
             inputActions.Player.Move.performed += movement.OnMove;
             inputActions.Player.Move.canceled += movement.OnMove;
-
             inputActions.Player.Jump.performed += IntentarSalto;
             inputActions.Player.Jump.canceled += CancelarSalto;
         }
@@ -206,7 +215,6 @@ public class PlayerController : MonoBehaviour
         if (inputActions != null && weapon != null && movement != null)
         {
             inputActions.Player.Attack.performed -= AnimarAtaque;
-
             inputActions.Player.Move.performed -= weapon.OnMove;
             inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
             inputActions.Player.Move.performed -= movement.OnMove;
@@ -221,19 +229,18 @@ public class PlayerController : MonoBehaviour
     {
         if (isDead || Time.timeScale == 0f) return;
 
-        // LECTURA DEL PARRY
+        if (knockbackStunTimer > 0) knockbackStunTimer -= Time.deltaTime;
         if (parryTimer > 0) parryTimer -= Time.deltaTime;
 
         bool presionaParry = false;
         if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) presionaParry = true;
         if (Gamepad.current != null && Gamepad.current.buttonNorth.wasPressedThisFrame) presionaParry = true;
 
-        if (presionaParry && parryTimer <= 0 && !isParrying && !isGrabbingWall && !isAttacking)
+        if (presionaParry && parryTimer <= 0 && !isParrying && !isGrabbingWall && !isAttacking && knockbackStunTimer <= 0)
         {
             StartCoroutine(RutinaParry());
         }
 
-        // 🔥 ¡AQUÍ ESTABA EL FRENO! Le saqué el "!isParrying" para que puedas seguir moviéndote libremente.
         if (movement != null && !isGrabbingWall) movement.Tick();
 
         if (controladorSuelo != null)
@@ -248,23 +255,29 @@ public class PlayerController : MonoBehaviour
             tocandoPared = Physics2D.Raycast(controladorPared.position, direccionMirada, distanciaPared, capaSuelo);
         }
 
-        // 🔥 Le saqué el bloqueo también de las animaciones.
-        if (!isGrabbingWall)
+        if (knockbackStunTimer <= 0)
         {
-            float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
-
-            if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
-
-            if (inputX > 0.1f) transform.localScale = new Vector3(1, 1, 1);
-            else if (inputX < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
-
-            if (enSuelo && Mathf.Abs(inputX) > 0.1f)
+            if (!isGrabbingWall)
             {
-                if (Time.time >= timerPasos)
+                float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
+
+                if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
+
+                if (inputX > 0.1f) transform.localScale = new Vector3(1, 1, 1);
+                else if (inputX < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
+
+                if (enSuelo && Mathf.Abs(inputX) > 0.1f)
                 {
-                    ReproducirSonido(sfxPasos, 0.5f);
-                    timerPasos = Time.time + tiempoEntrePasos;
+                    if (Time.time >= timerPasos)
+                    {
+                        ReproducirSonido(sfxPasos, 0.5f);
+                        timerPasos = Time.time + tiempoEntrePasos;
+                    }
                 }
+            }
+            else
+            {
+                if (animator != null) animator.SetFloat("Movement", 0f);
             }
         }
         else
@@ -310,7 +323,7 @@ public class PlayerController : MonoBehaviour
             coyoteTimeCounter -= Time.deltaTime;
         }
 
-        if (tocandoPared && !enSuelo && presionaGanchos && canGrab && currentStamina > 0 && wallJumpTimer <= 0)
+        if (tocandoPared && !enSuelo && presionaGanchos && canGrab && currentStamina > 0 && wallJumpTimer <= 0 && knockbackStunTimer <= 0)
         {
             if (!isGrabbingWall)
             {
@@ -357,9 +370,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (knockbackStunTimer > 0)
+        {
+            transform.localScale = escalaAlRecibirDaño;
+        }
+    }
+
     private void FixedUpdate()
     {
-        // 🔥 ¡AQUÍ ESTABA EL SEGUNDO FRENO FÍSICO! También lo quité.
         if (isDead || Time.timeScale == 0f) return;
 
         if (isGrabbingWall)
@@ -367,19 +387,16 @@ public class PlayerController : MonoBehaviour
             Vector2 inputsMovimiento = inputActions.Player.Move.ReadValue<Vector2>();
             rb.linearVelocity = new Vector2(0f, inputsMovimiento.y * climbSpeed);
         }
-        else
+        else if (knockbackStunTimer <= 0)
         {
             if (movement != null) movement.FixedTick();
         }
     }
 
-    // 🔥 LA RUTINA MÁGICA DEL PARRY HACIA ARRIBA 🔥
     private IEnumerator RutinaParry()
     {
         isParrying = true;
         parryTimer = parryCooldown;
-
-        // 🔥 ¡AQUÍ ESTABA EL TERCER FRENO QUE TE PARABA EN SECO! Eliminado.
 
         if (animator != null) animator.SetTrigger("Parry");
 
@@ -395,21 +412,28 @@ public class PlayerController : MonoBehaviour
                 Rigidbody2D rbProy = proy.GetComponent<Rigidbody2D>();
                 if (rbProy != null)
                 {
-                    // 1. Desvía la flecha hacia arriba con un poco de aleatoriedad
                     float desvioX = Random.Range(-5f, 5f);
                     rbProy.linearVelocity = new Vector2(desvioX, 15f);
 
-                    // 2. Rota el dibujo de la flecha para que mire hacia arriba
                     float angulo = Mathf.Atan2(rbProy.linearVelocity.y, rbProy.linearVelocity.x) * Mathf.Rad2Deg;
                     proy.transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
 
-                    // 3. La etiqueta para no lastimarte
                     proy.tag = "Parried";
 
-                    // 4. Manda la orden para reiniciar su ciclo de vida
                     proy.SendMessage("ResetLife", SendMessageOptions.DontRequireReceiver);
 
-                    ReproducirSonido(sfxParry);
+                    // El sonido solo se procesa si se detecta y modifica un proyectil válido
+                    if (sfxParry != null)
+                    {
+                        if (retrasoSonidoParry > 0f)
+                        {
+                            StartCoroutine(EjecutarSonidoConRetraso(sfxParry, volumenParry, retrasoSonidoParry));
+                        }
+                        else
+                        {
+                            ReproducirSonidoConfigurado(sfxParry, volumenParry);
+                        }
+                    }
                 }
             }
 
@@ -418,7 +442,28 @@ public class PlayerController : MonoBehaviour
         }
 
         isParrying = false;
-        if (spriteRenderer != null) spriteRenderer.color = colorOriginal;
+        if (spriteRenderer != null && !isInvincible) spriteRenderer.color = colorOriginal;
+    }
+
+    private IEnumerator EjecutarSonidoConRetraso(AudioClip clip, float volumen, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        ReproducirSonidoConfigurado(clip, volumen);
+    }
+
+    private void ReproducirSonidoConfigurado(AudioClip clip, float volumenEspecifico)
+    {
+        if (audioSource != null && clip != null)
+        {
+            float volumenGlobalSFX = 1f;
+
+            if (MusicManager.instance != null)
+            {
+                volumenGlobalSFX = MusicManager.instance.volumenSFXActual;
+            }
+
+            audioSource.PlayOneShot(clip, volumenEspecifico * volumenGlobalSFX);
+        }
     }
 
     private void DesactivarAgarre()
@@ -457,7 +502,7 @@ public class PlayerController : MonoBehaviour
 
     private void AnimarAtaque(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying) return;
+        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying || knockbackStunTimer > 0) return;
 
         isAttacking = true;
 
@@ -482,8 +527,7 @@ public class PlayerController : MonoBehaviour
 
     private void IntentarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        // 🔥 Ahora podés saltar mientras hacés el parry
-        if (isDead || Time.timeScale == 0f) return;
+        if (isDead || Time.timeScale == 0f || knockbackStunTimer > 0) return;
 
         if (isGrabbingWall)
         {
@@ -547,7 +591,6 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damageAmount, Vector2 knockbackDir, float knockbackForceValue)
     {
-        // 🔥 Si estás haciendo parry, sos inmune al daño.
         if (isInvincible || isDead || isParrying) return;
 
         currentHealth -= damageAmount;
@@ -565,6 +608,10 @@ public class PlayerController : MonoBehaviour
             if (health != null) health.TakeDamage(damageAmount, knockbackDir, knockbackForceValue);
             isInvincible = true;
             invincibilityTimer = invincibilityDuration;
+
+            escalaAlRecibirDaño = transform.localScale;
+            knockbackStunTimer = knockbackStunDuration;
+
             DesactivarAgarre();
 
             rb.linearVelocity = Vector2.zero;
