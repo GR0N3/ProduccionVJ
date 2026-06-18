@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,9 +12,23 @@ public class PlayerController : MonoBehaviour
     public AudioClip sfxCaidaOMuerte;
     public AudioClip sfxCheckpoint;
     public AudioClip sfxPasos;
+    public AudioClip sfxParry;
     [Tooltip("Tiempo entre cada sonido de paso al correr")]
     public float tiempoEntrePasos = 0.3f;
     private float timerPasos;
+
+    [Header("Mecánica de Parry (Desvío)")]
+    [Tooltip("Duración de la ventana de invulnerabilidad y desvío (Ej: 0.25 segundos)")]
+    public float parryDuration = 0.25f;
+    [Tooltip("Tiempo de espera antes de poder hacer otro parry")]
+    public float parryCooldown = 1f;
+    [Tooltip("Radio del escudo invisible que detecta la flecha")]
+    public float radioParry = 1.5f;
+    [Tooltip("¡IMPORTANTE! Capa donde están las balas/flechas de los enemigos")]
+    public LayerMask capaProyectiles;
+
+    private bool isParrying = false;
+    private float parryTimer = 0f;
 
     [Header("Salud y Reaparición")]
     PlayerHealth health;
@@ -204,9 +219,21 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        // 🔥 SEGURO DE PAUSA: Si el juego está pausado, ignoramos todo el Update
         if (isDead || Time.timeScale == 0f) return;
 
+        // LECTURA DEL PARRY
+        if (parryTimer > 0) parryTimer -= Time.deltaTime;
+
+        bool presionaParry = false;
+        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) presionaParry = true;
+        if (Gamepad.current != null && Gamepad.current.buttonNorth.wasPressedThisFrame) presionaParry = true;
+
+        if (presionaParry && parryTimer <= 0 && !isParrying && !isGrabbingWall && !isAttacking)
+        {
+            StartCoroutine(RutinaParry());
+        }
+
+        // 🔥 ¡AQUÍ ESTABA EL FRENO! Le saqué el "!isParrying" para que puedas seguir moviéndote libremente.
         if (movement != null && !isGrabbingWall) movement.Tick();
 
         if (controladorSuelo != null)
@@ -221,6 +248,7 @@ public class PlayerController : MonoBehaviour
             tocandoPared = Physics2D.Raycast(controladorPared.position, direccionMirada, distanciaPared, capaSuelo);
         }
 
+        // 🔥 Le saqué el bloqueo también de las animaciones.
         if (!isGrabbingWall)
         {
             float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
@@ -263,18 +291,8 @@ public class PlayerController : MonoBehaviour
 
         bool presionaGanchos = false;
 
-        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed)
-        {
-            presionaGanchos = true;
-        }
-
-        if (UnityEngine.InputSystem.Gamepad.current != null)
-        {
-            if (UnityEngine.InputSystem.Gamepad.current.rightTrigger.ReadValue() > 0.1f)
-            {
-                presionaGanchos = true;
-            }
-        }
+        if (Keyboard.current != null && Keyboard.current.eKey.isPressed) presionaGanchos = true;
+        if (Gamepad.current != null && Gamepad.current.rightTrigger.ReadValue() > 0.1f) presionaGanchos = true;
 
         if (wallJumpTimer > 0) wallJumpTimer -= Time.deltaTime;
 
@@ -323,7 +341,7 @@ public class PlayerController : MonoBehaviour
 
         if (barraEstamina != null && barraEstamina.gameObject.activeSelf) barraEstamina.value = currentStamina;
 
-        if (isInvincible)
+        if (isInvincible && !isParrying)
         {
             invincibilityTimer -= Time.deltaTime;
             if (spriteRenderer != null && !isGrabbingWall)
@@ -341,7 +359,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // 🔥 SEGURO DE PAUSA
+        // 🔥 ¡AQUÍ ESTABA EL SEGUNDO FRENO FÍSICO! También lo quité.
         if (isDead || Time.timeScale == 0f) return;
 
         if (isGrabbingWall)
@@ -353,6 +371,54 @@ public class PlayerController : MonoBehaviour
         {
             if (movement != null) movement.FixedTick();
         }
+    }
+
+    // 🔥 LA RUTINA MÁGICA DEL PARRY HACIA ARRIBA 🔥
+    private IEnumerator RutinaParry()
+    {
+        isParrying = true;
+        parryTimer = parryCooldown;
+
+        // 🔥 ¡AQUÍ ESTABA EL TERCER FRENO QUE TE PARABA EN SECO! Eliminado.
+
+        if (animator != null) animator.SetTrigger("Parry");
+
+        float timer = 0f;
+        while (timer < parryDuration)
+        {
+            Collider2D[] proyectiles = Physics2D.OverlapCircleAll(transform.position, radioParry, capaProyectiles);
+
+            foreach (Collider2D proy in proyectiles)
+            {
+                if (proy.CompareTag("Parried")) continue;
+
+                Rigidbody2D rbProy = proy.GetComponent<Rigidbody2D>();
+                if (rbProy != null)
+                {
+                    // 1. Desvía la flecha hacia arriba con un poco de aleatoriedad
+                    float desvioX = Random.Range(-5f, 5f);
+                    rbProy.linearVelocity = new Vector2(desvioX, 15f);
+
+                    // 2. Rota el dibujo de la flecha para que mire hacia arriba
+                    float angulo = Mathf.Atan2(rbProy.linearVelocity.y, rbProy.linearVelocity.x) * Mathf.Rad2Deg;
+                    proy.transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
+
+                    // 3. La etiqueta para no lastimarte
+                    proy.tag = "Parried";
+
+                    // 4. Manda la orden para reiniciar su ciclo de vida
+                    proy.SendMessage("ResetLife", SendMessageOptions.DontRequireReceiver);
+
+                    ReproducirSonido(sfxParry);
+                }
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        isParrying = false;
+        if (spriteRenderer != null) spriteRenderer.color = colorOriginal;
     }
 
     private void DesactivarAgarre()
@@ -391,8 +457,7 @@ public class PlayerController : MonoBehaviour
 
     private void AnimarAtaque(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        // 🔥 SEGURO DE PAUSA
-        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f) return;
+        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying) return;
 
         isAttacking = true;
 
@@ -417,7 +482,7 @@ public class PlayerController : MonoBehaviour
 
     private void IntentarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        // 🔥 SEGURO DE PAUSA
+        // 🔥 Ahora podés saltar mientras hacés el parry
         if (isDead || Time.timeScale == 0f) return;
 
         if (isGrabbingWall)
@@ -464,7 +529,6 @@ public class PlayerController : MonoBehaviour
 
     private void CancelarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        // 🔥 SEGURO DE PAUSA
         if (isDead || Time.timeScale == 0f) return;
 
         if (rb.linearVelocity.y > 0 && !isGrabbingWall)
@@ -483,7 +547,9 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damageAmount, Vector2 knockbackDir, float knockbackForceValue)
     {
-        if (isInvincible || isDead) return;
+        // 🔥 Si estás haciendo parry, sos inmune al daño.
+        if (isInvincible || isDead || isParrying) return;
+
         currentHealth -= damageAmount;
 
         ActualizarCorazones();
@@ -644,5 +710,11 @@ public class PlayerController : MonoBehaviour
 
             audioSource.PlayOneShot(clip, volumenFinal);
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, radioParry);
     }
 }

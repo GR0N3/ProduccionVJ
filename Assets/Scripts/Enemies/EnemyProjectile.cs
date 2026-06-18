@@ -11,20 +11,48 @@ public class EnemyProjectile : MonoBehaviour
     [Tooltip("Capas donde la flecha choca y se rompe (Ground, Paredes)")]
     public LayerMask groundLayer;
 
+    private float currentLifeTime;
+
     private void Start()
     {
-        Destroy(gameObject, lifeTime);
+        currentLifeTime = lifeTime;
+    }
+
+    private void Update()
+    {
+        currentLifeTime -= Time.deltaTime;
+        if (currentLifeTime <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void ResetLife()
+    {
+        currentLifeTime = lifeTime;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 1. Si choca contra el enemigo que la tiró u otro monstruo, la flecha los ignora.
-        if (collision.gameObject.GetComponent<Enemy>() != null || collision.gameObject.CompareTag("Enemy") || collision.gameObject.GetComponent<RangedEnemyAI>() != null)
+        //  MODO PARRY: Solo queremos que no lastime al jugador
+        if (gameObject.CompareTag("Parried"))
+        {
+            if (collision.CompareTag("Player")) return;
+
+            // Si al caer toca el piso, se destruye
+            if ((groundLayer.value & (1 << collision.gameObject.layer)) != 0)
+            {
+                Destroy(gameObject);
+            }
+            return;
+        }
+
+        
+        if (collision.gameObject.GetComponent<Enemy>() != null || collision.gameObject.CompareTag("Enemy"))
         {
             return;
         }
 
-        // 2. Si choca contra el Jugador
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerController player = collision.gameObject.GetComponent<PlayerController>();
@@ -37,7 +65,6 @@ public class EnemyProjectile : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        // 3. Si choca contra el piso/pared
         else if ((groundLayer.value & (1 << collision.gameObject.layer)) != 0)
         {
             Destroy(gameObject);

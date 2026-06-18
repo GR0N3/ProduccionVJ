@@ -185,7 +185,7 @@ MonoBehaviour:
   patrolDistance: 4
   diveSpeed: 6
   detectionRadius: 6
-  loseInterestRadius: 9
+  loseInterestRadius: 7
   attackDamage: 1
   attackRange: 1.7
   attackDelay: 0.3
