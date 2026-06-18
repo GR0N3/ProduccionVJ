@@ -219,6 +219,8 @@ MonoBehaviour:
   knockbackToPlayer: 20
   stunDuration: 1
   fadeDuration: 1.1
+  healthDropPrefab: {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}
+  dropChance: 50.9
   isStunned: 0
   isBlocking: 0
   currentHealth: 10

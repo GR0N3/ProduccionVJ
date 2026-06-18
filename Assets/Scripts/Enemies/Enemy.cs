@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 
@@ -14,8 +14,17 @@ public class Enemy : MonoBehaviour, IDamageable
     public float stunDuration = 0.5f;
 
     [Header("Efecto de Muerte")]
-    [Tooltip("Tiene que durar lo mismo o un poquito m�s que tu animaci�n de muerte para que no desaparezca antes de terminar de caer.")]
+    [Tooltip("Tiene que durar lo mismo o un poquito más que tu animación de muerte para que no desaparezca antes de terminar de caer.")]
     public float fadeDuration = 1f;
+
+    // 🔥 --- NUEVO: SISTEMA DE DROP --- 🔥
+    [Header("Drop de Vida")]
+    [Tooltip("El Prefab del corazón o poción que va a soltar (Tiene que ser un objeto con Collider y Script, no solo el dibujo).")]
+    public GameObject healthDropPrefab;
+    [Tooltip("Probabilidad de que suelte la vida al morir (0 = Nunca, 100 = Siempre)")]
+    [Range(0f, 100f)]
+    public float dropChance = 30f;
+    // ------------------------------------
 
     public bool isStunned = false;
     public bool isBlocking = false;
@@ -25,7 +34,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public int currentHealth;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    private Animator animator; // 
+    private Animator animator;
     private Color colorOriginal;
 
     private Coroutine stunCoroutine;
@@ -36,7 +45,7 @@ public class Enemy : MonoBehaviour, IDamageable
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>(); 
+        animator = GetComponent<Animator>();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -48,7 +57,28 @@ public class Enemy : MonoBehaviour, IDamageable
     void Die()
     {
         OnEnemyDeath?.Invoke();
+
+        
+        GenerarDrop();
+
         StartCoroutine(RutinaMuerteDesvanecimiento());
+    }
+
+    
+    private void GenerarDrop()
+    {
+        // Si asignaste un objeto en el Inspector...
+        if (healthDropPrefab != null)
+        {
+            // Tiramos un dado del 0 al 100
+            float probabilidadAleatoria = UnityEngine.Random.Range(0f, 100f);
+
+            // Si el dado cae dentro del porcentaje que elegiste, ¡soltamos el item!
+            if (probabilidadAleatoria <= dropChance)
+            {
+                Instantiate(healthDropPrefab, transform.position, Quaternion.identity);
+            }
+        }
     }
 
     public bool TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
@@ -124,7 +154,7 @@ public class Enemy : MonoBehaviour, IDamageable
             rb.bodyType = RigidbodyType2D.Kinematic;
         }
 
-        
+
         if (animator != null)
         {
             animator.SetTrigger("Death");

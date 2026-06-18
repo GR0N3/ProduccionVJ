@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 115888288743324333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.241, y: -0.349, z: 0}
+  m_LocalPosition: {x: 0.241, y: -0.175, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -189,17 +189,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.02418518, y: -0.19257927}
+  m_Offset: {x: -0.037124634, y: -0.17317152}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.4334625, y: 0.3604651}
-    oldSize: {x: 4, y: 3}
+    oldSize: {x: 3.2, y: 2.4}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.818573, y: 1.784317}
+  m_Size: {x: 0.63742065, y: 1.3961573}
   m_EdgeRadius: 0
 --- !u!114 &1848564229562375413
 MonoBehaviour:
@@ -217,7 +217,7 @@ MonoBehaviour:
   patrolDistance: 4
   distanciaEvasionPared: 0.8
   alturaSensorPared: -0.5
-  attackRange: 12
+  attackRange: 10
   playerLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -226,7 +226,7 @@ MonoBehaviour:
     m_Bits: 64
   projectilePrefab: {fileID: 6269322698052972482, guid: 06b8c923b46647d4f85a248bec0dd1b7, type: 3}
   firePoint: {fileID: 9147672743830146171}
-  projectileSpeed: 19
+  projectileSpeed: 15
   attackAnticipation: 0.4
   postAttackPause: 1
   attackCooldown: 0.8
@@ -270,6 +270,8 @@ MonoBehaviour:
   knockbackToPlayer: 10
   stunDuration: 0.5
   fadeDuration: 1
+  healthDropPrefab: {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}
+  dropChance: 49.7
   isStunned: 0
   isBlocking: 0
   currentHealth: 0

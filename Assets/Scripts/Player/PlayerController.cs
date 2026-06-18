@@ -500,7 +500,17 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(knockbackDir * knockbackForceValue, ForceMode2D.Impulse);
         }
     }
+    public void Curar(int cantidad)
+    {
+        if (currentHealth < maxHealth)
+        {
+            currentHealth += cantidad;
+            if (currentHealth > maxHealth) currentHealth = maxHealth;
+            ActualizarCorazones();
 
+            
+        }
+    }
     private IEnumerator SecuenciaMuerte()
     {
         isDead = true;

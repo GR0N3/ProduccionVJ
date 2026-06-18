@@ -1,21 +1,21 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class FlyingEnemy : MonoBehaviour, IDamageable
 {
-    [Header("Estadísticas")]
+    [Header("EstadÃ­sticas")]
     public int health = 3;
 
     [Header("Patrulla (Cielo)")]
     public float patrolSpeed = 2f;
     public float patrolDistance = 4f;
 
-    [Header("Persecución")]
+    [Header("PersecuciÃ³n")]
     public float diveSpeed = 6f;
     public float detectionRadius = 6f;
     public float loseInterestRadius = 12f;
 
-    [Header("Ataque (Sin Daño de Contacto)")]
+    [Header("Ataque (Sin DaÃ±o de Contacto)")]
     public int attackDamage = 1;
     public float attackRange = 1.5f;
     public float attackDelay = 0.3f;
@@ -28,10 +28,19 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     [Header("Efecto de Muerte")]
     public float duracionDesvanecimiento = 1f;
 
-    [Header("Detección de Paredes y Visión")]
-    [Tooltip("Asegurate de que esta capa tenga tildado 'Ground' o las paredes, sino tendrá visión de rayos X")]
+    [Header("DetecciÃ³n de Paredes y VisiÃ³n")]
+    [Tooltip("Asegurate de que esta capa tenga tildado 'Ground' o las paredes, sino tendrÃ¡ visiÃ³n de rayos X")]
     public LayerMask capaObstaculos;
     public float distanciaEvasion = 1f;
+
+    // ðŸ”¥ --- NUEVO: SISTEMA DE DROP --- ðŸ”¥
+    [Header("Drop de Vida")]
+    [Tooltip("El Prefab del corazÃ³n o pociÃ³n que va a soltar.")]
+    public GameObject healthDropPrefab;
+    [Tooltip("Probabilidad de que suelte la vida al morir (0 = Nunca, 100 = Siempre)")]
+    [Range(0f, 100f)]
+    public float dropChance = 30f;
+    // ------------------------------------
 
     private float cooldownTimer;
     private Vector2 startPos;
@@ -131,19 +140,15 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         }
     }
 
-    // --- NUEVO SISTEMA DE VISIÓN ---
     void BuscarJugador()
     {
         float distancia = Vector2.Distance(transform.position, playerTransform.position);
 
-        // 1. Primero verifica si estás dentro del círculo de radar
         if (distancia <= detectionRadius)
         {
-            // 2. Tira el láser invisible (Raycast) hacia vos
             Vector2 direccionAlJugador = (playerTransform.position - transform.position).normalized;
             RaycastHit2D paredEnElMedio = Physics2D.Raycast(transform.position, direccionAlJugador, distancia, capaObstaculos);
 
-            // 3. Si el láser NO chocó con ninguna pared (collider == null), entonces te está viendo
             if (paredEnElMedio.collider == null)
             {
                 estadoActual = BatState.Persiguiendo;
@@ -262,6 +267,19 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         cooldownTimer = attackCooldown;
     }
 
+    // ðŸ”¥ FunciÃ³n donde calculamos si suelta el corazÃ³n
+    private void GenerarDrop()
+    {
+        if (healthDropPrefab != null)
+        {
+            float probabilidadAleatoria = Random.Range(0f, 100f);
+            if (probabilidadAleatoria <= dropChance)
+            {
+                Instantiate(healthDropPrefab, transform.position, Quaternion.identity);
+            }
+        }
+    }
+
     public bool TakeDamage(int damage, Vector2 direction, float knockback)
     {
         if (isDead) return false;
@@ -307,6 +325,9 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     private IEnumerator SecuenciaMuerteEnemigo()
     {
         isDead = true;
+
+        // ðŸ”¥ Â¡AcÃ¡ suelta la vida justo cuando muere!
+        GenerarDrop();
 
         if (flashCoroutine != null) StopCoroutine(flashCoroutine);
 
