@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.InputSystem; // 🔥 Necesario para leer el teclado y mando
+using UnityEngine.InputSystem;
 
 public class PauseMenuManager : MonoBehaviour
 {
@@ -14,13 +14,17 @@ public class PauseMenuManager : MonoBehaviour
     public Slider sliderSFX;
 
     [Header("Configuración")]
-    [Tooltip("Escribe el nombre exacto de la escena de tu menú principal")]
-    public string nombreMenuPrincipal = "MainMenu"; // Cambiá esto por el nombre real de tu menú
+    [Tooltip("Escribe el nombre exacto de la escena de tu menú principal (Ej: MainMenu)")]
+    public string nombreMenuPrincipal = "MainMenu";
 
     private bool juegoPausado = false;
 
     private void Start()
     {
+        // 🔥 ARREGLO 1: Forzamos a que el tiempo del juego corra normal al iniciar el nivel
+        Time.timeScale = 1f;
+        juegoPausado = false;
+
         // Nos aseguramos de que el menú de pausa esté apagado al empezar a jugar
         if (panelPausaPrincipal != null) panelPausaPrincipal.SetActive(false);
         if (panelOpciones != null) panelOpciones.SetActive(false);
@@ -41,7 +45,6 @@ public class PauseMenuManager : MonoBehaviour
 
     private void Update()
     {
-        // Detectar la tecla ESC o el botón Options/Start del mando
         bool presionaPausa = false;
 
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -53,24 +56,17 @@ public class PauseMenuManager : MonoBehaviour
             presionaPausa = true;
         }
 
-        // Si se presionó el botón, alternamos la pausa
         if (presionaPausa)
         {
-            if (juegoPausado)
-            {
-                ReanudarJuego();
-            }
-            else
-            {
-                PausarJuego();
-            }
+            if (juegoPausado) ReanudarJuego();
+            else PausarJuego();
         }
     }
 
     public void PausarJuego()
     {
         juegoPausado = true;
-        Time.timeScale = 0f; // 🔥 CONGELA EL TIEMPO DEL JUEGO
+        Time.timeScale = 0f; // Congela el juego
 
         if (panelPausaPrincipal != null) panelPausaPrincipal.SetActive(true);
         if (panelOpciones != null) panelOpciones.SetActive(false);
@@ -79,7 +75,7 @@ public class PauseMenuManager : MonoBehaviour
     public void ReanudarJuego()
     {
         juegoPausado = false;
-        Time.timeScale = 1f; // 🔥 DESCONGELA EL TIEMPO
+        Time.timeScale = 1f; // Descongela el juego
 
         if (panelPausaPrincipal != null) panelPausaPrincipal.SetActive(false);
         if (panelOpciones != null) panelOpciones.SetActive(false);
@@ -92,7 +88,6 @@ public class PauseMenuManager : MonoBehaviour
         {
             panelOpciones.SetActive(true);
 
-            // Sincronizamos las barritas con el volumen real al abrir
             if (MusicManager.instance != null)
             {
                 if (sliderMusica != null) sliderMusica.value = MusicManager.instance.audioSource.volume;
@@ -109,8 +104,10 @@ public class PauseMenuManager : MonoBehaviour
 
     public void SalirAlMenuPrincipal()
     {
-        // 🔥 ¡CRÍTICO! Si no descongelás el tiempo antes de salir, tu menú principal quedará trabado
+        // Descongelamos el tiempo antes de salir
         Time.timeScale = 1f;
+
+        // 🔥 Cargamos la escena del menú
         SceneManager.LoadScene(nombreMenuPrincipal);
     }
 

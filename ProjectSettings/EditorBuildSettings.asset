@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/CoreScenes/MainMenu.unity
     guid: a79dd048bb9a44747b46f7dbb810d96b
   - enabled: 1
-    path: Assets/Scenes/PREentrega/MainMenu1.0.unity
+    path: Assets/Scenes/PREentrega/MainMenu.unity
     guid: 72dc100140456f842a784e5ea2afcd7c
   - enabled: 1
     path: Assets/Scenes/PREentrega/Level1.unity
