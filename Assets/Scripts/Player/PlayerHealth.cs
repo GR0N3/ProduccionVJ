@@ -5,6 +5,7 @@ public class PlayerHealth
 {
     private int maxHealth;
     private int currentHealth;
+    private bool isDead;
 
     public static event Action OnPlayerDamaged;
     public static event Action OnPlayerHealed;
@@ -12,19 +13,34 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    public void Init(int maxHealth)
+    private AnimationController anim;
+
+
+    public void Init(PlayerController player)
+    {
+        anim.Init(player.Animator);
+    }
+
+    public void SetHealth(int maxHealth)
     {
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
+
+        isDead = false;
     }
 
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
+        if (isDead)
+        {
+            return;
+        }
+
         currentHealth -= damage;
 
         Debug.Log("took damage: " + currentHealth);
 
-        OnPlayerDamaged!.Invoke();
+        OnPlayerDamaged?.Invoke();
 
         if (currentHealth <= 0) 
         {
@@ -48,6 +64,7 @@ public class PlayerHealth
             .WithClearUnusedAssets()
             .WithOverlay()
             .Perfrom();
+        OnPlayerDeath?.Invoke();
     }
 
     #region Upgrades

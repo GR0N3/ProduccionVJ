@@ -25,28 +25,42 @@ public class PlayerMovement
 
     private bool isInLeft;
 
+    private AnimationController anim;
+
     public void Init(PlayerController player)
     {
         rb = player.rb;
-        inputActions = player.InputActions;
         groundLayer = player.GroundLayer;
         speed = player.Speed;
         jumpForce = player.JumpForce;
         borderLayer = player.BorderLayer;
         acceleration = player.Acceleration;
         deceleration = player.Deceleration;
+        anim.Init(player.Animator);
+
     }
+
+    public void SetMoveInput(Vector2 input)
+    {
+        movement = input;
+    }
+
+    public void Jump()
+    {
+        if (isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        }
+    }
+
     public void OnMove(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
-        movement = ctx.ReadValue<Vector2>();                                                                
+        SetMoveInput(ctx.ReadValue<Vector2>());                                                                
     }                                                                                                       
                                                                                                             
     public void OnJump(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
-        if (isGrounded)                                                                                     
-        {                                                                                                   
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);                                
-        }
+        Jump();
     }
 
     public void ApplyKnockback(Vector2 direction, float force)

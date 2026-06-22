@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     public InputSystem_Actions InputActions { get; private set; }
 
+    public Animator Animator { get; private set; }
     private void Awake()
     {
         playerManager = ServiceLocator.Get<PlayerManager>();
@@ -44,6 +45,9 @@ public class PlayerController : MonoBehaviour
         weapon = playerManager.PlayerWeapon;
         health = playerManager.PlayerHealth;
         movement = playerManager.PlayerMovement;
+
+        Animator = playerManager.Animator;
+
         rb = GetComponent<Rigidbody2D>();
         weapon.Init(this);
         movement.Init(this);
@@ -52,11 +56,11 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         InputActions.Enable();
-        
-        InputActions.Player.Attack.performed += weapon.OnFire;           
-        InputActions.Player.Move.performed += weapon.OnMove;             
+
+        InputActions.Player.Attack.performed += weapon.OnFire;
+        InputActions.Player.Move.performed += weapon.OnMove;
         InputActions.Player.AltAttack.performed += weapon.OnAltFire;
-            
+
         InputActions.Player.Move.performed += movement.OnMove;
         InputActions.Player.Move.canceled += movement.OnMove;
         InputActions.Player.Jump.performed += movement.OnJump;
@@ -69,7 +73,7 @@ public class PlayerController : MonoBehaviour
         InputActions.Player.AltAttack.performed -= weapon.OnAltFire;
 
         InputActions.Player.Move.performed -= movement.OnMove;
-        InputActions.Player.Move.canceled -= movement.OnMove; 
+        InputActions.Player.Move.canceled -= movement.OnMove;
         InputActions.Player.Jump.performed -= movement.OnJump;
 
         InputActions.Disable();

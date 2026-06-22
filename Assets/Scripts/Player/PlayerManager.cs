@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-98)]
 public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;
@@ -14,6 +15,9 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
     public int MaxHealthPoints => maxHealthPoints;
+
+    private Animator animator;
+    public Animator Animator => animator;
 
     public Stats Stats { get; private set; }
 
@@ -30,6 +34,8 @@ public class PlayerManager : MonoBehaviour
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
+
+        animator = GetComponent<Animator>();
 
         InitialStats();
     }
@@ -49,7 +55,7 @@ public class PlayerManager : MonoBehaviour
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 25);
 
-        playerHealth.Init((int)Stats.GetStat(UpgradeType.MaxHealth));
+        playerHealth.SetHealth((int)Stats.GetStat(UpgradeType.MaxHealth));
     }
 
     private void OnDestroy()
