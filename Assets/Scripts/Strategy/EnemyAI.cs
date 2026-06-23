@@ -31,11 +31,17 @@ public class EnemyAI : MonoBehaviour
     public float attack2Delay = 0.3f;
     public float attack2Duration = 0.2f;
 
-    [Header("Tiempos de Combate")]
+    [Header("Tiempos de Combate (Ataque)")]
     public float attackTriggerDistance = 1.5f;
-    public float shieldDropRecovery = 0.6f;
     public float postAttackPause = 0.8f;
     public float attackCooldown = 2f;
+
+    [Header("Defensa y Bloqueo")]
+    public float blockDuration = 1.5f;
+    public float normalBlockCooldown = 4f;
+    public float lowHealthBlockCooldown = 1.5f;
+    [Range(0f, 1f)] public float lowHealthThreshold = 0.2f;
+    private float lastBlockTime = -100f;
 
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public Transform player;
@@ -51,8 +57,11 @@ public class EnemyAI : MonoBehaviour
     private Animator animator;
 
     private bool isAttacking = false;
+    private bool isBlockRoutineActive = false;
     private float lastAttackTime = -100f;
-    private float lastShieldDropTime = -100f;
+
+    private Coroutine activeAttackCoroutine;
+    private Coroutine activeBlockCoroutine;
 
     private void Awake()
     {
@@ -75,14 +84,19 @@ public class EnemyAI : MonoBehaviour
     {
         if (enemyComponent != null && (enemyComponent.IsDead || enemyComponent.isStunned))
         {
-            if (animator != null) animator.SetBool("IsMoving", false);
+            if (isAttacking) CancelarAtaque();
+            if (isBlockRoutineActive) CancelarBloqueo();
+
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            ActualizarAnimadorAbsoluto();
             return;
         }
 
         if (isAttacking)
         {
+            currentStrategy = null;
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            if (animator != null) animator.SetBool("IsMoving", false);
+            ActualizarAnimadorAbsoluto();
             return;
         }
 
@@ -90,105 +104,164 @@ public class EnemyAI : MonoBehaviour
 
         if (enemyComponent.isBlocking || currentStrategy == null)
         {
+            currentStrategy = null;
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            GirarHaciaElJugador();
+
+            if (!enemyComponent.isBlocking)
+            {
+                GirarHaciaElJugador();
+            }
         }
         else if (currentStrategy != null)
         {
             currentStrategy.Execute(this);
         }
 
-        if (animator != null && !enemyComponent.isBlocking && !isAttacking && currentStrategy != null)
+        ActualizarAnimadorAbsoluto();
+    }
+
+    // 🔥 NUEVO: Un freno absoluto de físicas. Si el enemigo está en un estado inmovilizado, 
+    // Unity no podrá empujarlo ni deslizarlo por inercia bajo ninguna circunstancia.
+    private void FixedUpdate()
+    {
+        if (enemyComponent != null && (enemyComponent.isBlocking || isAttacking || enemyComponent.isStunned || enemyComponent.IsDead))
         {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        }
+    }
+
+    private void CancelarAtaque()
+    {
+        if (activeAttackCoroutine != null) StopCoroutine(activeAttackCoroutine);
+        isAttacking = false;
+        currentStrategy = null;
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("AttackHorizontal");
+            animator.ResetTrigger("AttackOmni");
+        }
+    }
+
+    private void CancelarBloqueo()
+    {
+        if (activeBlockCoroutine != null) StopCoroutine(activeBlockCoroutine);
+        DesactivarEscudo();
+        isBlockRoutineActive = false;
+        currentStrategy = null;
+    }
+
+    private void ActualizarAnimadorAbsoluto()
+    {
+        if (animator == null) return;
+
+        if (enemyComponent.isBlocking)
+        {
+            animator.SetBool("IsBlocking", true);
+            animator.SetBool("IsMoving", false);
+        }
+        else if (isAttacking || enemyComponent.IsDead || enemyComponent.isStunned)
+        {
+            animator.SetBool("IsBlocking", false);
+            animator.SetBool("IsMoving", false);
+        }
+        else
+        {
+            animator.SetBool("IsBlocking", false);
             bool seMueve = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
             animator.SetBool("IsMoving", seMueve);
         }
     }
 
-    // --- SISTEMA DE VISIÓN ACTUALIZADO CON RAYCAST ---
     private void DetectPlayerAndDecideAction()
     {
-        // 1. El radar circular detecta si estás a menos de X metros
         Collider2D playerCollider = Physics2D.OverlapCircle(transform.position, detectionRange, playerLayer);
 
         if (playerCollider != null)
         {
             player = playerCollider.transform;
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-
-            // 2. Lanza el láser visual hacia tu personaje
             Vector2 direccionAlJugador = (player.position - transform.position).normalized;
+
             RaycastHit2D paredEnElMedio = Physics2D.Raycast(transform.position, direccionAlJugador, distanceToPlayer, groundLayer);
 
-            // 3. Si el láser NO choca contra una pared, te está viendo
             if (paredEnElMedio.collider == null)
             {
-                // ZONA DE COMBATE (Estás Cerca)
-                if (distanceToPlayer <= attackTriggerDistance)
-                {
-                    if (enemyComponent.isBlocking)
-                    {
-                        DesactivarEscudo();
-                        lastShieldDropTime = Time.time;
-                    }
+                float currentBlockCooldown = normalBlockCooldown;
 
-                    if (Time.time < lastShieldDropTime + shieldDropRecovery)
+                if (enemyComponent != null)
+                {
+                    float porcentajeVida = (float)enemyComponent.currentHealth / enemyComponent.maxHealth;
+                    if (porcentajeVida <= lowHealthThreshold)
+                    {
+                        currentBlockCooldown = lowHealthBlockCooldown;
+                    }
+                }
+
+                if (Time.time >= lastBlockTime + currentBlockCooldown && !isAttacking && !isBlockRoutineActive)
+                {
+                    activeBlockCoroutine = StartCoroutine(RutinaBloqueo());
+                    return;
+                }
+
+                if (!enemyComponent.isBlocking && !isAttacking)
+                {
+                    if (distanceToPlayer <= attackTriggerDistance)
                     {
                         currentStrategy = null;
+
+                        if (Time.time >= lastAttackTime + attackCooldown)
+                        {
+                            activeAttackCoroutine = StartCoroutine(AttackDecisionRoutine());
+                        }
                     }
                     else
                     {
-                        if (Time.time >= lastAttackTime + attackCooldown)
-                        {
-                            StartCoroutine(AttackDecisionRoutine());
-                        }
-                        else
-                        {
-                            currentStrategy = chaseStrategy;
-                        }
+                        currentStrategy = chaseStrategy;
                     }
                 }
-                // ZONA DE DEFENSA (Estás lejos)
-                else
-                {
-                    ActivarEscudo();
-                    currentStrategy = null;
-                }
             }
-            // 4. Si el láser chocó con una pared (hay un obstáculo en el medio)
             else
             {
-                // Actúa como si no existieras, sigue su patrulla normal
                 player = null;
-                DesactivarEscudo();
-                currentStrategy = patrolStrategy;
+                if (!enemyComponent.isBlocking) currentStrategy = patrolStrategy;
             }
         }
         else
         {
-            // ZONA PACÍFICA (Saliste de su radar)
             player = null;
-            DesactivarEscudo();
-            currentStrategy = patrolStrategy;
+            if (!enemyComponent.isBlocking) currentStrategy = patrolStrategy;
         }
     }
 
+    private IEnumerator RutinaBloqueo()
+    {
+        isBlockRoutineActive = true;
+        currentStrategy = null;
+
+        GirarHaciaElJugador();
+
+        ActivarEscudo();
+
+        yield return new WaitForSeconds(blockDuration);
+
+        DesactivarEscudo();
+        lastBlockTime = Time.time;
+        isBlockRoutineActive = false;
+    }
+
+    // 🔥 CORRECCIÓN CLAVE: Ahora fuerzan a la animación a prenderse/apagarse SIEMPRE, 
+    // evitando que el Animator se quede trabado si recibe un golpe en la espalda.
     private void ActivarEscudo()
     {
-        if (!enemyComponent.isBlocking)
-        {
-            enemyComponent.isBlocking = true;
-            if (animator != null) animator.SetBool("IsBlocking", true);
-        }
+        enemyComponent.isBlocking = true;
+        if (animator != null) animator.SetBool("IsBlocking", true);
     }
 
     private void DesactivarEscudo()
     {
-        if (enemyComponent.isBlocking)
-        {
-            enemyComponent.isBlocking = false;
-            if (animator != null) animator.SetBool("IsBlocking", false);
-        }
+        enemyComponent.isBlocking = false;
+        if (animator != null) animator.SetBool("IsBlocking", false);
     }
 
     private void GirarHaciaElJugador()
@@ -206,8 +279,8 @@ public class EnemyAI : MonoBehaviour
     private IEnumerator AttackDecisionRoutine()
     {
         isAttacking = true;
+        currentStrategy = null;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        if (animator != null) animator.SetBool("IsMoving", false);
 
         GirarHaciaElJugador();
 

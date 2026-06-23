@@ -17,23 +17,16 @@ public class PlayerController : MonoBehaviour
     private float timerPasos;
 
     [Header("Mecánica de Parry (Desvío)")]
-    [Tooltip("Duración de la ventana de invulnerabilidad y desvío (Ej: 0.25 segundos)")]
     public float parryDuration = 0.25f;
-    [Tooltip("Tiempo de espera antes de poder hacer otro parry")]
     public float parryCooldown = 1f;
-    [Tooltip("Radio del escudo invisible que detecta la flecha")]
     public float radioParry = 1.5f;
-    [Tooltip("Capa donde están las balas/flechas de los enemigos")]
     public LayerMask capaProyectiles;
 
     [Space(5)]
     [Header("Control de Sonido y Sincronización del Parry")]
     [HideInInspector] public AudioClip sfxInicioParry;
     [HideInInspector] public float volumenInicioParry = 0.7f;
-    [Range(0f, 1f)]
-    [Tooltip("Volumen del sonido de éxito (cuando desvía el proyectil)")]
-    public float volumenParry = 1f;
-    [Tooltip("Tiempo de retraso en segundos para el sonido de éxito (0 = instantáneo al chocar)")]
+    [Range(0f, 1f)] public float volumenParry = 1f;
     public float retrasoSonidoParry = 0f;
 
     private bool isParrying = false;
@@ -59,12 +52,16 @@ public class PlayerController : MonoBehaviour
     [Header("Bloqueos de Estado")]
     private bool isAttacking = false;
 
-    [Header("Game Feel")]
-    public float coyoteTime = 0.2f;
-    private float coyoteTimeCounter;
+    [Header("Game Feel (Knockback)")]
     public float knockbackStunDuration = 0.25f;
     private float knockbackStunTimer;
-    private Vector3 escalaAlRecibirDaño;
+    private float lastFacingDirection = 1f;
+
+    [Header("Game Feel (Salto y Disparo Aéreo)")]
+    public float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
+    public float tiempoLevitacionAerea = 0.2f;
+    private float timerLevitacionAerea;
 
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
@@ -149,6 +146,13 @@ public class PlayerController : MonoBehaviour
     {
         inputActions = new InputSystem_Actions();
         rb = GetComponent<Rigidbody2D>();
+
+        // 🔥 DIAGNÓSTICO EXACTO: Si falta el Rigidbody, te avisa por consola en vez de crashear el juego
+        if (rb == null)
+        {
+            Debug.LogError("🚨 ERROR CRÍTICO: El objeto '" + gameObject.name + "' tiene el script PlayerController pero NO tiene un Rigidbody2D. Si este objeto no es tu Jugador, por favor eliminale este script.");
+        }
+
         animator = GetComponent<Animator>();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -164,8 +168,15 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         ActualizarCorazones();
         ultimoCheckpoint = transform.position;
-        originalGravityScale = rb.gravityScale;
+
+        // Seguro de inicio
+        if (rb != null)
+        {
+            originalGravityScale = rb.gravityScale;
+        }
+
         currentStamina = maxStamina;
+        lastFacingDirection = transform.localScale.x > 0 ? 1f : -1f;
 
         if (barraEstamina != null)
         {
@@ -227,10 +238,14 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        // 🛡️ SEGURO ANTI-CRASHEO: Evita el NullReferenceException inmediato
+        if (inputActions == null || rb == null) return;
+
         if (isDead || Time.timeScale == 0f) return;
 
         if (knockbackStunTimer > 0) knockbackStunTimer -= Time.deltaTime;
         if (parryTimer > 0) parryTimer -= Time.deltaTime;
+        if (timerLevitacionAerea > 0) timerLevitacionAerea -= Time.deltaTime;
 
         bool presionaParry = false;
         if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) presionaParry = true;
@@ -263,8 +278,8 @@ public class PlayerController : MonoBehaviour
 
                 if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
 
-                if (inputX > 0.1f) transform.localScale = new Vector3(1, 1, 1);
-                else if (inputX < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
+                if (inputX > 0.1f) lastFacingDirection = 1f;
+                else if (inputX < -0.1f) lastFacingDirection = -1f;
 
                 if (enSuelo && Mathf.Abs(inputX) > 0.1f)
                 {
@@ -332,7 +347,28 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
             }
         }
-        else if (isGrabbingWall) DesactivarAgarre();
+        else if (isGrabbingWall)
+        {
+            Vector2 inputsMovimiento = inputActions.Player.Move.ReadValue<Vector2>();
+
+            if (!tocandoPared && inputsMovimiento.y > 0)
+            {
+                DesactivarAgarre();
+
+                if (animator != null)
+                {
+                    animator.ResetTrigger("JumpTrigger");
+                    animator.SetTrigger("JumpTrigger");
+                }
+                ReproducirSonido(sfxSalto);
+
+                rb.linearVelocity = new Vector2(lastFacingDirection * speed * 0.6f, jumpForce * 0.75f);
+            }
+            else
+            {
+                DesactivarAgarre();
+            }
+        }
 
         if (isGrabbingWall)
         {
@@ -372,15 +408,18 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (knockbackStunTimer > 0)
-        {
-            transform.localScale = escalaAlRecibirDaño;
-        }
+        // Seguro adicional
+        if (rb == null) return;
+
+        Vector3 escalaForzada = transform.localScale;
+        escalaForzada.x = lastFacingDirection;
+        transform.localScale = escalaForzada;
     }
 
     private void FixedUpdate()
     {
-        if (isDead || Time.timeScale == 0f) return;
+        // Seguro adicional
+        if (inputActions == null || rb == null || isDead || Time.timeScale == 0f) return;
 
         if (isGrabbingWall)
         {
@@ -390,6 +429,11 @@ public class PlayerController : MonoBehaviour
         else if (knockbackStunTimer <= 0)
         {
             if (movement != null) movement.FixedTick();
+
+            if (timerLevitacionAerea > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            }
         }
     }
 
@@ -468,7 +512,10 @@ public class PlayerController : MonoBehaviour
     private void DesactivarAgarre()
     {
         isGrabbingWall = false;
-        rb.gravityScale = originalGravityScale;
+
+        // Seguro interno
+        if (rb != null) rb.gravityScale = originalGravityScale;
+
         if (spriteRenderer != null && !isInvincible) spriteRenderer.color = colorOriginal;
     }
 
@@ -505,6 +552,11 @@ public class PlayerController : MonoBehaviour
 
         isAttacking = true;
 
+        if (!enSuelo)
+        {
+            timerLevitacionAerea = tiempoLevitacionAerea;
+        }
+
         if (animator != null) animator.SetTrigger("Attack");
         StartCoroutine(RutinaDisparoSincronizado(context));
     }
@@ -526,7 +578,7 @@ public class PlayerController : MonoBehaviour
 
     private void IntentarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        if (isDead || Time.timeScale == 0f || knockbackStunTimer > 0) return;
+        if (inputActions == null || rb == null || isDead || Time.timeScale == 0f || knockbackStunTimer > 0) return;
 
         if (isGrabbingWall)
         {
@@ -572,7 +624,7 @@ public class PlayerController : MonoBehaviour
 
     private void CancelarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        if (isDead || Time.timeScale == 0f) return;
+        if (rb == null || isDead || Time.timeScale == 0f) return;
 
         if (rb.linearVelocity.y > 0 && !isGrabbingWall)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
@@ -586,14 +638,13 @@ public class PlayerController : MonoBehaviour
             if (currentHealth > maxHealth) currentHealth = maxHealth;
             ActualizarCorazones();
 
-            // 🔥 SOLUCIÓN 1: Mantiene sincronizado al script oculto para que no muera en falso
             if (health != null) health.Init(maxHealth);
         }
     }
 
     public void TakeDamage(int damageAmount, Vector2 knockbackDir, float knockbackForceValue)
     {
-        if (isInvincible || isDead || isParrying) return;
+        if (rb == null || isInvincible || isDead || isParrying) return;
 
         currentHealth -= damageAmount;
 
@@ -609,7 +660,6 @@ public class PlayerController : MonoBehaviour
         {
             if (health != null)
             {
-                // 🔥 SOLUCIÓN 2: Try-Catch protector para enemigos normales
                 try { health.TakeDamage(damageAmount, knockbackDir, knockbackForceValue); }
                 catch (System.Exception e) { Debug.LogWarning("Se evitó error de PlayerHealth: " + e.Message); }
             }
@@ -617,7 +667,6 @@ public class PlayerController : MonoBehaviour
             isInvincible = true;
             invincibilityTimer = invincibilityDuration;
 
-            escalaAlRecibirDaño = transform.localScale;
             knockbackStunTimer = knockbackStunDuration;
 
             DesactivarAgarre();
@@ -631,10 +680,12 @@ public class PlayerController : MonoBehaviour
     {
         isDead = true;
         isAttacking = false;
-        inputActions.Disable();
+
+        if (inputActions != null) inputActions.Disable();
+
         DesactivarAgarre();
 
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
         if (animator != null) animator.SetTrigger("Death");
 
@@ -687,7 +738,7 @@ public class PlayerController : MonoBehaviour
             pantallaNegra.gameObject.SetActive(false);
         }
 
-        inputActions.Enable();
+        if (inputActions != null) inputActions.Enable();
         isDead = false;
 
         isInvincible = true;
@@ -696,13 +747,12 @@ public class PlayerController : MonoBehaviour
 
     private void ProcesarChoques(GameObject objetoTocado)
     {
-        if (movement == null || isDead) return;
+        if (movement == null || isDead || rb == null) return;
         string objName = objetoTocado.name.ToLower();
         string objTag = objetoTocado.tag.ToLower();
 
         if (objetoTocado.layer == 11)
         {
-            // 🔥 SOLUCIÓN 3: Evitar bofetadas dobles en la trampa en el mismo segundo
             if (isInvincible || isDead) return;
 
             currentHealth -= 1;
@@ -716,11 +766,9 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                // Damos invulnerabilidad primero
                 isInvincible = true;
                 invincibilityTimer = invincibilityDuration;
 
-                // 🔥 SOLUCIÓN 4: Teletransportamos ANTES de comunicarnos con el script frágil
                 transform.position = ultimoCheckpoint;
                 DesactivarAgarre();
                 rb.linearVelocity = Vector2.zero;
@@ -728,11 +776,11 @@ public class PlayerController : MonoBehaviour
                 if (health != null)
                 {
                     try { health.TakeDamage(1, Vector2.zero, 0f); }
-                    catch { /* Se ahoga el crasheo para no frenar el teleport */ }
+                    catch { }
                 }
             }
 
-            return; // Corta la ejecución limpia acá
+            return;
         }
 
         if (objName.Contains("checkpoint") || objTag.Contains("checkpoint"))

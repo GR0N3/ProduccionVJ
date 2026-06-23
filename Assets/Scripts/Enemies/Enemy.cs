@@ -14,17 +14,19 @@ public class Enemy : MonoBehaviour, IDamageable
     public float stunDuration = 0.5f;
 
     [Header("Efecto de Muerte")]
-    [Tooltip("Tiene que durar lo mismo o un poquito más que tu animación de muerte para que no desaparezca antes de terminar de caer.")]
     public float fadeDuration = 1f;
 
-    // 🔥 --- NUEVO: SISTEMA DE DROP --- 🔥
     [Header("Drop de Vida")]
-    [Tooltip("El Prefab del corazón o poción que va a soltar (Tiene que ser un objeto con Collider y Script, no solo el dibujo).")]
     public GameObject healthDropPrefab;
-    [Tooltip("Probabilidad de que suelte la vida al morir (0 = Nunca, 100 = Siempre)")]
-    [Range(0f, 100f)]
-    public float dropChance = 30f;
-    // ------------------------------------
+    [Range(0f, 100f)] public float dropChance = 30f;
+
+    [Header("Mecánica Anti Stun-Lock")]
+    public int golpesParaInmunidad = 3;
+    public float duracionInmunidad = 1.5f;
+
+    private int golpesRecibidosSeguidos = 0;
+    private bool esInmuneAlStun = false;
+    private float temporizadorInmunidad = 0f;
 
     public bool isStunned = false;
     public bool isBlocking = false;
@@ -54,26 +56,31 @@ public class Enemy : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
     }
 
+    void Update()
+    {
+        if (esInmuneAlStun)
+        {
+            temporizadorInmunidad -= Time.deltaTime;
+            if (temporizadorInmunidad <= 0f)
+            {
+                esInmuneAlStun = false;
+                golpesRecibidosSeguidos = 0;
+            }
+        }
+    }
+
     void Die()
     {
         OnEnemyDeath?.Invoke();
-
-        
         GenerarDrop();
-
         StartCoroutine(RutinaMuerteDesvanecimiento());
     }
 
-    
     private void GenerarDrop()
     {
-        // Si asignaste un objeto en el Inspector...
         if (healthDropPrefab != null)
         {
-            // Tiramos un dado del 0 al 100
             float probabilidadAleatoria = UnityEngine.Random.Range(0f, 100f);
-
-            // Si el dado cae dentro del porcentaje que elegiste, ¡soltamos el item!
             if (probabilidadAleatoria <= dropChance)
             {
                 Instantiate(healthDropPrefab, transform.position, Quaternion.identity);
@@ -84,26 +91,59 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
         if (IsDead) return false;
-        if (isBlocking) return false;
+
+        // 🔥 NUEVA COMPROBACIÓN TRIGONOMÉTRICA DE FLANQUEO
+        if (isBlocking)
+        {
+            // Multiplicamos la escala horizontal de mirada por la dirección del vector de impacto
+            // Si el resultado es positivo (> 0), significa que el proyectil viaja hacia donde mira el enemigo (le pega por la espalda)
+            bool golpePorLaEspalda = (transform.localScale.x * hitDirection.x) > 0f;
+
+            if (!golpePorLaEspalda)
+            {
+                // El escudo detiene el golpe perfectamente si viene de frente
+                return false;
+            }
+
+            // Si es por detrás, desactivamos el escudo de inmediato para que procese el daño y el stun normal
+            isBlocking = false;
+        }
 
         currentHealth -= damage;
 
-        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
-        if (stunCoroutine != null) StopCoroutine(stunCoroutine);
-
         if (currentHealth <= 0)
         {
+            if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+            if (stunCoroutine != null) StopCoroutine(stunCoroutine);
             Die();
             return true;
         }
-        else
+
+        golpesRecibidosSeguidos++;
+
+        if (golpesRecibidosSeguidos >= golpesParaInmunidad && !esInmuneAlStun)
         {
-            flashCoroutine = StartCoroutine(RutinaParpadeo());
+            esInmuneAlStun = true;
+            temporizadorInmunidad = duracionInmunidad;
+
+            isStunned = false;
+            if (stunCoroutine != null) StopCoroutine(stunCoroutine);
+            if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        }
+
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+        flashCoroutine = StartCoroutine(RutinaParpadeo());
+
+        if (!esInmuneAlStun)
+        {
+            if (stunCoroutine != null) StopCoroutine(stunCoroutine);
             stunCoroutine = StartCoroutine(StunRoutine(stunDuration, hitDirection, knockbackForce));
         }
 
         return false;
     }
+
+    private IEnumerator RutinaParry() { yield return null; } // Marcador por compatibilidad si es requerido por mensajes externos
 
     private IEnumerator RutinaParpadeo()
     {
@@ -128,15 +168,17 @@ public class Enemy : MonoBehaviour, IDamageable
     private IEnumerator StunRoutine(float time, Vector2 direction, float force)
     {
         isStunned = true;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
 
-        rb.linearVelocity = Vector2.zero;
-
-        Vector2 finalForce = direction.normalized * force / knockbackResistance;
-        rb.AddForce(finalForce, ForceMode2D.Impulse);
+        if (rb != null && knockbackResistance > 0)
+        {
+            Vector2 finalForce = direction.normalized * force / knockbackResistance;
+            rb.AddForce(finalForce, ForceMode2D.Impulse);
+        }
 
         yield return new WaitForSeconds(time);
 
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        if (rb != null) rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         isStunned = false;
     }
 
@@ -153,7 +195,6 @@ public class Enemy : MonoBehaviour, IDamageable
             rb.linearVelocity = Vector2.zero;
             rb.bodyType = RigidbodyType2D.Kinematic;
         }
-
 
         if (animator != null)
         {
