@@ -41,6 +41,8 @@ public class PlayerController : MonoBehaviour
     {
         playerManager = ServiceLocator.Get<PlayerManager>();
 
+        Debug.Log(playerManager);
+
         InputActions = new();
         weapon = playerManager.PlayerWeapon;
         health = playerManager.PlayerHealth;

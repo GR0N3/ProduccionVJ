@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: f48ad237b980fb047a860044f56b7a86, type: 3}
+  m_Sprite: {fileID: 105169053199506356, guid: 8fa9ad8dae47044448cb7ebd94d4a75d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -169,9 +169,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b8dc70f1ad2cb04e818e160e3b850eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProyectile
-  damage: 1
-  knockbackForce: 5
-  lifeTime: 0.5
   hitMask:
     serializedVersion: 2
     m_Bits: 320

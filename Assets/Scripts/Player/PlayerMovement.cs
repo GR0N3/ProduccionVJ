@@ -1,4 +1,3 @@
-using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,11 +20,9 @@ public class PlayerMovement
     private Vector2 movement;
     private bool isGrounded;
 
-    private InputSystem_Actions inputActions;
-
     private bool isInLeft;
 
-    private AnimationController anim;
+    private AnimationController anim = new();
 
     public void Init(PlayerController player)
     {
@@ -43,6 +40,11 @@ public class PlayerMovement
     public void SetMoveInput(Vector2 input)
     {
         movement = input;
+        anim.Play(PlayerAnimations.Run);
+        if (movement == Vector2.zero)
+        {
+            anim.Play(PlayerAnimations.Idle);
+        }
     }
 
     public void Jump()
@@ -51,6 +53,7 @@ public class PlayerMovement
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
+        anim.Play(PlayerAnimations.Jump);
     }
 
     public void OnMove(InputAction.CallbackContext ctx)                                                    

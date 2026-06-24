@@ -19,7 +19,7 @@ public class PlayerWeapon
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
-    private AnimationController anim;
+    private AnimationController anim =new();
 
     public void Init(PlayerController player)
     {
@@ -67,6 +67,7 @@ public class PlayerWeapon
     public void OnFire(InputAction.CallbackContext ctx)
     {
         Fire();
+        anim.Play(PlayerAnimations.Attack);
     }
 
     private void ShootNormal()

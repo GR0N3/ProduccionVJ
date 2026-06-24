@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[DefaultExecutionOrder(-98)]
 public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;
@@ -15,9 +14,7 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
     public int MaxHealthPoints => maxHealthPoints;
-
-    private Animator animator;
-    public Animator Animator => animator;
+    public Animator Animator { get; private set; }
 
     public Stats Stats { get; private set; }
 
@@ -35,7 +32,7 @@ public class PlayerManager : MonoBehaviour
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
 
-        animator = GetComponent<Animator>();
+        Animator = GetComponent<Animator>();
 
         InitialStats();
     }

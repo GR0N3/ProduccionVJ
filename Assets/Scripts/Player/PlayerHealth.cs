@@ -13,7 +13,7 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    private AnimationController anim;
+    private AnimationController anim = new();
 
 
     public void Init(PlayerController player)
@@ -37,6 +37,8 @@ public class PlayerHealth
         }
 
         currentHealth -= damage;
+
+        anim.Play(PlayerAnimations.Hurt);
 
         Debug.Log("took damage: " + currentHealth);
 
