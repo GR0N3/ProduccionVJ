@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.UI.Image;
@@ -10,7 +11,6 @@ public class PlayerMovement
     private LayerMask borderLayer;
     private Transform leftBorder;
 
-    private float groundCheckDistance = 1.2f;
     private LayerMask groundLayer;
     private float acceleration;
     private float deceleration;
@@ -43,6 +43,9 @@ public class PlayerMovement
     public void SetMoveInput(Vector2 input)
     {
         movement = input;
+
+        FlipSprite(input.x);
+        
         anim.Play(PlayerAnimations.Run);
         if (movement == Vector2.zero)
         {
@@ -80,30 +83,16 @@ public class PlayerMovement
     {                                                                                     
         GroundCheck();
         LimitLeft();
-
-        if (anim.IsPlaying(PlayerAnimations.Idle.Hash))
-        {
-            Debug.Log("im idle");
-        }
-        else
-        {
-            Debug.Log(anim.Current.Priority);
-        }
     }
                                                                                           
     public void FixedTick()                                                               
-    {                                                                                     
-        float targetSpeed = movement.x * speed;                                           
-                                                                                          
+    {
+        float targetSpeed = movement.x * speed;
+        
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration; 
-                                                                                          
-        float newVelocityX = Mathf.MoveTowards(                                           
-            rb.linearVelocity.x,                                                          
-            targetSpeed,                                                                  
-            accelRate * Time.fixedDeltaTime                                               
-        );                                                                                
-                                                                                          
-        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
+
+        float newVelocityX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelRate * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);
     }
     private void GroundCheck()
     {
@@ -134,6 +123,20 @@ public class PlayerMovement
 
         }
         Debug.DrawRay(rb.position, Vector2.left * 2);
+    }
+
+    private void FlipSprite(float xInput)
+    {
+        var scale = rb.transform.localScale;
+
+        if (xInput > 0)
+        {
+            rb.transform.localScale = new Vector3(math.abs(scale.x), scale.y, scale.z);
+        }
+        else if (xInput < 0)
+        {
+            rb.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
+        }
     }
 
     private void DrawBox(Vector2 origin)

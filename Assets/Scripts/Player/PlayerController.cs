@@ -50,8 +50,10 @@ public class PlayerController : MonoBehaviour
         Animator = GetComponent<Animator>();
         col = GetComponent<Collider2D>(); 
         rb = GetComponent<Rigidbody2D>();
+
         weapon.Init(this);
         movement.Init(this);
+        health.Init(this);
     }
 
     private void OnEnable()
