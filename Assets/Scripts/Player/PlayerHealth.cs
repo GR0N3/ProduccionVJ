@@ -15,7 +15,6 @@ public class PlayerHealth
 
     private AnimationController anim = new();
 
-
     public void Init(PlayerController player)
     {
         anim.Init(player.Animator);
@@ -39,8 +38,6 @@ public class PlayerHealth
         currentHealth -= damage;
 
         anim.Play(PlayerAnimations.Hurt);
-
-        Debug.Log("took damage: " + currentHealth);
 
         OnPlayerDamaged?.Invoke();
 

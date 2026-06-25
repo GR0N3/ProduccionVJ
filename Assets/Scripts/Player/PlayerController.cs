@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerMovement movement;
     public Rigidbody2D rb;
+    public Collider2D col;
     public float Speed => playerManager.Stats.GetStat(UpgradeType.Speed);
     public float JumpForce => playerManager.Stats.GetStat(UpgradeType.JumpForce);
     public float Acceleration => playerManager.Stats.GetStat(UpgradeType.Acceleration);
@@ -41,15 +42,13 @@ public class PlayerController : MonoBehaviour
     {
         playerManager = ServiceLocator.Get<PlayerManager>();
 
-        Debug.Log(playerManager);
-
         InputActions = new();
         weapon = playerManager.PlayerWeapon;
         health = playerManager.PlayerHealth;
         movement = playerManager.PlayerMovement;
 
-        Animator = playerManager.Animator;
-
+        Animator = GetComponent<Animator>();
+        col = GetComponent<Collider2D>(); 
         rb = GetComponent<Rigidbody2D>();
         weapon.Init(this);
         movement.Init(this);

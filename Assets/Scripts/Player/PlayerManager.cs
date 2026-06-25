@@ -14,8 +14,6 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
     public int MaxHealthPoints => maxHealthPoints;
-    public Animator Animator { get; private set; }
-
     public Stats Stats { get; private set; }
 
     private void Awake()
@@ -31,8 +29,6 @@ public class PlayerManager : MonoBehaviour
         playerWeapon = new PlayerWeapon();
         playerHealth = new PlayerHealth();
         playerMovement = new PlayerMovement();
-
-        Animator = GetComponent<Animator>();
 
         InitialStats();
     }

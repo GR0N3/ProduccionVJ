@@ -4,21 +4,29 @@ public class AnimationController
 {
     private Animator animator;
 
-    private int currentAnimation = -1;
+    private AnimationState current = PlayerAnimations.Idle;
+
+    public AnimationState Current => current;
 
     public void Init(Animator animator)
     {
         this.animator = animator;
     }
 
-    public void Play(int animation, float crossFade = 0.1f)
+    public bool Play(AnimationState next, float fade = 0.1f, bool force = false)
     {
-        if (currentAnimation == animation)
-            return;
+        if (!force && next.Priority < current.Priority)
+        {
+            return false;
+        }
+        if (current.Hash == next.Hash) 
+        {
+            return false;
+        }
+        current = next;
+        animator.CrossFade(next.Hash, fade, 0);
+        return true;
 
-        currentAnimation = animation;
-
-        animator.CrossFade(animation,crossFade);
     }
 
     public bool IsPlaying(int animation)
@@ -55,4 +63,5 @@ public class AnimationController
     {
         animator.ResetTrigger(parameter);
     }
+
 }
