@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[DefaultExecutionOrder(-98)]
 public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;
@@ -38,7 +37,7 @@ public class PlayerManager : MonoBehaviour
     {
         Stats.SetStat(UpgradeType.MaxHealth, 10);
         Stats.SetStat(UpgradeType.Speed, 10);
-        Stats.SetStat(UpgradeType.JumpForce, 20);
+        Stats.SetStat(UpgradeType.JumpForce, 24);
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 5);
         Stats.SetStat(UpgradeType.Damage, 1);

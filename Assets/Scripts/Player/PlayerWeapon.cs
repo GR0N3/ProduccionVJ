@@ -11,26 +11,32 @@ public class PlayerWeapon
     private float bulletLifetime = 0.5f;
     private float bulletsSpread;
     private int damage;
-    private float attackSpeed;
     private float knockbackforce;
     private int bulletsCount;
+    private float attackSpeed;
 
     private InputSystem_Actions inputActions;
 
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
+    private AnimatorBrain anim = new();
+
+    private Rigidbody2D rb;
+
     public void Init(PlayerController player)
     {
         playerController = player;
         firePoint = player.FirePoint;
         damage = player.Damage;
-        attackSpeed = player.AttackSpeed;
         knockbackforce = player.KnockbackForce;
         bulletsSpread = player.BulletSpread;
         bulletSpeed = player.BulletSpeed;
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
+        anim = player.AnimatorBrain;
+        attackSpeed = player.AttackSpeed;
+        rb = player.rb; 
     }
 
     public void SetMoveInput(Vector2 input)
@@ -43,23 +49,6 @@ public class PlayerWeapon
         }
     }
 
-    public void Fire()
-    {
-        ShootNormal();
-        playerController.PlayAttackAnimation();
-    }
-
-    public void AltFire()
-    {
-        ShootSpread();
-        playerController.PlayAttackAnimation();
-    }
-
-    public void OnAltFire(InputAction.CallbackContext ctx)
-    {
-        AltFire();
-    }
-
     public void OnMove(InputAction.CallbackContext ctx)
     {
         SetMoveInput(ctx.ReadValue<Vector2>());
@@ -67,36 +56,27 @@ public class PlayerWeapon
 
     public void OnFire(InputAction.CallbackContext ctx)
     {
-<<<<<<< HEAD
-        Fire();
-=======
         anim.Play(PlayerAnimations.Attack, lockAnimation: true, speed: attackSpeed);
->>>>>>> 8eeac3b (Push de scenes)
     }
 
-    private void ShootNormal()
+    public void Shoot()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-        ? movement.normalized
-        : lastDirection;
+        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
 
-        FireBullet(baseDir);
-    }
+        if (bulletsCount == 1)
+        {
+            FireBullet(baseDir);
+            return;
+        }
 
-    private void ShootSpread()
-    {
-        Vector2 baseDir = (movement != Vector2.zero)
-            ? movement.normalized
-            : lastDirection;
+        float step = (bulletsSpread * 0.5f) / (bulletsCount - 1);
 
-        //for (int i =0; i<= bulletsCount; i++)
-        //{
-        //    FireBullet(baseDir);
-        //} Cambiar x formula para los tiros blablabla
+        for (int i = 0; i < bulletsCount; i++)
+        {
+            float angle = (i - (bulletsCount - 1) / 2f) * bulletsSpread;
+            FireBullet(Rotate(baseDir, angle));
+        }
 
-        FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, bulletsSpread));   // derecha
-        FireBullet(Rotate(baseDir, -bulletsSpread));  // izquierda
     }
 
     private Vector2 Rotate(Vector2 direction, float angle)
@@ -121,11 +101,11 @@ public class PlayerWeapon
 
     #region Upgrades
 
-    public void UpgradeDamage(int result) {damage = result;}
-    public void UpgradeBulletSpeed(float result) {bulletSpeed = result;}
-    public void UpgradeBulletsCount(int result) {bulletsCount = result;}
-    public void UpgradeBulletsSpread(float result) {bulletsSpread = result;}
-    public void UpgradeKnockbackForce(float result) {knockbackforce = result;}
+    public void UpgradeDamage(int result) { damage = result; }
+    public void UpgradeBulletSpeed(float result) { bulletSpeed = result; }
+    public void UpgradeBulletsCount(int result) { bulletsCount = result; }
+    public void UpgradeBulletsSpread(float result) { bulletsSpread = result; }
+    public void UpgradeKnockbackForce(float result) { knockbackforce = result; }
 
     #endregion
 }
