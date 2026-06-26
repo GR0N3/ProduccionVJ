@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7412325028320168343
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1945049493783585297}
+  - component: {fileID: 1954977099335435730}
+  m_Layer: 0
+  m_Name: UpgradesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1945049493783585297
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7412325028320168343}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1954977099335435730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7412325028320168343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb234de74ed031646b418a1f08f0e5c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradesManager
+  upgradesCant: 3
+  upgradeCardPrefab: {fileID: 4311018239715742215, guid: addbcf41cea5dfb4599268a8a3c204e6, type: 3}
+  allUpgrades:
+  - {fileID: 11400000, guid: 6a532a51900eff44ebd2a5c4536903bc, type: 2}
+  - {fileID: 11400000, guid: fecced0dde6d6ed4190bfa3837aa6bc8, type: 2}
+  - {fileID: 11400000, guid: 3afe4b482c668e44cad739ad6595d99d, type: 2}
+  - {fileID: 11400000, guid: 10d28b757d2a1744487e581c673e0385, type: 2}
+  - {fileID: 11400000, guid: 04659b40c03eea44999e9c987df9a50c, type: 2}
+  - {fileID: 11400000, guid: 60c6f9325bb1a884595489528a5471a7, type: 2}
+  - {fileID: 11400000, guid: 687783f42e5037f40b2c4e797852c067, type: 2}
+  - {fileID: 11400000, guid: 01e844f5d8cdb4f4bb72a74a392bf63d, type: 2}
+  upgradesParent: {fileID: 0}

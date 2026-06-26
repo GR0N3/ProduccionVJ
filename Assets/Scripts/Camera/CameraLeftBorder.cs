@@ -47,7 +47,7 @@ public class CameraLeftBorder : MonoBehaviour
         float halfWidth = cam.orthographicSize * cam.aspect;
 
         float playerPushPoint = player.position.x - halfWidth;
-
+        
         if (playerPushPoint > maxX)
         {
             maxX = playerPushPoint;

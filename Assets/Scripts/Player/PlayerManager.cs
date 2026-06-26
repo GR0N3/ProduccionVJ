@@ -15,7 +15,6 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
     public int MaxHealthPoints => maxHealthPoints;
-
     public Stats Stats { get; private set; }
 
     private void Awake()
@@ -41,23 +40,21 @@ public class PlayerManager : MonoBehaviour
         Stats.SetStat(UpgradeType.Speed, 10);
         Stats.SetStat(UpgradeType.JumpForce, 20);
         Stats.SetStat(UpgradeType.Acceleration, 20);
-        Stats.SetStat(UpgradeType.Deceleration, 25);
+        Stats.SetStat(UpgradeType.Deceleration, 5);
         Stats.SetStat(UpgradeType.Damage, 1);
         Stats.SetStat(UpgradeType.BulletSpeed, 10);
-        Stats.SetStat(UpgradeType.BullesCount, 10);
-        Stats.SetStat(UpgradeType.BulletsSpread, 0);
-        Stats.SetStat(UpgradeType.KnockbackForce, 0.5f);
+        Stats.SetStat(UpgradeType.BulletsCount, 1);
+        Stats.SetStat(UpgradeType.BulletsSpread,0);
+        Stats.SetStat(UpgradeType.KnockbackForce, 0.1f);
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 25);
 
-        playerHealth.Init((int)Stats.GetStat(UpgradeType.MaxHealth));
+        playerHealth.SetHealth((int)Stats.GetStat(UpgradeType.MaxHealth));
     }
 
     private void OnDestroy()
     {
         ServiceLocator.Unregister<PlayerManager>();
     }
-
-    //Usar el manager para las mejoras 
 
 }
