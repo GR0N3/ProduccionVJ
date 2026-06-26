@@ -66,6 +66,7 @@ public class SessionController : MonoBehaviour
     {
         sceneIndex = 0;
         CurrentScene = sceneAssets[sceneIndex];
+        BackToMainMenu();
     }
 
     private void LevelCompleted()
@@ -104,6 +105,18 @@ public class SessionController : MonoBehaviour
     {
         gold = result;
         UpdateGoldUI();
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneController.Instance
+            .NewTransition()
+            .Unload(SceneDataBase.Scenes.Match)
+            .Unload(SceneDataBase.Scenes.Session)
+            .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
+            .WithClearUnusedAssets()
+            .WithOverlay()
+            .Perfrom();
     }
 
     private void OnDestroy()

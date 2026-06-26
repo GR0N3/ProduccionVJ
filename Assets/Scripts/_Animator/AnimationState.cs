@@ -1,13 +1,11 @@
-using UnityEngine;
-
-public class AnimationState
+public readonly struct AnimationState
 {
-    public int Hash;
-    public int Priority;
+    public readonly int Hash;
+    public readonly bool Loop;
 
-    public AnimationState(int hash, int priority)
+    public AnimationState(int hash, bool loop = false)
     {
         Hash = hash;
-        Priority = priority;
+        Loop = loop;
     }
 }

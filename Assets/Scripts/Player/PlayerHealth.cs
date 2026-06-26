@@ -13,11 +13,12 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    private AnimationController anim = new();
+    private AnimatorBrain anim = new();
 
     public void Init(PlayerController player)
+
     {
-        anim.Init(player.Animator);
+        anim = player.AnimatorBrain;
     }
 
     public void SetHealth(int maxHealth)
@@ -37,7 +38,8 @@ public class PlayerHealth
 
         currentHealth -= damage;
 
-        anim.Play(PlayerAnimations.Hurt);
+        anim.Play(PlayerAnimations.Hurt, lockAnimation: false, overrideLock: true);
+        
 
         OnPlayerDamaged?.Invoke();
 
@@ -55,15 +57,9 @@ public class PlayerHealth
 
     public void Death()
     {
-        SceneController.Instance
-            .NewTransition()
-            .Unload(SceneDataBase.Scenes.Match)
-            .Unload(SceneDataBase.Scenes.Session)
-            .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
-            .WithClearUnusedAssets()
-            .WithOverlay()
-            .Perfrom();
+        anim.Play(PlayerAnimations.Death, lockAnimation: true, overrideLock: true);
         OnPlayerDeath?.Invoke();
+
     }
 
     #region Upgrades

@@ -1,5 +1,9 @@
+using System;
 using UnityEngine;
 
+
+//DEPRECATED
+[Obsolete("Old animation controller - Not Working")]
 public class AnimationController
 {
     private Animator animator;
@@ -15,18 +19,18 @@ public class AnimationController
 
     public bool Play(AnimationState next, float fade = 0.1f, bool force = false)
     {
-        if (!force && next.Priority < current.Priority)
-        {
-            return false;
-        }
-        if (current.Hash == next.Hash) 
-        {
-            return false;
-        }
-        current = next;
-        animator.CrossFade(next.Hash, fade, 0);
+        //if (!force && next.Priority < current.Priority)
+        //{
+        //    return false;
+        //}
+        //if (current.Hash == next.Hash) 
+        //{
+        //    return false;
+        //}
+        //current = next;
+        //animator.CrossFade(next.Hash, fade, 0);
         return true;
-
+    
     }
 
     public bool IsPlaying(int animation)

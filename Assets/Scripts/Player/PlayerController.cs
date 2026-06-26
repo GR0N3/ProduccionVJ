@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     public GameObject BulletPrefab => bulletPrefab;
     public int Damage => (int)playerManager.Stats.GetStat(UpgradeType.Damage);
-    public int BulletsCount => (int)playerManager.Stats.GetStat(UpgradeType.BullesCount);
+    public int BulletsCount => (int)playerManager.Stats.GetStat(UpgradeType.BulletsCount);
     public float BulletSpread => playerManager.Stats.GetStat(UpgradeType.BulletsSpread);
     public float BulletSpeed => playerManager.Stats.GetStat(UpgradeType.BulletSpeed);
     public float KnockbackForce => playerManager.Stats.GetStat(UpgradeType.KnockbackForce);
@@ -38,18 +38,24 @@ public class PlayerController : MonoBehaviour
     public InputSystem_Actions InputActions { get; private set; }
 
     public Animator Animator { get; private set; }
+    public AnimatorBrain AnimatorBrain { get; private set; }
     private void Awake()
     {
         playerManager = ServiceLocator.Get<PlayerManager>();
 
         InputActions = new();
+
         weapon = playerManager.PlayerWeapon;
         health = playerManager.PlayerHealth;
         movement = playerManager.PlayerMovement;
 
-        Animator = GetComponent<Animator>();
         col = GetComponent<Collider2D>(); 
         rb = GetComponent<Rigidbody2D>();
+        Animator = GetComponent<Animator>();
+
+        AnimatorBrain = new();
+        AnimatorBrain.SetIdle(PlayerAnimations.Idle);
+        AnimatorBrain.Init(Animator);
 
         weapon.Init(this);
         movement.Init(this);
@@ -62,7 +68,6 @@ public class PlayerController : MonoBehaviour
 
         InputActions.Player.Attack.performed += weapon.OnFire;
         InputActions.Player.Move.performed += weapon.OnMove;
-        InputActions.Player.AltAttack.performed += weapon.OnAltFire;
 
         InputActions.Player.Move.performed += movement.OnMove;
         InputActions.Player.Move.canceled += movement.OnMove;
@@ -73,7 +78,6 @@ public class PlayerController : MonoBehaviour
     {
         InputActions.Player.Attack.performed -= weapon.OnFire;
         InputActions.Player.Move.performed -= weapon.OnMove;
-        InputActions.Player.AltAttack.performed -= weapon.OnAltFire;
 
         InputActions.Player.Move.performed -= movement.OnMove;
         InputActions.Player.Move.canceled -= movement.OnMove;
@@ -85,11 +89,17 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         movement.Tick();
+        AnimatorBrain.Tick();
     }
 
     private void FixedUpdate()
     {
         movement.FixedTick();
+    }
+
+    public void Shoot()
+    {
+        weapon.Shoot();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

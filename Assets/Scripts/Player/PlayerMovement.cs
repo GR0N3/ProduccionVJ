@@ -24,7 +24,7 @@ public class PlayerMovement
 
     private bool isInLeft;
 
-    private AnimationController anim = new();
+    private AnimatorBrain anim = new();
 
     public void Init(PlayerController player)
     {
@@ -36,8 +36,7 @@ public class PlayerMovement
         borderLayer = player.BorderLayer;
         acceleration = player.Acceleration;
         deceleration = player.Deceleration;
-        anim.Init(player.Animator);
-
+        anim = player.AnimatorBrain;
     }
 
     public void SetMoveInput(Vector2 input)
@@ -45,12 +44,6 @@ public class PlayerMovement
         movement = input;
 
         FlipSprite(input.x);
-        
-        anim.Play(PlayerAnimations.Run);
-        if (movement == Vector2.zero)
-        {
-            anim.Play(PlayerAnimations.Idle);
-        }
     }
 
     public void Jump()
@@ -59,7 +52,6 @@ public class PlayerMovement
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
-        anim.Play(PlayerAnimations.Jump);
     }
 
     public void OnMove(InputAction.CallbackContext ctx)                                                    
@@ -83,6 +75,8 @@ public class PlayerMovement
     {                                                                                     
         GroundCheck();
         LimitLeft();
+
+        UpdateAnimations();
     }
                                                                                           
     public void FixedTick()                                                               
@@ -135,7 +129,33 @@ public class PlayerMovement
         }
         else if (xInput < 0)
         {
-            rb.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
+            rb.transform.localScale = new Vector3(-math.abs(scale.x), scale.y, scale.z);
+        }
+    }
+
+    private void UpdateAnimations()
+    {
+        if (!isGrounded)
+        {
+            if (rb.linearVelocity.y > 0.1f)
+            {
+                anim.Play(PlayerAnimations.Jump);
+            }
+            else if (rb.linearVelocity.y < -0.1f)
+            {
+                anim.Play(PlayerAnimations.Fall);
+            }
+
+            return;
+        }
+
+        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+        {
+            anim.Play(PlayerAnimations.Run);
+        }
+        else
+        {
+            anim.Play(PlayerAnimations.Idle);
         }
     }
 

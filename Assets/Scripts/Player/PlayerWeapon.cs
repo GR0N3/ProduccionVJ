@@ -19,7 +19,7 @@ public class PlayerWeapon
     private Vector2 movement;
     private Vector2 lastDirection = Vector2.right; // default
 
-    private AnimationController anim =new();
+    private AnimatorBrain anim = new();
 
     public void Init(PlayerController player)
     {
@@ -31,7 +31,7 @@ public class PlayerWeapon
         bulletSpeed = player.BulletSpeed;
         bulletsCount = player.BulletsCount;
         bulletPrefab = player.BulletPrefab;
-        anim.Init(player.Animator);
+        anim = player.AnimatorBrain;
     }
 
     public void SetMoveInput(Vector2 input)
@@ -44,21 +44,6 @@ public class PlayerWeapon
         }
     }
 
-    public void Fire()
-    {
-        ShootNormal();
-    }
-
-    public void AltFire()
-    {
-        ShootSpread();
-    }
-
-    public void OnAltFire(InputAction.CallbackContext ctx)
-    {
-        AltFire();
-    }
-
     public void OnMove(InputAction.CallbackContext ctx)
     {
         SetMoveInput(ctx.ReadValue<Vector2>());
@@ -66,33 +51,27 @@ public class PlayerWeapon
 
     public void OnFire(InputAction.CallbackContext ctx)
     {
-        Fire();
-        anim.Play(PlayerAnimations.Attack);
+        anim.Play(PlayerAnimations.Attack, lockAnimation: true);
     }
 
-    private void ShootNormal()
+    public void Shoot()
     {
-        Vector2 baseDir = (movement != Vector2.zero)
-        ? movement.normalized
-        : lastDirection;
+        Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
+        
+        if (bulletsCount == 1)
+        {
+            FireBullet(baseDir);
+            return;
+        }
 
-        FireBullet(baseDir);
-    }
+        float step = (bulletsSpread * 0.5f ) / (bulletsCount - 1);
 
-    private void ShootSpread()
-    {
-        Vector2 baseDir = (movement != Vector2.zero)
-            ? movement.normalized
-            : lastDirection;
+        for (int i = 0; i < bulletsCount; i++) 
+        {
+            float angle = (i - (bulletsCount - 1)/ 2f) * bulletsSpread;
+            FireBullet(Rotate(baseDir, angle));
+        }
 
-        //for (int i =0; i<= bulletsCount; i++)
-        //{
-        //    FireBullet(baseDir);
-        //} Cambiar x formula para los tiros blablabla
-
-        FireBullet(baseDir); // centro
-        FireBullet(Rotate(baseDir, bulletsSpread));   // derecha
-        FireBullet(Rotate(baseDir, -bulletsSpread));  // izquierda
     }
 
     private Vector2 Rotate(Vector2 direction, float angle)

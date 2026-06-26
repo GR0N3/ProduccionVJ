@@ -42,9 +42,9 @@ public class PlayerManager : MonoBehaviour
         Stats.SetStat(UpgradeType.Deceleration, 5);
         Stats.SetStat(UpgradeType.Damage, 1);
         Stats.SetStat(UpgradeType.BulletSpeed, 10);
-        Stats.SetStat(UpgradeType.BullesCount, 10);
-        Stats.SetStat(UpgradeType.BulletsSpread, 0);
-        Stats.SetStat(UpgradeType.KnockbackForce, 0.5f);
+        Stats.SetStat(UpgradeType.BulletsCount, 1);
+        Stats.SetStat(UpgradeType.BulletsSpread,0);
+        Stats.SetStat(UpgradeType.KnockbackForce, 0.1f);
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 25);
 
@@ -55,7 +55,5 @@ public class PlayerManager : MonoBehaviour
     {
         ServiceLocator.Unregister<PlayerManager>();
     }
-
-    //Usar el manager para las mejoras 
 
 }
