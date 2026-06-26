@@ -80,9 +80,7 @@ public class UpgradesManager : MonoBehaviour
             }
         }
 
-        int totalGold =  controller.Gold - upgrade.cost;
-
-        controller.ChangeGold(totalGold);
+        int totalGold =  (int)controller.Points - upgrade.cost;
 
     }
 

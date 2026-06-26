@@ -1,8 +1,13 @@
+using System;
 using UnityEngine;
 
 public class ShopController : MonoBehaviour
 {
     private SessionController sessionController;
+
+    public static event Action OnLevelBegin;
+
+
     private void Awake()
     {
         sessionController = ServiceLocator.Get<SessionController>();
@@ -16,5 +21,10 @@ public class ShopController : MonoBehaviour
             .WithOverlay()
             .Unload(SceneDataBase.Scenes.Shop)
             .Perfrom();
+
+        OnLevelBegin?.Invoke();
     }
+
+    
+
 }

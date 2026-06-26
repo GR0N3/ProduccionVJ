@@ -45,9 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SessionController
   sceneAssets:
-  - {fileID: 102900000, guid: 7ec79b30f4f23504da6586726c3847c0, type: 3}
-  - {fileID: 102900000, guid: 83fe4d675d470b643b58dd1c18de0695, type: 3}
-  - {fileID: 102900000, guid: 8c9d75a6a420b0744b07c73523774a21, type: 3}
-  PlayerManager: {fileID: 0}
+  - {fileID: 102900000, guid: 6e2976812b466034aa922d5e2d6422df, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
   pointsText: {fileID: 0}
-  goldText: {fileID: 0}
+  timer: {fileID: 0}
+  maxTimerBonus: 0
+  PlayerManager: {fileID: 0}

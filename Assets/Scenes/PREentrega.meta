@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: b6bf7a83c075a73419e7e55f6879f883
+=======
+guid: 3e0240d79dc58f3409260e94096a3128
+>>>>>>> 8eeac3b (Push de scenes)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

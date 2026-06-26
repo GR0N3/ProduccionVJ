@@ -11,6 +11,7 @@ public class PlayerWeapon
     private float bulletLifetime = 0.5f;
     private float bulletsSpread;
     private int damage;
+    private float attackSpeed;
     private float knockbackforce;
     private int bulletsCount;
 
@@ -24,6 +25,7 @@ public class PlayerWeapon
         playerController = player;
         firePoint = player.FirePoint;
         damage = player.Damage;
+        attackSpeed = player.AttackSpeed;
         knockbackforce = player.KnockbackForce;
         bulletsSpread = player.BulletSpread;
         bulletSpeed = player.BulletSpeed;
@@ -65,7 +67,11 @@ public class PlayerWeapon
 
     public void OnFire(InputAction.CallbackContext ctx)
     {
+<<<<<<< HEAD
         Fire();
+=======
+        anim.Play(PlayerAnimations.Attack, lockAnimation: true, speed: attackSpeed);
+>>>>>>> 8eeac3b (Push de scenes)
     }
 
     private void ShootNormal()

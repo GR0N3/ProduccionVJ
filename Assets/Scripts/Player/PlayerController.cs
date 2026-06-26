@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     public int BulletsCount => (int)playerManager.Stats.GetStat(UpgradeType.BullesCount);
     public float BulletSpread => playerManager.Stats.GetStat(UpgradeType.BulletsSpread);
     public float BulletSpeed => playerManager.Stats.GetStat(UpgradeType.BulletSpeed);
+    public float AttackSpeed => playerManager.Stats.GetStat(UpgradeType.AttackSpeed);
     public float KnockbackForce => playerManager.Stats.GetStat(UpgradeType.KnockbackForce);
 
     [SerializeField] private Transform firePoint;

@@ -45,6 +45,7 @@ public class PlayerManager : MonoBehaviour
         Stats.SetStat(UpgradeType.BulletSpeed, 10);
         Stats.SetStat(UpgradeType.BulletsCount, 1);
         Stats.SetStat(UpgradeType.BulletsSpread,0);
+        Stats.SetStat(UpgradeType.AttackSpeed,1f);
         Stats.SetStat(UpgradeType.KnockbackForce, 0.1f);
         Stats.SetStat(UpgradeType.Acceleration, 20);
         Stats.SetStat(UpgradeType.Deceleration, 25);

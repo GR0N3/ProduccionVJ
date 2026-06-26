@@ -223,6 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 163890030}
   - component: {fileID: 163890031}
+  - component: {fileID: 163890032}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -253,6 +254,61 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 163890029}
   m_Enabled: 1
+--- !u!114 &163890032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163890029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ac3fcd141e52a4f8a598b878146d10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  sounds:
+  - name: Fall
+    clip: {fileID: 8300000, guid: 1acb46510aebcfc4eb458420be4dc954, type: 3}
+    volume: 0.432
+    pitch: 0.55
+    loop: 0
+    source: {fileID: 0}
+  - name: Checkpoint
+    clip: {fileID: 8300000, guid: 7d48c6a425c722349a600954f6538a39, type: 3}
+    volume: 0.109
+    pitch: 1.04
+    loop: 0
+    source: {fileID: 0}
+  - name: Coin
+    clip: {fileID: 8300000, guid: c8587e60451170240b701688cd9ae378, type: 3}
+    volume: 0.76
+    pitch: 1.1
+    loop: 0
+    source: {fileID: 0}
+  - name: Step1
+    clip: {fileID: 8300000, guid: bc5b967ad2bc7ac42b05fb28efab2eb4, type: 3}
+    volume: 0.828
+    pitch: 0.99
+    loop: 1
+    source: {fileID: 0}
+  - name: Step2
+    clip: {fileID: 8300000, guid: 652d1e4523cdebb44a7d356514045718, type: 3}
+    volume: 0.599
+    pitch: 1.2
+    loop: 1
+    source: {fileID: 0}
+  - name: Jump
+    clip: {fileID: 8300000, guid: 88c3e983344f66c4390d7b70538e2723, type: 3}
+    volume: 0.729
+    pitch: 1.49
+    loop: 0
+    source: {fileID: 0}
+  - name: ArrowHit
+    clip: {fileID: 8300000, guid: 1824ecd7864c0b94abf916f209576abd, type: 3}
+    volume: 0.771
+    pitch: 0.87
+    loop: 0
+    source: {fileID: 0}
 --- !u!1 &483726869
 GameObject:
   m_ObjectHideFlags: 0

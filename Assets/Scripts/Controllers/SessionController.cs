@@ -5,44 +5,40 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Rendering;
-[DefaultExecutionOrder(-99)]
 public class SessionController : MonoBehaviour
 {
     
-    private float points = 0f;
-    private int gold = 1;
+    private int points = 0;
 
     private InputSystem_Actions inputActions;
 
     private int sceneIndex;
 
     [SerializeField] private List<SceneAsset> sceneAssets;
+
+    [SerializeField] private TMP_Text pointsText; 
+
+    [SerializeField] private Timer timer;
+    [SerializeField] private float maxTimerBonus;
     public SceneAsset CurrentScene {  get; private set; }
 
     private void OnEnable()
     {
         Enemy.OnEnemyDeath += UpdateScoreUI;
-        Enemy.OnEnemyDeath += AddGold;
         Door.OnLevelCompleted += LevelCompleted;
         PlayerHealth.OnPlayerDeath += ResetLevel;
     }
     private void OnDisable()
     {
         Enemy.OnEnemyDeath -= UpdateScoreUI;
-        Enemy.OnEnemyDeath -= AddGold;
         Door.OnLevelCompleted -= LevelCompleted;
         PlayerHealth.OnPlayerDeath -= ResetLevel;
     }
 
     private string orignaltext;
-    private string goldOriginalText;
 
     public PlayerManager PlayerManager;
     public float Points => points;
-    public int Gold => gold;
-
-    [SerializeField] private TMP_Text pointsText; 
-    [SerializeField] private TMP_Text goldText;
 
     private void Awake()
     {
@@ -53,10 +49,8 @@ public class SessionController : MonoBehaviour
     private void Start()
     {
         orignaltext = pointsText.text;
-        goldOriginalText = goldText.text;
 
         pointsText.text += points.ToString();
-        goldText.text += gold.ToString();
 
         CurrentScene = sceneAssets[sceneIndex];
 
@@ -72,8 +66,13 @@ public class SessionController : MonoBehaviour
     private void LevelCompleted()
     {
         sceneIndex++;
+
         if (sceneIndex > sceneAssets.Count - 1)
         {
+            TimerPoints();
+
+            timer.RestartTimer();
+
             ResetLevel();
         }
         else
@@ -84,27 +83,9 @@ public class SessionController : MonoBehaviour
         Debug.Log(sceneIndex);
     }
 
-    private void AddGold()
-    {
-        gold += 1;
-        UpdateGoldUI();
-    }
-
     public void UpdateScoreUI()
     {
-        points += 10;
         pointsText.text = orignaltext + (points).ToString();
-        
-    }
-    public void UpdateGoldUI()
-    {
-        goldText.text = goldOriginalText + (gold).ToString();
-    }
-
-    public void ChangeGold(int result)
-    {
-        gold = result;
-        UpdateGoldUI();
     }
 
     public void BackToMainMenu()
@@ -117,6 +98,35 @@ public class SessionController : MonoBehaviour
             .WithClearUnusedAssets()
             .WithOverlay()
             .Perfrom();
+    }
+
+    public void TimerPoints()
+    {
+        Debug.Log(timer.RemainingTime);
+
+        float ratio =
+            timer.RemainingTime /
+            timer.MaxTime;
+
+        int bonus =
+            Mathf.RoundToInt(
+                ratio *
+                ratio *
+                maxTimerBonus
+            );
+
+        Debug.Log(bonus);
+
+        AddPoints(bonus);
+    }
+
+    public void AddPoints(int amount)
+    {
+        points += amount;
+
+        pointsText.text =
+            orignaltext +
+            points;
     }
 
     private void OnDestroy()

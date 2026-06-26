@@ -25,7 +25,7 @@ public class AnimatorBrain
         idleAnimation = idle;
     }
 
-    public bool Play(AnimationState next, bool lockAnimation = false, bool overrideLock = false, float fade = 0.1f)
+    public bool Play(AnimationState next, bool lockAnimation = false, bool overrideLock = false, float fade = 0.1f, float? speed = null )
     {
         if (locked && !overrideLock)
         {
@@ -40,6 +40,8 @@ public class AnimatorBrain
         current = next;
 
         locked = lockAnimation;
+
+        animator.speed = speed ?? next.Speed;
 
         animator.CrossFade(next.Hash, fade, 0);
 
@@ -68,6 +70,15 @@ public class AnimatorBrain
         return info.shortNameHash == current.Hash && info.normalizedTime >= 1f;
     }
 
+    public void SetPlaybackSpeed(float speed)
+    {
+        animator.speed = speed;
+    }
+
+    public void ResetPlaybackSpeed()
+    {
+        animator.speed = 1f;
+    }
 
     public void Tick()
     {

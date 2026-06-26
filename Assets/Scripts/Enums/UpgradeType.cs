@@ -12,5 +12,6 @@ public enum UpgradeType
     BulletSpeed,
     BulletsCount,
     BulletsSpread,
+    AttackSpeed,
     KnockbackForce
 }

@@ -327,14 +327,14 @@ public class EnemyAI : MonoBehaviour
 
             if (impacto != null)
             {
-                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
-                if (playerCtrl != null && !playerCtrl.isDead)
-                {
-                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
-                    direccionEmpuje.y = 0.5f;
-                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
-                    yaGolpeo = true;
-                }
+                //PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                //if (playerCtrl != null && !playerCtrl.isDead)
+                //{
+                //    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                //    direccionEmpuje.y = 0.5f;
+                //    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                //    yaGolpeo = true;
+                //}
             }
 
             tiempo += Time.deltaTime;
@@ -356,14 +356,14 @@ public class EnemyAI : MonoBehaviour
 
             if (impacto != null)
             {
-                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
-                if (playerCtrl != null && !playerCtrl.isDead)
-                {
-                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
-                    direccionEmpuje.y = 0.5f;
-                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
-                    yaGolpeo = true;
-                }
+                //PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                //if (playerCtrl != null && !playerCtrl.isDead)
+                //{
+                //    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                //    direccionEmpuje.y = 0.5f;
+                //    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                //    yaGolpeo = true;
+                //}
             }
 
             tiempo += Time.deltaTime;
