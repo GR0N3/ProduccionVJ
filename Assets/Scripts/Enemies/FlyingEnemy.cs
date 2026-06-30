@@ -1,10 +1,16 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI; // 🔥 NUEVO: Necesario para controlar la barra de vida
 
 public class FlyingEnemy : MonoBehaviour, IDamageable
 {
     [Header("Estadísticas")]
     public int health = 3;
+
+    // 🔥 NUEVO: Referencia a la barra de vida
+    [Header("UI de Vida")]
+    [Tooltip("Arrastra aquí el Slider de la barra de vida del enemigo volador")]
+    public Slider healthBar;
 
     [Header("Patrulla (Cielo)")]
     public float patrolSpeed = 2f;
@@ -74,6 +80,13 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         PlayerController player = FindAnyObjectByType<PlayerController>();
         if (player != null) playerTransform = player.transform;
+
+        // 🔥 NUEVO: Inicializamos la barra de vida al máximo
+        if (healthBar != null)
+        {
+            healthBar.maxValue = health;
+            healthBar.value = health;
+        }
     }
 
     void FixedUpdate()
@@ -267,7 +280,6 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         cooldownTimer = attackCooldown;
     }
 
-    // 🔥 Función donde calculamos si suelta el corazón
     private void GenerarDrop()
     {
         if (healthDropPrefab != null)
@@ -287,6 +299,12 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         health -= damage;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockback, ForceMode2D.Impulse);
+
+        // 🔥 NUEVO: Actualizamos el valor de la barra de vida al recibir daño
+        if (healthBar != null)
+        {
+            healthBar.value = health;
+        }
 
         if (flashCoroutine != null) StopCoroutine(flashCoroutine);
 
@@ -326,7 +344,12 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     {
         isDead = true;
 
-        // 🔥 ¡Acá suelta la vida justo cuando muere!
+        // 🔥 NUEVO: Ocultamos la barra de vida al morir
+        if (healthBar != null)
+        {
+            healthBar.gameObject.SetActive(false);
+        }
+
         GenerarDrop();
 
         if (flashCoroutine != null) StopCoroutine(flashCoroutine);

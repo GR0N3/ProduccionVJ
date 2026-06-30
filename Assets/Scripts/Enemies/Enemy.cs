@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI; // 🔥 NUEVO: Necesario para usar Sliders de la interfaz
 
 public class Enemy : MonoBehaviour, IDamageable
 {
     [Header("Salud")]
     public int maxHealth = 3;
     public float knockbackResistance = 1f;
+
+    [Header("UI de Vida")]
+    [Tooltip("Arrastra aquí el Slider de la barra de vida del enemigo")]
+    public Slider healthBar; // 🔥 NUEVO: Referencia a la barra de vida
 
     [Header("Ataque al Jugador")]
     public int damageToPlayer = 1;
@@ -54,6 +59,13 @@ public class Enemy : MonoBehaviour, IDamageable
         if (spriteRenderer != null) colorOriginal = spriteRenderer.color;
 
         currentHealth = maxHealth;
+
+        // 🔥 NUEVO: Inicializamos la barra de vida al máximo
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
     }
 
     void Update()
@@ -71,6 +83,12 @@ public class Enemy : MonoBehaviour, IDamageable
 
     void Die()
     {
+        // 🔥 NUEVO: Ocultamos la barra de vida cuando el enemigo muere
+        if (healthBar != null)
+        {
+            healthBar.gameObject.SetActive(false);
+        }
+
         OnEnemyDeath?.Invoke();
         GenerarDrop();
         StartCoroutine(RutinaMuerteDesvanecimiento());
@@ -92,24 +110,24 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (IsDead) return false;
 
-        // 🔥 NUEVA COMPROBACIÓN TRIGONOMÉTRICA DE FLANQUEO
         if (isBlocking)
         {
-            // Multiplicamos la escala horizontal de mirada por la dirección del vector de impacto
-            // Si el resultado es positivo (> 0), significa que el proyectil viaja hacia donde mira el enemigo (le pega por la espalda)
             bool golpePorLaEspalda = (transform.localScale.x * hitDirection.x) > 0f;
 
             if (!golpePorLaEspalda)
             {
-                // El escudo detiene el golpe perfectamente si viene de frente
                 return false;
             }
-
-            // Si es por detrás, desactivamos el escudo de inmediato para que procese el daño y el stun normal
             isBlocking = false;
         }
 
         currentHealth -= damage;
+
+        // 🔥 NUEVO: Actualizamos la barrita visual para que baje
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
 
         if (currentHealth <= 0)
         {
@@ -143,7 +161,7 @@ public class Enemy : MonoBehaviour, IDamageable
         return false;
     }
 
-    private IEnumerator RutinaParry() { yield return null; } // Marcador por compatibilidad si es requerido por mensajes externos
+    private IEnumerator RutinaParry() { yield return null; }
 
     private IEnumerator RutinaParpadeo()
     {

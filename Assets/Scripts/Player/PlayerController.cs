@@ -51,11 +51,18 @@ public class PlayerController : MonoBehaviour
 
     [Header("Bloqueos de Estado")]
     private bool isAttacking = false;
+    private bool isHoldingAttack = false;
 
     [Header("Game Feel (Knockback)")]
     public float knockbackStunDuration = 0.25f;
     private float knockbackStunTimer;
     private float lastFacingDirection = 1f;
+
+    [Header("Control de Cámara (Mirar alrededor)")]
+    public Transform cameraTarget;
+    public float cameraPanDistance = 4f;
+    public float cameraPanSpeed = 6f;
+    private Vector3 originalCameraTargetLocalPos;
 
     [Header("Game Feel (Salto y Disparo Aéreo)")]
     public float coyoteTime = 0.2f;
@@ -147,19 +154,15 @@ public class PlayerController : MonoBehaviour
         inputActions = new InputSystem_Actions();
         rb = GetComponent<Rigidbody2D>();
 
-        // 🔥 DIAGNÓSTICO EXACTO: Si falta el Rigidbody, te avisa por consola en vez de crashear el juego
         if (rb == null)
         {
-            Debug.LogError("🚨 ERROR CRÍTICO: El objeto '" + gameObject.name + "' tiene el script PlayerController pero NO tiene un Rigidbody2D. Si este objeto no es tu Jugador, por favor eliminale este script.");
+            Debug.LogError("🚨 ERROR CRÍTICO: El objeto '" + gameObject.name + "' carece de Rigidbody2D.");
         }
 
         animator = GetComponent<Animator>();
-
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-
         if (spriteRenderer != null) colorOriginal = spriteRenderer.color;
-
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
@@ -169,11 +172,7 @@ public class PlayerController : MonoBehaviour
         ActualizarCorazones();
         ultimoCheckpoint = transform.position;
 
-        // Seguro de inicio
-        if (rb != null)
-        {
-            originalGravityScale = rb.gravityScale;
-        }
+        if (rb != null) originalGravityScale = rb.gravityScale;
 
         currentStamina = maxStamina;
         lastFacingDirection = transform.localScale.x > 0 ? 1f : -1f;
@@ -185,16 +184,18 @@ public class PlayerController : MonoBehaviour
             barraEstamina.gameObject.SetActive(false);
 
             Image fillImage = barraEstamina.fillRect.GetComponent<Image>();
-            if (fillImage != null)
-            {
-                colorOriginalBarra = fillImage.color;
-            }
+            if (fillImage != null) colorOriginalBarra = fillImage.color;
         }
 
         if (pantallaNegra != null)
         {
             pantallaNegra.color = new Color(0, 0, 0, 0);
             pantallaNegra.gameObject.SetActive(false);
+        }
+
+        if (cameraTarget != null)
+        {
+            originalCameraTargetLocalPos = cameraTarget.localPosition;
         }
 
         if (SessionController.Instance != null && SessionController.Instance.PlayerManager != null)
@@ -209,7 +210,9 @@ public class PlayerController : MonoBehaviour
             if (weapon != null) weapon.Init(this);
             if (movement != null) movement.Init(this);
 
-            inputActions.Player.Attack.performed += AnimarAtaque;
+            inputActions.Player.Attack.started += IniciarApuntado;
+            inputActions.Player.Attack.canceled += SoltarDisparo;
+
             inputActions.Player.Move.performed += weapon.OnMove;
             inputActions.Player.AltAttack.performed += weapon.OnAltFire;
             inputActions.Player.Move.performed += movement.OnMove;
@@ -225,7 +228,8 @@ public class PlayerController : MonoBehaviour
     {
         if (inputActions != null && weapon != null && movement != null)
         {
-            inputActions.Player.Attack.performed -= AnimarAtaque;
+            inputActions.Player.Attack.started -= IniciarApuntado;
+            inputActions.Player.Attack.canceled -= SoltarDisparo;
             inputActions.Player.Move.performed -= weapon.OnMove;
             inputActions.Player.AltAttack.performed -= weapon.OnAltFire;
             inputActions.Player.Move.performed -= movement.OnMove;
@@ -238,14 +242,52 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        // 🛡️ SEGURO ANTI-CRASHEO: Evita el NullReferenceException inmediato
         if (inputActions == null || rb == null) return;
-
         if (isDead || Time.timeScale == 0f) return;
 
         if (knockbackStunTimer > 0) knockbackStunTimer -= Time.deltaTime;
         if (parryTimer > 0) parryTimer -= Time.deltaTime;
         if (timerLevitacionAerea > 0) timerLevitacionAerea -= Time.deltaTime;
+
+        Vector2 stickAim = Vector2.zero;
+        Vector2 cameraPanInput = Vector2.zero; // 🔥 NUEVA VARIABLE: Aisla el stick derecho
+
+        if (Gamepad.current != null)
+        {
+            cameraPanInput = Gamepad.current.rightStick.ReadValue();
+            stickAim = cameraPanInput;
+
+            if (stickAim.magnitude < 0.2f)
+            {
+                stickAim = inputActions.Player.Move.ReadValue<Vector2>();
+            }
+        }
+        else
+        {
+            stickAim = inputActions.Player.Move.ReadValue<Vector2>();
+        }
+
+        // 🔥 CORRECCIÓN: La cámara ahora solo usa 'cameraPanInput' que viene estrictamente del stick derecho
+        if (cameraTarget != null)
+        {
+            Vector3 targetOffset = new Vector3(cameraPanInput.x, cameraPanInput.y, 0f) * cameraPanDistance;
+            Vector3 desiredPosition = originalCameraTargetLocalPos + targetOffset;
+
+            cameraTarget.localPosition = Vector3.Lerp(cameraTarget.localPosition, desiredPosition, Time.deltaTime * cameraPanSpeed);
+        }
+
+        if (firePoint != null)
+        {
+            if (stickAim.magnitude > 0.2f)
+            {
+                float angulo = Mathf.Atan2(stickAim.y, stickAim.x) * Mathf.Rad2Deg;
+                firePoint.rotation = Quaternion.Euler(0f, 0f, angulo);
+            }
+            else
+            {
+                firePoint.rotation = (lastFacingDirection == 1f) ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 0f, 180f);
+            }
+        }
 
         bool presionaParry = false;
         if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) presionaParry = true;
@@ -278,8 +320,14 @@ public class PlayerController : MonoBehaviour
 
                 if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
 
-                if (inputX > 0.1f) lastFacingDirection = 1f;
-                else if (inputX < -0.1f) lastFacingDirection = -1f;
+                if (isHoldingAttack && Mathf.Abs(stickAim.x) > 0.2f)
+                {
+                    lastFacingDirection = (stickAim.x > 0f) ? 1f : -1f;
+                }
+                else if (Mathf.Abs(inputX) > 0.1f)
+                {
+                    lastFacingDirection = (inputX > 0f) ? 1f : -1f;
+                }
 
                 if (enSuelo && Mathf.Abs(inputX) > 0.1f)
                 {
@@ -306,6 +354,16 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("IsGrabbing", isGrabbingWall);
             animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
 
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (isHoldingAttack && stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 0.85f)
+            {
+                animator.speed = 0f;
+            }
+            else
+            {
+                animator.speed = (Time.timeScale == 0f) ? 0f : 1f;
+            }
+
             if (isGrabbingWall)
             {
                 float velocidadNormalizada = Mathf.Abs(rb.linearVelocity.y) / climbSpeed;
@@ -318,9 +376,8 @@ public class PlayerController : MonoBehaviour
         }
 
         bool presionaGanchos = false;
-
         if (Keyboard.current != null && Keyboard.current.eKey.isPressed) presionaGanchos = true;
-        if (Gamepad.current != null && Gamepad.current.rightTrigger.ReadValue() > 0.1f) presionaGanchos = true;
+        if (Gamepad.current != null && Gamepad.current.leftTrigger.ReadValue() > 0.1f) presionaGanchos = true;
 
         if (wallJumpTimer > 0) wallJumpTimer -= Time.deltaTime;
 
@@ -354,14 +411,12 @@ public class PlayerController : MonoBehaviour
             if (!tocandoPared && inputsMovimiento.y > 0)
             {
                 DesactivarAgarre();
-
                 if (animator != null)
                 {
                     animator.ResetTrigger("JumpTrigger");
                     animator.SetTrigger("JumpTrigger");
                 }
                 ReproducirSonido(sfxSalto);
-
                 rb.linearVelocity = new Vector2(lastFacingDirection * speed * 0.6f, jumpForce * 0.75f);
             }
             else
@@ -408,9 +463,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        // Seguro adicional
         if (rb == null) return;
-
         Vector3 escalaForzada = transform.localScale;
         escalaForzada.x = lastFacingDirection;
         transform.localScale = escalaForzada;
@@ -418,7 +471,6 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Seguro adicional
         if (inputActions == null || rb == null || isDead || Time.timeScale == 0f) return;
 
         if (isGrabbingWall)
@@ -435,6 +487,64 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             }
         }
+    }
+
+    private void IniciarApuntado(InputAction.CallbackContext context)
+    {
+        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying || knockbackStunTimer > 0) return;
+
+        isAttacking = true;
+        isHoldingAttack = true;
+
+        if (!enSuelo)
+        {
+            timerLevitacionAerea = tiempoLevitacionAerea;
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("IsHoldingAttack", true);
+            animator.SetTrigger("Attack");
+        }
+
+        StartCoroutine(RutinaDisparoSincronizado(context));
+    }
+
+    private void SoltarDisparo(InputAction.CallbackContext context)
+    {
+        if (!isHoldingAttack) return;
+
+        isHoldingAttack = false;
+        if (animator != null)
+        {
+            animator.SetBool("IsHoldingAttack", false);
+            animator.speed = 1f;
+        }
+    }
+
+    private IEnumerator RutinaDisparoSincronizado(InputAction.CallbackContext context)
+    {
+        float timer = 0f;
+        while (timer < delayDisparo)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        while (isHoldingAttack)
+        {
+            if (!enSuelo) timerLevitacionAerea = 0.1f;
+            yield return null;
+        }
+
+        ReproducirSonido(sfxDisparo);
+        if (weapon != null) weapon.OnFire(context);
+
+        float tiempoRestante = fireCooldown - delayDisparo;
+        if (tiempoRestante > 0) yield return new WaitForSeconds(tiempoRestante);
+
+        if (animator != null) animator.ResetTrigger("Attack");
+        isAttacking = false;
     }
 
     private IEnumerator RutinaParry()
@@ -463,7 +573,6 @@ public class PlayerController : MonoBehaviour
                     proy.transform.rotation = Quaternion.AngleAxis(angulo, Vector3.forward);
 
                     proy.tag = "Parried";
-
                     proy.SendMessage("ResetLife", SendMessageOptions.DontRequireReceiver);
 
                     if (sfxParry != null)
@@ -499,12 +608,7 @@ public class PlayerController : MonoBehaviour
         if (audioSource != null && clip != null)
         {
             float volumenGlobalSFX = 1f;
-
-            if (MusicManager.instance != null)
-            {
-                volumenGlobalSFX = MusicManager.instance.volumenSFXActual;
-            }
-
+            if (MusicManager.instance != null) volumenGlobalSFX = MusicManager.instance.volumenSFXActual;
             audioSource.PlayOneShot(clip, volumenEspecifico * volumenGlobalSFX);
         }
     }
@@ -512,10 +616,7 @@ public class PlayerController : MonoBehaviour
     private void DesactivarAgarre()
     {
         isGrabbingWall = false;
-
-        // Seguro interno
         if (rb != null) rb.gravityScale = originalGravityScale;
-
         if (spriteRenderer != null && !isInvincible) spriteRenderer.color = colorOriginal;
     }
 
@@ -546,36 +647,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void AnimarAtaque(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying || knockbackStunTimer > 0) return;
-
-        isAttacking = true;
-
-        if (!enSuelo)
-        {
-            timerLevitacionAerea = tiempoLevitacionAerea;
-        }
-
-        if (animator != null) animator.SetTrigger("Attack");
-        StartCoroutine(RutinaDisparoSincronizado(context));
-    }
-
-    private IEnumerator RutinaDisparoSincronizado(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        yield return new WaitForSeconds(delayDisparo);
-
-        ReproducirSonido(sfxDisparo);
-
-        if (weapon != null) weapon.OnFire(context);
-
-        float tiempoRestante = fireCooldown - delayDisparo;
-        if (tiempoRestante > 0) yield return new WaitForSeconds(tiempoRestante);
-
-        if (animator != null) animator.ResetTrigger("Attack");
-        isAttacking = false;
-    }
-
     private void IntentarSalto(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         if (inputActions == null || rb == null || isDead || Time.timeScale == 0f || knockbackStunTimer > 0) return;
@@ -592,7 +663,6 @@ public class PlayerController : MonoBehaviour
             else direccionSaltoX = transform.localScale.x > 0 ? 1 : -1;
 
             rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, wallJumpForce);
-
             ReproducirSonido(sfxSalto);
 
             if (animator != null)
@@ -611,7 +681,6 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             coyoteTimeCounter = 0f;
-
             ReproducirSonido(sfxSalto);
 
             if (animator != null)
@@ -637,7 +706,6 @@ public class PlayerController : MonoBehaviour
             currentHealth += cantidad;
             if (currentHealth > maxHealth) currentHealth = maxHealth;
             ActualizarCorazones();
-
             if (health != null) health.Init(maxHealth);
         }
     }
@@ -647,9 +715,7 @@ public class PlayerController : MonoBehaviour
         if (rb == null || isInvincible || isDead || isParrying) return;
 
         currentHealth -= damageAmount;
-
         ActualizarCorazones();
-
         ReproducirSonido(sfxCaidaOMuerte);
 
         if (currentHealth <= 0)
@@ -666,9 +732,7 @@ public class PlayerController : MonoBehaviour
 
             isInvincible = true;
             invincibilityTimer = invincibilityDuration;
-
             knockbackStunTimer = knockbackStunDuration;
-
             DesactivarAgarre();
 
             rb.linearVelocity = Vector2.zero;
@@ -680,13 +744,10 @@ public class PlayerController : MonoBehaviour
     {
         isDead = true;
         isAttacking = false;
-
         if (inputActions != null) inputActions.Disable();
-
         DesactivarAgarre();
 
         if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-
         if (animator != null) animator.SetTrigger("Death");
 
         yield return new WaitForSeconds(duracionAnimacionMuerte);
@@ -710,7 +771,6 @@ public class PlayerController : MonoBehaviour
 
         transform.position = ultimoCheckpoint;
         currentHealth = maxHealth;
-
         ActualizarCorazones();
 
         currentStamina = maxStamina;
@@ -740,7 +800,6 @@ public class PlayerController : MonoBehaviour
 
         if (inputActions != null) inputActions.Enable();
         isDead = false;
-
         isInvincible = true;
         invincibilityTimer = invincibilityDuration;
     }
@@ -757,7 +816,6 @@ public class PlayerController : MonoBehaviour
 
             currentHealth -= 1;
             ActualizarCorazones();
-
             ReproducirSonido(sfxCaidaOMuerte);
 
             if (currentHealth <= 0)
@@ -768,7 +826,6 @@ public class PlayerController : MonoBehaviour
             {
                 isInvincible = true;
                 invincibilityTimer = invincibilityDuration;
-
                 transform.position = ultimoCheckpoint;
                 DesactivarAgarre();
                 rb.linearVelocity = Vector2.zero;
@@ -779,7 +836,6 @@ public class PlayerController : MonoBehaviour
                     catch { }
                 }
             }
-
             return;
         }
 
@@ -799,19 +855,9 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < corazonesUI.Length; i++)
         {
             int valorDeEsteCorazon = (i + 1) * 2;
-
-            if (currentHealth >= valorDeEsteCorazon)
-            {
-                corazonesUI[i].sprite = corazonLleno;
-            }
-            else if (currentHealth == valorDeEsteCorazon - 1)
-            {
-                corazonesUI[i].sprite = corazonMitad;
-            }
-            else
-            {
-                corazonesUI[i].sprite = corazonVacio;
-            }
+            if (currentHealth >= valorDeEsteCorazon) corazonesUI[i].sprite = corazonLleno;
+            else if (currentHealth == valorDeEsteCorazon - 1) corazonesUI[i].sprite = corazonMitad;
+            else corazonesUI[i].sprite = corazonVacio;
         }
     }
 
@@ -823,12 +869,7 @@ public class PlayerController : MonoBehaviour
         if (audioSource != null && clip != null)
         {
             float volumenFinal = volumen;
-
-            if (MusicManager.instance != null)
-            {
-                volumenFinal = volumen * MusicManager.instance.volumenSFXActual;
-            }
-
+            if (MusicManager.instance != null) volumenFinal = volumen * MusicManager.instance.volumenSFXActual;
             audioSource.PlayOneShot(clip, volumenFinal);
         }
     }
