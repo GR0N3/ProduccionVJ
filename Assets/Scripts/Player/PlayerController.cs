@@ -77,6 +77,7 @@ public class PlayerController : MonoBehaviour
     private float coyoteTimeCounter;
     public float tiempoLevitacionAerea = 0.2f;
     private float timerLevitacionAerea;
+    private bool yaLevitoEnElAire = false; // 🔥 NUEVO: Candado para evitar el levite infinito
 
     [Header("Sincronización de Ataque")]
     public float delayDisparo = 0.3f;
@@ -316,11 +317,8 @@ public class PlayerController : MonoBehaviour
                     lastFacingDirection = (inputX > 0f) ? 1f : -1f;
                 }
 
-                // 🔥 SOLUCIÓN A LA ANIMACIÓN CORTADA:
                 float animatorSpeedValue = Mathf.Abs(inputX) > 0.1f ? 1f : 0f;
 
-                // Le mentimos al Animator: Si está atacando, le decimos que no hay movimiento 
-                // para que NO pase al estado "Correr" y corte el ataque prematuramente.
                 if (isHoldingAttack || isAttacking)
                 {
                     animatorSpeedValue = 0f;
@@ -401,6 +399,8 @@ public class PlayerController : MonoBehaviour
             currentStamina = Mathf.MoveTowards(currentStamina, maxStamina, 60f * Time.deltaTime);
             canGrab = true;
 
+            yaLevitoEnElAire = false; // 🔥 RECARGA: Se recupera el token al pisar el suelo
+
             if (barraEstamina != null && barraEstamina.gameObject.activeSelf && currentStamina >= maxStamina)
                 barraEstamina.gameObject.SetActive(false);
         }
@@ -416,6 +416,8 @@ public class PlayerController : MonoBehaviour
                 isGrabbingWall = true;
                 rb.gravityScale = 0f;
                 rb.linearVelocity = Vector2.zero;
+
+                yaLevitoEnElAire = false; // 🔥 RECARGA: Se recupera el token al agarrarse de la pared
             }
         }
         else if (isGrabbingWall)
@@ -528,9 +530,11 @@ public class PlayerController : MonoBehaviour
         isAttacking = true;
         isHoldingAttack = true;
 
-        if (!enSuelo)
+        // 🔥 LÓGICA DEL CANDADO: Solo se levita si no se hizo previamente en este salto
+        if (!enSuelo && !yaLevitoEnElAire)
         {
             timerLevitacionAerea = tiempoLevitacionAerea;
+            yaLevitoEnElAire = true; // Se consume el uso
         }
 
         if (animator != null)
@@ -801,6 +805,8 @@ public class PlayerController : MonoBehaviour
         InterrumpirAtaque();
         if (inputActions != null) inputActions.Disable();
         DesactivarAgarre();
+
+        yaLevitoEnElAire = false; // 🔥 RECARGA al morir o reaparecer
 
         if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         if (animator != null) animator.SetTrigger("Death");
