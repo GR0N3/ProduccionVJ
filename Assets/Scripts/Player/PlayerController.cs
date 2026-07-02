@@ -249,9 +249,6 @@ public class PlayerController : MonoBehaviour
     private Vector2 LeerStickIzquierdo()
     {
         Vector2 rawInput = Vector2.zero;
-
-        // 🔥 LECTURA CRUDA DE HARDWARE: 
-        // Evita el "Axis Snapping" de Unity que fuerza a 0 el eje X cuando mirás hacia abajo.
         if (Gamepad.current != null)
         {
             rawInput = Gamepad.current.leftStick.ReadValue();
@@ -287,7 +284,6 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 targetOffset = new Vector3(cameraPanInput.x, cameraPanInput.y, 0f) * cameraPanDistance;
             Vector3 desiredPosition = originalCameraTargetLocalPos + targetOffset;
-
             cameraTarget.localPosition = Vector3.Lerp(cameraTarget.localPosition, desiredPosition, Time.deltaTime * cameraPanSpeed);
         }
 
@@ -318,14 +314,15 @@ public class PlayerController : MonoBehaviour
             {
                 float inputX = moveInput.x;
 
-                // 🔥 MICRO-DEADZONE (0.05f) 
-                // Ignora el pulso físico de tu dedo, pero si empujás un "poquito", gira al instante.
-                if (Mathf.Abs(inputX) > 0.05f)
+                if (inputX > 0.01f)
                 {
-                    lastFacingDirection = (inputX > 0f) ? 1f : -1f;
+                    lastFacingDirection = 1f;
+                }
+                else if (inputX < -0.01f)
+                {
+                    lastFacingDirection = -1f;
                 }
 
-                // Aplicación inmediata del giro
                 Vector3 escalaForzada = transform.localScale;
                 escalaForzada.x = lastFacingDirection;
                 transform.localScale = escalaForzada;
@@ -358,6 +355,7 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.SetFloat("Movement", 0f);
         }
 
+        // 🔥 FIJAMOS LA ROTACIÓN EN CERO, NUNCA MÁS LA TOCAMOS NI DAMOS DOBLES VUELTAS
         if (firePoint != null)
         {
             firePoint.localRotation = Quaternion.identity;
