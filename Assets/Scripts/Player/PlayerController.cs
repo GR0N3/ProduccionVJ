@@ -63,9 +63,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Ignora movimientos mínimos para evitar drift al caminar (recomendado: 0.1)")]
     [Range(0f, 1f)] public float stickDeadzone = 0.1f;
 
-    [Tooltip("Fuerza necesaria en el stick para darte vuelta MIENTRAS atacas (0.75 = Empujar fuerte)")]
-    [Range(0.1f, 1f)] public float umbralGiroAtacando = 0.75f;
-
     [Header("Control de Cámara (Mirar alrededor)")]
     public Transform cameraTarget;
     public float cameraPanDistance = 4f;
@@ -83,7 +80,7 @@ public class PlayerController : MonoBehaviour
     public float delayDisparo = 0.3f;
     public float tiempoParaCongelarAnimacion = 0.15f;
     [Tooltip("En qué porcentaje de la animación se congela (ej: 0.65)")]
-    [Range(0f, 1f)] public float frameDeCongelamiento = 0.65f; // 🔥 CORREGIDO: Faltaba la palabra "float"
+    [Range(0f, 1f)] public float frameDeCongelamiento = 0.65f;
 
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
@@ -251,8 +248,19 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 LeerStickIzquierdo()
     {
-        if (inputActions == null) return Vector2.zero;
-        Vector2 rawInput = inputActions.Player.Move.ReadValue<Vector2>();
+        Vector2 rawInput = Vector2.zero;
+
+        // 🔥 LECTURA CRUDA DE HARDWARE: 
+        // Evita el "Axis Snapping" de Unity que fuerza a 0 el eje X cuando mirás hacia abajo.
+        if (Gamepad.current != null)
+        {
+            rawInput = Gamepad.current.leftStick.ReadValue();
+        }
+        else if (inputActions != null)
+        {
+            rawInput = inputActions.Player.Move.ReadValue<Vector2>();
+        }
+
         return rawInput.magnitude >= stickDeadzone ? rawInput : Vector2.zero;
     }
 
@@ -310,12 +318,17 @@ public class PlayerController : MonoBehaviour
             {
                 float inputX = moveInput.x;
 
-                float umbralActual = (isHoldingAttack || isAttacking) ? umbralGiroAtacando : 0.1f;
-
-                if (Mathf.Abs(inputX) >= umbralActual)
+                // 🔥 MICRO-DEADZONE (0.05f) 
+                // Ignora el pulso físico de tu dedo, pero si empujás un "poquito", gira al instante.
+                if (Mathf.Abs(inputX) > 0.05f)
                 {
                     lastFacingDirection = (inputX > 0f) ? 1f : -1f;
                 }
+
+                // Aplicación inmediata del giro
+                Vector3 escalaForzada = transform.localScale;
+                escalaForzada.x = lastFacingDirection;
+                transform.localScale = escalaForzada;
 
                 float animatorSpeedValue = Mathf.Abs(inputX) > 0.1f ? 1f : 0f;
 
@@ -344,10 +357,6 @@ public class PlayerController : MonoBehaviour
         {
             if (animator != null) animator.SetFloat("Movement", 0f);
         }
-
-        Vector3 escalaForzada = transform.localScale;
-        escalaForzada.x = lastFacingDirection;
-        transform.localScale = escalaForzada;
 
         if (firePoint != null)
         {
@@ -482,14 +491,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
-    {
-        if (rb == null) return;
-        Vector3 escalaForzada = transform.localScale;
-        escalaForzada.x = lastFacingDirection;
-        transform.localScale = escalaForzada;
-    }
-
     private void FixedUpdate()
     {
         if (inputActions == null || rb == null || isDead || Time.timeScale == 0f) return;
@@ -590,6 +591,10 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator != null) animator.speed = 1f;
+
+        Vector3 escalaForzada = transform.localScale;
+        escalaForzada.x = lastFacingDirection;
+        transform.localScale = escalaForzada;
 
         if (firePoint != null)
         {
@@ -724,7 +729,7 @@ public class PlayerController : MonoBehaviour
             float inputX = LeerStickIzquierdo().x;
             float direccionSaltoX = 0f;
 
-            if (Mathf.Abs(inputX) > 0.1f) direccionSaltoX = Mathf.Sign(inputX);
+            if (Mathf.Abs(inputX) > 0f) direccionSaltoX = Mathf.Sign(inputX);
             else direccionSaltoX = transform.localScale.x > 0 ? 1 : -1;
 
             rb.linearVelocity = new Vector2(direccionSaltoX * speed * 0.8f, wallJumpForce);
