@@ -672982,7 +672982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f394ffff82bab234e8f9b1288a40f182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTrigger
-  tutorialMessage: 'Press E/R2 to climb.
+  tutorialMessage: 'Press E/L2 to climb.
 
     Jumping while climbing will allow the
     player to jump even higher'
