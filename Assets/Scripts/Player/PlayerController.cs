@@ -59,6 +59,13 @@ public class PlayerController : MonoBehaviour
     private float knockbackStunTimer;
     private float lastFacingDirection = 1f;
 
+    [Header("Sensibilidad de Mando")]
+    [Tooltip("Ignora movimientos mínimos para evitar drift al caminar (recomendado: 0.1)")]
+    [Range(0f, 1f)] public float stickDeadzone = 0.1f;
+
+    [Tooltip("Fuerza necesaria en el stick para darte vuelta MIENTRAS atacas (0.75 = Empujar fuerte)")]
+    [Range(0.1f, 1f)] public float umbralGiroAtacando = 0.75f;
+
     [Header("Control de Cámara (Mirar alrededor)")]
     public Transform cameraTarget;
     public float cameraPanDistance = 4f;
@@ -158,10 +165,7 @@ public class PlayerController : MonoBehaviour
         inputActions = new InputSystem_Actions();
         rb = GetComponent<Rigidbody2D>();
 
-        if (rb == null)
-        {
-            Debug.LogError("🚨 ERROR CRÍTICO: El objeto '" + gameObject.name + "' carece de Rigidbody2D.");
-        }
+        if (rb == null) Debug.LogError("🚨 ERROR CRÍTICO: El objeto carece de Rigidbody2D.");
 
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -244,6 +248,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private Vector2 LeerStickIzquierdo()
+    {
+        if (inputActions == null) return Vector2.zero;
+        Vector2 rawInput = inputActions.Player.Move.ReadValue<Vector2>();
+        return rawInput.magnitude >= stickDeadzone ? rawInput : Vector2.zero;
+    }
+
+    private Vector2 LeerStickDerecho()
+    {
+        if (Gamepad.current == null) return Vector2.zero;
+        Vector2 rawInput = Gamepad.current.rightStick.ReadValue();
+        return rawInput.magnitude >= stickDeadzone ? rawInput : Vector2.zero;
+    }
+
     private void Update()
     {
         if (inputActions == null || rb == null) return;
@@ -253,23 +271,8 @@ public class PlayerController : MonoBehaviour
         if (parryTimer > 0) parryTimer -= Time.deltaTime;
         if (timerLevitacionAerea > 0) timerLevitacionAerea -= Time.deltaTime;
 
-        Vector2 stickAim = Vector2.zero;
-        Vector2 cameraPanInput = Vector2.zero;
-
-        if (Gamepad.current != null)
-        {
-            cameraPanInput = Gamepad.current.rightStick.ReadValue();
-            stickAim = cameraPanInput;
-
-            if (stickAim.magnitude < 0.2f)
-            {
-                stickAim = inputActions.Player.Move.ReadValue<Vector2>();
-            }
-        }
-        else
-        {
-            stickAim = inputActions.Player.Move.ReadValue<Vector2>();
-        }
+        Vector2 moveInput = LeerStickIzquierdo();
+        Vector2 cameraPanInput = LeerStickDerecho();
 
         if (cameraTarget != null)
         {
@@ -277,19 +280,6 @@ public class PlayerController : MonoBehaviour
             Vector3 desiredPosition = originalCameraTargetLocalPos + targetOffset;
 
             cameraTarget.localPosition = Vector3.Lerp(cameraTarget.localPosition, desiredPosition, Time.deltaTime * cameraPanSpeed);
-        }
-
-        if (firePoint != null)
-        {
-            if (stickAim.magnitude > 0.2f)
-            {
-                float angulo = Mathf.Atan2(stickAim.y, stickAim.x) * Mathf.Rad2Deg;
-                firePoint.rotation = Quaternion.Euler(0f, 0f, angulo);
-            }
-            else
-            {
-                firePoint.rotation = (lastFacingDirection == 1f) ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 0f, 180f);
-            }
         }
 
         bool presionaParry = false;
@@ -304,10 +294,7 @@ public class PlayerController : MonoBehaviour
 
         if (movement != null && !isGrabbingWall) movement.Tick();
 
-        if (controladorSuelo != null)
-        {
-            enSuelo = Physics2D.Raycast(controladorSuelo.position, Vector2.down, distanciaSuelo, capaSuelo);
-        }
+        if (controladorSuelo != null) enSuelo = Physics2D.Raycast(controladorSuelo.position, Vector2.down, distanciaSuelo, capaSuelo);
 
         if (controladorPared != null)
         {
@@ -320,18 +307,26 @@ public class PlayerController : MonoBehaviour
         {
             if (!isGrabbingWall)
             {
-                float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
+                float inputX = moveInput.x;
 
-                if (animator != null) animator.SetFloat("Movement", Mathf.Abs(inputX));
+                float umbralActual = (isHoldingAttack || isAttacking) ? umbralGiroAtacando : 0.1f;
 
-                if (isHoldingAttack && Mathf.Abs(stickAim.x) > 0.2f)
-                {
-                    lastFacingDirection = (stickAim.x > 0f) ? 1f : -1f;
-                }
-                else if (Mathf.Abs(inputX) > 0.1f)
+                if (Mathf.Abs(inputX) >= umbralActual)
                 {
                     lastFacingDirection = (inputX > 0f) ? 1f : -1f;
                 }
+
+                // 🔥 SOLUCIÓN A LA ANIMACIÓN CORTADA:
+                float animatorSpeedValue = Mathf.Abs(inputX) > 0.1f ? 1f : 0f;
+
+                // Le mentimos al Animator: Si está atacando, le decimos que no hay movimiento 
+                // para que NO pase al estado "Correr" y corte el ataque prematuramente.
+                if (isHoldingAttack || isAttacking)
+                {
+                    animatorSpeedValue = 0f;
+                }
+
+                if (animator != null) animator.SetFloat("Movement", animatorSpeedValue);
 
                 if (enSuelo && Mathf.Abs(inputX) > 0.1f)
                 {
@@ -350,6 +345,11 @@ public class PlayerController : MonoBehaviour
         else
         {
             if (animator != null) animator.SetFloat("Movement", 0f);
+        }
+
+        if (firePoint != null)
+        {
+            firePoint.localRotation = Quaternion.identity;
         }
 
         if (animator != null)
@@ -420,7 +420,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (isGrabbingWall)
         {
-            Vector2 inputsMovimiento = inputActions.Player.Move.ReadValue<Vector2>();
+            Vector2 inputsMovimiento = LeerStickIzquierdo();
 
             if (!tocandoPared && inputsMovimiento.y > 0)
             {
@@ -445,7 +445,7 @@ public class PlayerController : MonoBehaviour
             if (barraEstamina != null && !barraEstamina.gameObject.activeSelf)
                 barraEstamina.gameObject.SetActive(true);
 
-            Vector2 inputsMovimiento = inputActions.Player.Move.ReadValue<Vector2>();
+            Vector2 inputsMovimiento = LeerStickIzquierdo();
             float tasaDrenaje = (inputsMovimiento.y != 0) ? staminaDrainClimb : staminaDrainHold;
             currentStamina -= tasaDrenaje * Time.deltaTime;
 
@@ -490,7 +490,7 @@ public class PlayerController : MonoBehaviour
 
         if (isGrabbingWall)
         {
-            Vector2 inputsMovimiento = inputActions.Player.Move.ReadValue<Vector2>();
+            Vector2 inputsMovimiento = LeerStickIzquierdo();
             rb.linearVelocity = new Vector2(0f, inputsMovimiento.y * climbSpeed);
         }
         else if (knockbackStunTimer <= 0)
@@ -528,7 +528,6 @@ public class PlayerController : MonoBehaviour
         isAttacking = true;
         isHoldingAttack = true;
 
-        // 🔥 CORRECCIÓN: El Hang Time aéreo se define una única vez al pulsar el botón. 
         if (!enSuelo)
         {
             timerLevitacionAerea = tiempoLevitacionAerea;
@@ -556,7 +555,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // 🔥 CORRECCIÓN CLAVE: El bucle ahora SOLO congela la animación, NO toca la gravedad.
     private IEnumerator RutinaDisparoSincronizado(InputAction.CallbackContext context)
     {
         float timer = 0f;
@@ -581,7 +579,6 @@ public class PlayerController : MonoBehaviour
                 break;
             }
 
-            // Ya no refrescamos "timerLevitacionAerea = 0.1f" acá adentro.
             yield return null;
         }
 
@@ -655,12 +652,16 @@ public class PlayerController : MonoBehaviour
 
     private void ReproducirSonidoConfigurado(AudioClip clip, float volumenEspecifico)
     {
-        if (audioSource != null && clip != null)
+        if (audioSource == null || clip == null) return;
+
+        float volumenFinal = volumenEspecifico;
+
+        if (MusicManager.instance != null)
         {
-            float volumenGlobalSFX = 1f;
-            if (MusicManager.instance != null) volumenGlobalSFX = MusicManager.instance.volumenSFXActual;
-            audioSource.PlayOneShot(clip, volumenEspecifico * volumenGlobalSFX);
+            volumenFinal = volumenEspecifico * MusicManager.instance.volumenSFXActual;
         }
+
+        audioSource.PlayOneShot(clip, volumenFinal);
     }
 
     private void DesactivarAgarre()
@@ -708,7 +709,7 @@ public class PlayerController : MonoBehaviour
             currentStamina -= staminaJumpCost;
             if (currentStamina < 0) currentStamina = 0;
 
-            float inputX = inputActions.Player.Move.ReadValue<Vector2>().x;
+            float inputX = LeerStickIzquierdo().x;
             float direccionSaltoX = 0f;
 
             if (Mathf.Abs(inputX) > 0.1f) direccionSaltoX = Mathf.Sign(inputX);
@@ -922,12 +923,16 @@ public class PlayerController : MonoBehaviour
 
     private void ReproducirSonido(AudioClip clip, float volumen = 1f)
     {
-        if (audioSource != null && clip != null)
+        if (audioSource == null || clip == null) return;
+
+        float volumenFinal = volumen;
+
+        if (MusicManager.instance != null)
         {
-            float volumenFinal = volumen;
-            if (MusicManager.instance != null) volumenFinal = volumen * MusicManager.instance.volumenSFXActual;
-            audioSource.PlayOneShot(clip, volumenFinal);
+            volumenFinal = volumen * MusicManager.instance.volumenSFXActual;
         }
+
+        audioSource.PlayOneShot(clip, volumenFinal);
     }
 
     private void OnDrawGizmosSelected()
