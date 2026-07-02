@@ -414,7 +414,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b04aa296f3df74886c9576a023eeea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 3
+  maxHealth: 9
   knockbackResistance: 2
   healthBar: {fileID: 8723604674505248797}
   damageToPlayer: 1

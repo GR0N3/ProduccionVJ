@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
     [Header("Bloqueos de Estado")]
     private bool isAttacking = false;
     private bool isHoldingAttack = false;
+    private Coroutine rutinaAtaqueActual;
 
     [Header("Game Feel (Knockback)")]
     public float knockbackStunDuration = 0.25f;
@@ -70,15 +71,18 @@ public class PlayerController : MonoBehaviour
     public float tiempoLevitacionAerea = 0.2f;
     private float timerLevitacionAerea;
 
+    [Header("Sincronización de Ataque")]
+    public float delayDisparo = 0.3f;
+    public float tiempoParaCongelarAnimacion = 0.15f;
+    [Tooltip("En qué porcentaje de la animación se congela (ej: 0.65)")]
+    [Range(0f, 1f)] public float frameDeCongelamiento = 0.65f;
+
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
     private float invincibilityTimer;
     private bool isInvincible;
     private SpriteRenderer spriteRenderer;
     private Color colorOriginal;
-
-    [Header("Sincronización de Ataque")]
-    public float delayDisparo = 0.3f;
 
     [Header("Sistema de Estamina y Escalada")]
     public float maxStamina = 100f;
@@ -250,7 +254,7 @@ public class PlayerController : MonoBehaviour
         if (timerLevitacionAerea > 0) timerLevitacionAerea -= Time.deltaTime;
 
         Vector2 stickAim = Vector2.zero;
-        Vector2 cameraPanInput = Vector2.zero; // 🔥 NUEVA VARIABLE: Aisla el stick derecho
+        Vector2 cameraPanInput = Vector2.zero;
 
         if (Gamepad.current != null)
         {
@@ -267,7 +271,6 @@ public class PlayerController : MonoBehaviour
             stickAim = inputActions.Player.Move.ReadValue<Vector2>();
         }
 
-        // 🔥 CORRECCIÓN: La cámara ahora solo usa 'cameraPanInput' que viene estrictamente del stick derecho
         if (cameraTarget != null)
         {
             Vector3 targetOffset = new Vector3(cameraPanInput.x, cameraPanInput.y, 0f) * cameraPanDistance;
@@ -295,6 +298,7 @@ public class PlayerController : MonoBehaviour
 
         if (presionaParry && parryTimer <= 0 && !isParrying && !isGrabbingWall && !isAttacking && knockbackStunTimer <= 0)
         {
+            InterrumpirAtaque();
             StartCoroutine(RutinaParry());
         }
 
@@ -355,9 +359,19 @@ public class PlayerController : MonoBehaviour
             animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
 
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (isHoldingAttack && stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 0.85f)
+            bool estaEnAtaque = stateInfo.IsName("Attack");
+
+            if (isHoldingAttack && estaEnAtaque)
             {
-                animator.speed = 0f;
+                if (stateInfo.normalizedTime >= frameDeCongelamiento)
+                {
+                    animator.speed = 0f;
+                    animator.Play("Attack", 0, frameDeCongelamiento);
+                }
+                else
+                {
+                    animator.speed = 1f;
+                }
             }
             else
             {
@@ -411,6 +425,7 @@ public class PlayerController : MonoBehaviour
             if (!tocandoPared && inputsMovimiento.y > 0)
             {
                 DesactivarAgarre();
+                InterrumpirAtaque();
                 if (animator != null)
                 {
                     animator.ResetTrigger("JumpTrigger");
@@ -489,6 +504,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void InterrumpirAtaque()
+    {
+        if (isAttacking || isHoldingAttack)
+        {
+            isAttacking = false;
+            isHoldingAttack = false;
+            if (rutinaAtaqueActual != null) StopCoroutine(rutinaAtaqueActual);
+
+            if (animator != null)
+            {
+                animator.speed = 1f;
+                animator.SetBool("IsHoldingAttack", false);
+                animator.ResetTrigger("Attack");
+            }
+        }
+    }
+
     private void IniciarApuntado(InputAction.CallbackContext context)
     {
         if (isDead || isAttacking || isGrabbingWall || Time.timeScale == 0f || isParrying || knockbackStunTimer > 0) return;
@@ -496,6 +528,7 @@ public class PlayerController : MonoBehaviour
         isAttacking = true;
         isHoldingAttack = true;
 
+        // 🔥 CORRECCIÓN: El Hang Time aéreo se define una única vez al pulsar el botón. 
         if (!enSuelo)
         {
             timerLevitacionAerea = tiempoLevitacionAerea;
@@ -507,7 +540,8 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger("Attack");
         }
 
-        StartCoroutine(RutinaDisparoSincronizado(context));
+        if (rutinaAtaqueActual != null) StopCoroutine(rutinaAtaqueActual);
+        rutinaAtaqueActual = StartCoroutine(RutinaDisparoSincronizado(context));
     }
 
     private void SoltarDisparo(InputAction.CallbackContext context)
@@ -522,25 +556,41 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // 🔥 CORRECCIÓN CLAVE: El bucle ahora SOLO congela la animación, NO toca la gravedad.
     private IEnumerator RutinaDisparoSincronizado(InputAction.CallbackContext context)
     {
         float timer = 0f;
-        while (timer < delayDisparo)
+        bool animacionEstaCongelada = false;
+
+        while (isHoldingAttack || timer < delayDisparo)
         {
             timer += Time.deltaTime;
+
+            if (isHoldingAttack && timer >= tiempoParaCongelarAnimacion && !animacionEstaCongelada)
+            {
+                if (animator != null)
+                {
+                    animator.speed = 0f;
+                    animator.Play("Attack", 0, frameDeCongelamiento);
+                }
+                animacionEstaCongelada = true;
+            }
+
+            if (!isHoldingAttack && timer >= delayDisparo)
+            {
+                break;
+            }
+
+            // Ya no refrescamos "timerLevitacionAerea = 0.1f" acá adentro.
             yield return null;
         }
 
-        while (isHoldingAttack)
-        {
-            if (!enSuelo) timerLevitacionAerea = 0.1f;
-            yield return null;
-        }
+        if (animator != null) animator.speed = 1f;
 
         ReproducirSonido(sfxDisparo);
         if (weapon != null) weapon.OnFire(context);
 
-        float tiempoRestante = fireCooldown - delayDisparo;
+        float tiempoRestante = fireCooldown - timer;
         if (tiempoRestante > 0) yield return new WaitForSeconds(tiempoRestante);
 
         if (animator != null) animator.ResetTrigger("Attack");
@@ -651,6 +701,8 @@ public class PlayerController : MonoBehaviour
     {
         if (inputActions == null || rb == null || isDead || Time.timeScale == 0f || knockbackStunTimer > 0) return;
 
+        InterrumpirAtaque();
+
         if (isGrabbingWall)
         {
             currentStamina -= staminaJumpCost;
@@ -714,6 +766,8 @@ public class PlayerController : MonoBehaviour
     {
         if (rb == null || isInvincible || isDead || isParrying) return;
 
+        InterrumpirAtaque();
+
         currentHealth -= damageAmount;
         ActualizarCorazones();
         ReproducirSonido(sfxCaidaOMuerte);
@@ -743,7 +797,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator SecuenciaMuerte()
     {
         isDead = true;
-        isAttacking = false;
+        InterrumpirAtaque();
         if (inputActions != null) inputActions.Disable();
         DesactivarAgarre();
 
@@ -813,6 +867,8 @@ public class PlayerController : MonoBehaviour
         if (objetoTocado.layer == 11)
         {
             if (isInvincible || isDead) return;
+
+            InterrumpirAtaque();
 
             currentHealth -= 1;
             ActualizarCorazones();

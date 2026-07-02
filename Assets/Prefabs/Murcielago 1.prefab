@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea7e47ac883c58249848199370499802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemy
-  health: 3
+  health: 8
   healthBar: {fileID: 6522034021805896844}
   patrolSpeed: 5
   patrolDistance: 4
