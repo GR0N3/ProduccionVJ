@@ -77,13 +77,13 @@ public class PlayerController : MonoBehaviour
     private float coyoteTimeCounter;
     public float tiempoLevitacionAerea = 0.2f;
     private float timerLevitacionAerea;
-    private bool yaLevitoEnElAire = false; // 🔥 NUEVO: Candado para evitar el levite infinito
+    private bool yaLevitoEnElAire = false;
 
     [Header("Sincronización de Ataque")]
     public float delayDisparo = 0.3f;
     public float tiempoParaCongelarAnimacion = 0.15f;
     [Tooltip("En qué porcentaje de la animación se congela (ej: 0.65)")]
-    [Range(0f, 1f)] public float frameDeCongelamiento = 0.65f;
+    [Range(0f, 1f)] public float frameDeCongelamiento = 0.65f; // 🔥 CORREGIDO: Faltaba la palabra "float"
 
     [Header("I-Frames (Inmortalidad)")]
     public float invincibilityDuration = 1.5f;
@@ -345,6 +345,10 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.SetFloat("Movement", 0f);
         }
 
+        Vector3 escalaForzada = transform.localScale;
+        escalaForzada.x = lastFacingDirection;
+        transform.localScale = escalaForzada;
+
         if (firePoint != null)
         {
             firePoint.localRotation = Quaternion.identity;
@@ -399,7 +403,7 @@ public class PlayerController : MonoBehaviour
             currentStamina = Mathf.MoveTowards(currentStamina, maxStamina, 60f * Time.deltaTime);
             canGrab = true;
 
-            yaLevitoEnElAire = false; // 🔥 RECARGA: Se recupera el token al pisar el suelo
+            yaLevitoEnElAire = false;
 
             if (barraEstamina != null && barraEstamina.gameObject.activeSelf && currentStamina >= maxStamina)
                 barraEstamina.gameObject.SetActive(false);
@@ -417,7 +421,7 @@ public class PlayerController : MonoBehaviour
                 rb.gravityScale = 0f;
                 rb.linearVelocity = Vector2.zero;
 
-                yaLevitoEnElAire = false; // 🔥 RECARGA: Se recupera el token al agarrarse de la pared
+                yaLevitoEnElAire = false;
             }
         }
         else if (isGrabbingWall)
@@ -530,11 +534,10 @@ public class PlayerController : MonoBehaviour
         isAttacking = true;
         isHoldingAttack = true;
 
-        // 🔥 LÓGICA DEL CANDADO: Solo se levita si no se hizo previamente en este salto
         if (!enSuelo && !yaLevitoEnElAire)
         {
             timerLevitacionAerea = tiempoLevitacionAerea;
-            yaLevitoEnElAire = true; // Se consume el uso
+            yaLevitoEnElAire = true;
         }
 
         if (animator != null)
@@ -587,6 +590,11 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator != null) animator.speed = 1f;
+
+        if (firePoint != null)
+        {
+            firePoint.localRotation = Quaternion.identity;
+        }
 
         ReproducirSonido(sfxDisparo);
         if (weapon != null) weapon.OnFire(context);
@@ -806,7 +814,7 @@ public class PlayerController : MonoBehaviour
         if (inputActions != null) inputActions.Disable();
         DesactivarAgarre();
 
-        yaLevitoEnElAire = false; // 🔥 RECARGA al morir o reaparecer
+        yaLevitoEnElAire = false;
 
         if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         if (animator != null) animator.SetTrigger("Death");
