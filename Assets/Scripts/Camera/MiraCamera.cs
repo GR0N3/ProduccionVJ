@@ -38,14 +38,13 @@ public class CameraScanner : MonoBehaviour
 
         if (hit.collider != null || estaSaltandoHaciaArriba)
         {
-            // 🔥 EL ARREGLO ESTÁ ACÁ 🔥
-            // Ahora X y Y son EXACTAMENTE la posición del jugador. Cero asomo a los costados.
+            
+            //  X y Y son EXACTAMENTE la posición del jugador.
             posicionDeseada = new Vector3(jugador.transform.position.x, jugador.transform.position.y, 0f);
         }
         else
         {
-            // POZO CIEGO: El láser no detectó nada (estás cayendo al vacío).
-            // La cámara baja en línea recta (solo afectamos el eje Y) para mostrarte el fondo.
+           
             posicionDeseada = new Vector3(jugador.transform.position.x, jugador.transform.position.y - distanciaAbajo, 0f);
         }
 

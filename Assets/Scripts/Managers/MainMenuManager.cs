@@ -12,8 +12,8 @@ public class MenuManager : MonoBehaviour
     public GameObject panelDeOpciones;
 
     [Header("Ajustes de Sonido")]
-    public Slider sliderMusica; // 🔥 Le cambié el nombre para no confundir
-    public Slider sliderSFX;    // 🔥 Tu nuevo Slider para efectos
+    public Slider sliderMusica; 
+    public Slider sliderSFX;    
 
     private void Start()
     {

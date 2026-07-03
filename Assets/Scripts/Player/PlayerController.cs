@@ -355,7 +355,7 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.SetFloat("Movement", 0f);
         }
 
-        // 🔥 FIJAMOS LA ROTACIÓN EN CERO, NUNCA MÁS LA TOCAMOS NI DAMOS DOBLES VUELTAS
+        
         if (firePoint != null)
         {
             firePoint.localRotation = Quaternion.identity;

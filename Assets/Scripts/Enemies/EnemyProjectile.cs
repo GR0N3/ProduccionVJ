@@ -34,7 +34,7 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //  MODO PARRY: Solo queremos que no lastime al jugador
+        
         if (gameObject.CompareTag("Parried"))
         {
             if (collision.CompareTag("Player")) return;

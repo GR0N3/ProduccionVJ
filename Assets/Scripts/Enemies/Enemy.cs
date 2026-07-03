@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI; // 🔥 NUEVO: Necesario para usar Sliders de la interfaz
+using UnityEngine.UI; 
 
 public class Enemy : MonoBehaviour, IDamageable
 {
@@ -11,7 +11,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     [Header("UI de Vida")]
     [Tooltip("Arrastra aquí el Slider de la barra de vida del enemigo")]
-    public Slider healthBar; // 🔥 NUEVO: Referencia a la barra de vida
+    public Slider healthBar; 
 
     [Header("Ataque al Jugador")]
     public int damageToPlayer = 1;
@@ -60,7 +60,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         currentHealth = maxHealth;
 
-        // 🔥 NUEVO: Inicializamos la barra de vida al máximo
+        
         if (healthBar != null)
         {
             healthBar.maxValue = maxHealth;
@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // 🔥 NUEVO: Ocultamos la barra de vida cuando el enemigo muere
+        
         if (healthBar != null)
         {
             healthBar.gameObject.SetActive(false);
@@ -123,7 +123,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         currentHealth -= damage;
 
-        // 🔥 NUEVO: Actualizamos la barrita visual para que baje
+        
         if (healthBar != null)
         {
             healthBar.value = currentHealth;

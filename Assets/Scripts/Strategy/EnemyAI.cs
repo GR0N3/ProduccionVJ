@@ -120,8 +120,7 @@ public class EnemyAI : MonoBehaviour
         ActualizarAnimadorAbsoluto();
     }
 
-    // 🔥 NUEVO: Un freno absoluto de físicas. Si el enemigo está en un estado inmovilizado, 
-    // Unity no podrá empujarlo ni deslizarlo por inercia bajo ninguna circunstancia.
+    
     private void FixedUpdate()
     {
         if (enemyComponent != null && (enemyComponent.isBlocking || isAttacking || enemyComponent.isStunned || enemyComponent.IsDead))
@@ -250,8 +249,7 @@ public class EnemyAI : MonoBehaviour
         isBlockRoutineActive = false;
     }
 
-    // 🔥 CORRECCIÓN CLAVE: Ahora fuerzan a la animación a prenderse/apagarse SIEMPRE, 
-    // evitando que el Animator se quede trabado si recibe un golpe en la espalda.
+    
     private void ActivarEscudo()
     {
         enemyComponent.isBlocking = true;

@@ -23,7 +23,7 @@ public class PlayerHealth
         currentHealth -= damage;
         Debug.Log("took damage: " + currentHealth);
 
-        // FIX: Cambiamos el '!' por un '?' para que no crashee si la UI no está conectada
+        
         OnPlayerDamaged?.Invoke();
 
         if (currentHealth <= 0)
@@ -47,6 +47,6 @@ public class PlayerHealth
             .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
             .WithClearUnusedAssets()
             .WithOverlay()
-            .Perfrom(); // Mantengo tu typo "Perfrom" para no romper tu SceneController
+            .Perfrom(); 
     }
 }

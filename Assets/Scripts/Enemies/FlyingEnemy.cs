@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI; // 🔥 NUEVO: Necesario para controlar la barra de vida
+using UnityEngine.UI; //  Necesario para controlar la barra de vida
 
 public class FlyingEnemy : MonoBehaviour, IDamageable
 {
     [Header("Estadísticas")]
     public int health = 3;
 
-    // 🔥 NUEVO: Referencia a la barra de vida
+    //  Referencia a la barra de vida
     [Header("UI de Vida")]
     [Tooltip("Arrastra aquí el Slider de la barra de vida del enemigo volador")]
     public Slider healthBar;
@@ -300,7 +300,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockback, ForceMode2D.Impulse);
 
-        // 🔥 NUEVO: Actualizamos el valor de la barra de vida al recibir daño
+        //  Actualizamos el valor de la barra de vida al recibir daño
         if (healthBar != null)
         {
             healthBar.value = health;
@@ -344,7 +344,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     {
         isDead = true;
 
-        // 🔥 NUEVO: Ocultamos la barra de vida al morir
+        // Ocultamos la barra de vida al morir
         if (healthBar != null)
         {
             healthBar.gameObject.SetActive(false);

@@ -152,13 +152,13 @@ public class RangedEnemyAI : MonoBehaviour
         isAttacking = false;
     }
 
-    // --- NUEVA LÓGICA DE PATRULLAJA ANTICHOQUES ---
+    
     private void Patrullar()
     {
         float limiteDer = startPosition.x + patrolDistance;
         float limiteIzq = startPosition.x - patrolDistance;
 
-        // Levantamos el láser para que salga del pecho/cintura y no de los pies
+        
         Vector2 origenRayo = new Vector2(transform.position.x, transform.position.y + alturaSensorPared);
         Vector2 direccionMirada = movingRight ? Vector2.right : Vector2.left;
 
@@ -201,7 +201,7 @@ public class RangedEnemyAI : MonoBehaviour
         transform.localScale = scaler;
     }
 
-    // Dibuja las líneas en el editor para que puedas configurarlo fácil
+    
     private void OnDrawGizmosSelected()
     {
         // Radar de visión (Amarillo)
