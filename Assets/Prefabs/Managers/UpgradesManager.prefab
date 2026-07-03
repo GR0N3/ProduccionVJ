@@ -55,4 +55,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 60c6f9325bb1a884595489528a5471a7, type: 2}
   - {fileID: 11400000, guid: 687783f42e5037f40b2c4e797852c067, type: 2}
   - {fileID: 11400000, guid: 01e844f5d8cdb4f4bb72a74a392bf63d, type: 2}
+  - {fileID: 11400000, guid: c6703e10d66299745bfc64b264950fe4, type: 2}
+  - {fileID: 11400000, guid: 4b18ff9c5e57a7f4ebad1cf0191a98f2, type: 2}
+  - {fileID: 11400000, guid: 1aae23c4fa142334999500e46485a8f8, type: 2}
   upgradesParent: {fileID: 0}

@@ -191,7 +191,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
             {
                 var player = ServiceLocator.Get<PlayerManager>().PlayerHealth;
                 
-                
+                if (player == null) yield break;
+
                 Vector2 direccionEmpuje = rb.linearVelocity.normalized;
                 player.TakeDamage(attackDamage,direccionEmpuje,knockbackForce);
             }

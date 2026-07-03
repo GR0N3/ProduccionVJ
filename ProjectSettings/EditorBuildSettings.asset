@@ -17,18 +17,27 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CoreScenes/MainMenu.unity
     guid: a79dd048bb9a44747b46f7dbb810d96b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/CoreScenes/Match.unity
     guid: ecb178e7bd852764b9bd70589fe2cec6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lvl1Rework/LVL1Rework.unity
     guid: 7ec79b30f4f23504da6586726c3847c0
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lvl1Rework/LVL2Rework 1.unity
     guid: 83fe4d675d470b643b58dd1c18de0695
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lvl1Rework/LVL3Rework.unity
     guid: 8c9d75a6a420b0744b07c73523774a21
+  - enabled: 1
+    path: Assets/Scenes/LVL1_CUT/LVL1Rework A.unity
+    guid: 6e2976812b466034aa922d5e2d6422df
+  - enabled: 1
+    path: Assets/Scenes/LVL1_CUT/LVL1Rework B.unity
+    guid: e25c37c703a60de4fbf0f088be002ec9
+  - enabled: 1
+    path: Assets/Scenes/LVL1_CUT/LVL1Rework C.unity
+    guid: c5ee1282dfaf4d946b21ed713d767377
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

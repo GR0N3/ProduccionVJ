@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerHealth
 {
@@ -13,10 +14,17 @@ public class PlayerHealth
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
 
-    public void Init(int maxHealth)
+    AnimatorBrain anim = new();
+
+    public void Init(PlayerController player)
     {
-        this.maxHealth = maxHealth;
-        currentHealth = maxHealth;
+        anim = player.AnimatorBrain;
+    }
+
+    public void SetHealth(int health)
+    {
+        maxHealth = health;
+        currentHealth = health;
         isDead = false;
     }
 

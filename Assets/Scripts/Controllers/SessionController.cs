@@ -1,10 +1,7 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Rendering;
 public class SessionController : MonoBehaviour
 {
     
@@ -14,13 +11,13 @@ public class SessionController : MonoBehaviour
 
     private int sceneIndex;
 
-    [SerializeField] private List<SceneAsset> sceneAssets;
+    [SerializeField] private List<string> sceneNames;
 
     [SerializeField] private TMP_Text pointsText; 
 
     [SerializeField] private Timer timer;
-    [SerializeField] private float maxTimerBonus;
-    public SceneAsset CurrentScene {  get; private set; }
+    [SerializeField] private float maxTimerBonus = 1000;
+    public string CurrentScene { get; private set; }
 
     private void OnEnable()
     {
@@ -52,32 +49,32 @@ public class SessionController : MonoBehaviour
 
         pointsText.text += points.ToString();
 
-        CurrentScene = sceneAssets[sceneIndex];
+        CurrentScene = sceneNames[sceneIndex];
 
     }
 
     private void ResetLevel()
     {
         sceneIndex = 0;
-        CurrentScene = sceneAssets[sceneIndex];
+        CurrentScene = sceneNames[sceneIndex];
         BackToMainMenu();
     }
 
     private void LevelCompleted()
     {
         sceneIndex++;
+        TimerPoints();
 
-        if (sceneIndex > sceneAssets.Count - 1)
+        timer.RestartTimer();
+
+        if (sceneIndex > sceneNames.Count - 1)
         {
-            TimerPoints();
-
-            timer.RestartTimer();
 
             ResetLevel();
         }
         else
         {
-            CurrentScene = sceneAssets[sceneIndex];
+            CurrentScene = sceneNames[sceneIndex];
         }
 
         Debug.Log(sceneIndex);
@@ -115,8 +112,6 @@ public class SessionController : MonoBehaviour
                 maxTimerBonus
             );
 
-        Debug.Log(bonus);
-
         AddPoints(bonus);
     }
 
@@ -124,6 +119,14 @@ public class SessionController : MonoBehaviour
     {
         points += amount;
 
+        pointsText.text =
+            orignaltext +
+            points;
+    }
+
+    public void SubtractPoints(int amount)
+    {
+        points -= amount;
         pointsText.text =
             orignaltext +
             points;
