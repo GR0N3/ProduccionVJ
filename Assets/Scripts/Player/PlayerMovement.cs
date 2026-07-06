@@ -10,7 +10,6 @@ public class PlayerMovement
     private LayerMask borderLayer;
     private Transform leftBorder;
 
-    private float groundCheckDistance = 1.2f;
     private LayerMask groundLayer;
     private float acceleration;
     private float deceleration;
@@ -21,8 +20,6 @@ public class PlayerMovement
     private Rigidbody2D rb;
     private Vector2 movement;
     private bool isGrounded;
-
-    private InputSystem_Actions inputActions;
 
     private bool isInLeft;
 
@@ -94,9 +91,6 @@ public class PlayerMovement
         );                                                                                
                                                                                           
         rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
-                                                                                          
-        Debug.Log(isInLeft);
-                                                                                          
     }
     private void GroundCheck()
     {

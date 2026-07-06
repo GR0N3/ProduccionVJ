@@ -45,7 +45,6 @@ public class SessionController : MonoBehaviour
 
     private void Start()
     {
-        orignaltext = pointsText.text;
 
         pointsText.text += points.ToString();
 

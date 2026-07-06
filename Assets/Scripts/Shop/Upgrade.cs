@@ -12,9 +12,11 @@ public class Upgrade : MonoBehaviour
     private SessionController sessionController;
 
     private string description;
+    private string price;
     [SerializeField] private Image image;
-    [SerializeField] private TMP_Text Ui_Text;
-    private void Awake()
+    [SerializeField] private TMP_Text Description_Text;
+    [SerializeField] private TMP_Text Price_Text;
+    private void Start()
     {
         upgradeManager = ServiceLocator.Get<UpgradesManager>();
         sessionController = ServiceLocator.Get<SessionController>();
@@ -24,9 +26,11 @@ public class Upgrade : MonoBehaviour
         upgrade = data;
 
         image.sprite = upgrade.Image;
-        description = upgrade.description + "\n Cost:" + upgrade.cost;
+        description = upgrade.description;
+        price = upgrade.cost + "\n Points";
 
-        Ui_Text.text = description;
+        Description_Text.text = description;
+        Price_Text.text = price;
     }
 
     public void SelectUpgrade()

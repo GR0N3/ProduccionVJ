@@ -37,13 +37,19 @@ public class PlayerHealth
 
         currentHealth -= damage;
 
-        Debug.Log("took damage: " + currentHealth);
-
         OnPlayerDamaged?.Invoke();
-
         if (currentHealth <= 0) 
         {
-            Death();
+            anim.Play(PlayerAnimations.Death, overrideLock: true, lockAnimation: true);
+            if (!anim.IsPlaying(PlayerAnimations.Death))
+            {
+                Death();
+            }
+
+        }
+        else
+        {
+            anim.Play(PlayerAnimations.Hurt, overrideLock: true, lockAnimation:true);
         }
     }
 
