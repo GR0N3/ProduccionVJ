@@ -4,7 +4,6 @@ public class PlayerManager : MonoBehaviour
 {
     private SessionController sessionController;
 
-    private int maxHealthPoints = 10;
 
     private PlayerHealth playerHealth;
     private PlayerMovement playerMovement;
@@ -13,8 +12,19 @@ public class PlayerManager : MonoBehaviour
     public PlayerHealth PlayerHealth => playerHealth;
     public PlayerMovement PlayerMovement => playerMovement;
     public PlayerWeapon PlayerWeapon => playerWeapon;
-    public int MaxHealthPoints => maxHealthPoints;
     public Stats Stats { get; private set; }
+
+    [SerializeField] private float maxHealth;
+    [SerializeField] private float speed;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float acceleration;
+    [SerializeField] private float deceleration;
+    [SerializeField] private float damage;
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private float bulletsCount;
+    [SerializeField] private float bulletsSpread;
+    [SerializeField] private float attackSpeed;
+    [SerializeField] private float knockbackForce;
 
     private void Awake()
     {
@@ -35,19 +45,17 @@ public class PlayerManager : MonoBehaviour
 
     private void InitialStats() 
     {
-        Stats.SetStat(UpgradeType.MaxHealth, 10);
-        Stats.SetStat(UpgradeType.Speed, 10);
-        Stats.SetStat(UpgradeType.JumpForce, 24);
-        Stats.SetStat(UpgradeType.Acceleration, 20);
-        Stats.SetStat(UpgradeType.Deceleration, 5);
-        Stats.SetStat(UpgradeType.Damage, 1);
-        Stats.SetStat(UpgradeType.BulletSpeed, 10);
-        Stats.SetStat(UpgradeType.BulletsCount, 1);
-        Stats.SetStat(UpgradeType.BulletsSpread,0);
-        Stats.SetStat(UpgradeType.AttackSpeed,1f);
-        Stats.SetStat(UpgradeType.KnockbackForce, 0.1f);
-        Stats.SetStat(UpgradeType.Acceleration, 20);
-        Stats.SetStat(UpgradeType.Deceleration, 25);
+        Stats.SetStat(UpgradeType.MaxHealth, maxHealth);
+        Stats.SetStat(UpgradeType.Speed, speed);
+        Stats.SetStat(UpgradeType.JumpForce, jumpForce);
+        Stats.SetStat(UpgradeType.Acceleration, acceleration);
+        Stats.SetStat(UpgradeType.Deceleration, deceleration);
+        Stats.SetStat(UpgradeType.Damage, damage);
+        Stats.SetStat(UpgradeType.BulletSpeed, bulletSpeed);
+        Stats.SetStat(UpgradeType.BulletsCount, bulletsCount);
+        Stats.SetStat(UpgradeType.BulletsSpread,bulletsSpread);
+        Stats.SetStat(UpgradeType.AttackSpeed, attackSpeed);
+        Stats.SetStat(UpgradeType.KnockbackForce, knockbackForce);
 
         playerHealth.SetHealth((int)Stats.GetStat(UpgradeType.MaxHealth));
     }
