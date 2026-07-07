@@ -7,8 +7,6 @@ public class SessionController : MonoBehaviour
     
     private int points = 0;
 
-    private InputSystem_Actions inputActions;
-
     private int sceneIndex;
 
     [SerializeField] private List<string> sceneNames;
@@ -18,6 +16,8 @@ public class SessionController : MonoBehaviour
     [SerializeField] private Timer timer;
     [SerializeField] private float maxTimerBonus = 1000;
     public string CurrentScene { get; private set; }
+
+    public int SceneIndex => sceneIndex;
 
     private void OnEnable()
     {
