@@ -20,6 +20,6 @@ MonoBehaviour:
     value: 10
     multiplicative: 0
   Image: {fileID: 21300000, guid: 84880a7b5d24d4849b4003bb077eed1b, type: 3}
-  description: more bulets more spread
-  level: 1
-  cost: 1
+  description: +1 Bullet,+10 Spread
+  tier: 3
+  cost: 75
