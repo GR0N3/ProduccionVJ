@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class Upgrade : MonoBehaviour, IPointerEnterHandler,IPointerExitHandler
+public class Upgrade : MonoBehaviour
 {
     private ShopUpgrade upgrade;
 
@@ -12,37 +12,25 @@ public class Upgrade : MonoBehaviour, IPointerEnterHandler,IPointerExitHandler
     private SessionController sessionController;
 
     private string description;
+    private string price;
     [SerializeField] private Image image;
-    [SerializeField] private TMP_Text Ui_Text;
-    [SerializeField] private GameObject togglePanel;
-    private void Awake()
+    [SerializeField] private TMP_Text Description_Text;
+    [SerializeField] private TMP_Text Price_Text;
+    private void Start()
     {
         upgradeManager = ServiceLocator.Get<UpgradesManager>();
         sessionController = ServiceLocator.Get<SessionController>();
-    }
-
-    private void Start()
-    {
-        togglePanel.SetActive(false);
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        togglePanel.SetActive(true);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        togglePanel.SetActive(false);
     }
     public void Init(ShopUpgrade data)
     {
         upgrade = data;
 
         image.sprite = upgrade.Image;
-        description = upgrade.description + "\n Cost:" + upgrade.cost;
+        description = upgrade.description;
+        price = upgrade.cost + "\n Points";
 
-        Ui_Text.text = description;
+        Description_Text.text = description;
+        Price_Text.text = price;
     }
 
     public void SelectUpgrade()

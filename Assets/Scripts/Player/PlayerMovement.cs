@@ -6,27 +6,32 @@ public class PlayerMovement
 {
     private float speed;
     private float jumpForce;
+    private float riseMultiplier;
+    private float maxJumpSpeed;
+    private float fallMultiplier;
+    private float maxFallSpeed;
 
     private LayerMask borderLayer;
     private Transform leftBorder;
 
-    private float groundCheckDistance = 1.2f;
     private LayerMask groundLayer;
     private float acceleration;
     private float deceleration;
 
     public Transform CurrentPosition => rb.transform;
 
+    private Collider2D collider;
     private Rigidbody2D rb;
     private Vector2 movement;
     private bool isGrounded;
 
-    private InputSystem_Actions inputActions;
-
     private bool isInLeft;
+
+    private AnimatorBrain anim = new();
 
     public void Init(PlayerController player)
     {
+        collider = player.col;
         rb = player.rb;
         groundLayer = player.GroundLayer;
         speed = player.Speed;
@@ -34,18 +39,29 @@ public class PlayerMovement
         borderLayer = player.BorderLayer;
         acceleration = player.Acceleration;
         deceleration = player.Deceleration;
+        riseMultiplier = player.RiseMultiplier;
+        maxJumpSpeed = player.MaxJumpSpeed;
+        fallMultiplier = player.FallMultiplier;
+        maxFallSpeed = player.MaxFallSpeed;
+        anim = player.AnimatorBrain;
     }
 
     public void SetMoveInput(Vector2 input)
     {
         movement = input;
+
+        FlipSprite(movement.x);
     }
 
     public void Jump()
     {
         if (isGrounded)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            float finalJumpSpeed = jumpForce;
+            if (maxJumpSpeed > 0f)
+                finalJumpSpeed = Mathf.Min(finalJumpSpeed, maxJumpSpeed);
+
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, finalJumpSpeed);
         }
     }
 
@@ -69,7 +85,9 @@ public class PlayerMovement
     public void Tick()                                                                    
     {                                                                                     
         GroundCheck();
-        LimitLeft();                 
+        LimitLeft();
+
+        UpdateAnimations();
     }
                                                                                           
     public void FixedTick()                                                               
@@ -85,16 +103,34 @@ public class PlayerMovement
         );                                                                                
                                                                                           
         rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
-                                                                                          
-        Debug.Log(isInLeft);
-                                                                                          
+
+        if (rb.linearVelocity.y > 0f)
+        {
+            rb.linearVelocity += Vector2.up * (Physics2D.gravity.y * (riseMultiplier - 1f) * Time.fixedDeltaTime);
+
+            if (maxJumpSpeed > 0f)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, maxJumpSpeed));
+            }
+        }
+
+        if (rb.linearVelocity.y < 0f)
+        {
+            rb.linearVelocity += Vector2.up * (Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime);
+
+            if (maxFallSpeed > 0f)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+            }
+        }
     }
     private void GroundCheck()
     {
-        RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, groundCheckDistance, groundLayer);
-        isGrounded = hit.collider;
+        Vector2 origin = new Vector2(collider.bounds.center.x, collider.bounds.min.y);
 
-        Debug.DrawRay(rb.position,Vector2.down * groundCheckDistance,Color.yellow);
+        isGrounded = Physics2D.OverlapBox(origin, new Vector2(collider.bounds.size.x, 0.1f), 0f, groundLayer);
+
+        DrawBox(origin);
     }
     private void LimitLeft()
     {
@@ -117,6 +153,70 @@ public class PlayerMovement
 
         }
         Debug.DrawRay(rb.position, Vector2.left * 2);
+    }
+
+    private void UpdateAnimations()
+    {
+        if (anim.IsLocked())
+            return;
+
+        // Aire
+        if (!isGrounded)
+        {
+            if (rb.linearVelocity.y > 0.1f)
+            {
+                anim.Play(PlayerAnimations.Jump);
+            }
+            else if (rb.linearVelocity.y < -0.1f)
+            {
+                anim.Play(PlayerAnimations.Fall);
+            }
+
+            return;
+        }
+
+        // Suelo
+        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+        {
+            anim.Play(PlayerAnimations.Run);
+        }
+        else
+        {
+            anim.Play(PlayerAnimations.Idle);
+        }
+    }
+
+
+    private void FlipSprite(float xInput)
+    {
+        var scale = rb.transform.localScale;
+
+        if (xInput > 0)
+        {
+            rb.transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
+        }
+        else if (xInput < 0)
+        {
+            rb.transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, scale.z);
+        }
+    }
+
+    private void DrawBox(Vector2 origin)
+    {
+        Vector2 center = origin;
+        Vector2 size = new Vector2(collider.bounds.size.x * 0.9f, 0.1f);
+
+        Vector2 half = size * 0.5f;
+
+        Vector2 topLeft = center + new Vector2(-half.x, half.y);
+        Vector2 topRight = center + new Vector2(half.x, half.y);
+        Vector2 bottomLeft = center + new Vector2(-half.x, -half.y);
+        Vector2 bottomRight = center + new Vector2(half.x, -half.y);
+
+        Debug.DrawLine(topLeft, topRight, Color.green);
+        Debug.DrawLine(topRight, bottomRight, Color.green);
+        Debug.DrawLine(bottomRight, bottomLeft, Color.green);
+        Debug.DrawLine(bottomLeft, topLeft, Color.green);
     }
 
     #region Upgrades

@@ -2,24 +2,35 @@ using UnityEngine;
 
 public class CameraFollowWithBorder : MonoBehaviour
 {
-    public Transform player;
-    public Transform leftBorder;
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform leftBorder;
 
-    public float followSpeed = 10f;
+    [SerializeField] private float followSpeed = 10f;
+    [SerializeField] private Vector2 offset;
+
+    [SerializeField] private bool overrideView = true;
+    [SerializeField] private float orthographicSize = 5f;
+    [SerializeField] private float fieldOfView = 60f;
 
     private Camera cam;
 
-    void Awake()
+    private void Awake()
     {
         cam = GetComponent<Camera>();
+        ApplyView();
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
+        if (cam == null || player == null || leftBorder == null)
+            return;
+
+        ApplyView();
+
         float halfWidth = cam.orthographicSize * cam.aspect;
 
-        float targetX = leftBorder.position.x + halfWidth;
-        float targetY = player.position.y;
+        float targetX = leftBorder.position.x + halfWidth + offset.x;
+        float targetY = player.position.y + offset.y;
 
         Vector3 targetPos = new Vector3(targetX, targetY, transform.position.z);
 
@@ -28,5 +39,24 @@ public class CameraFollowWithBorder : MonoBehaviour
             targetPos,
             followSpeed * Time.deltaTime
         );
+    }
+
+    private void ApplyView()
+    {
+        if (!overrideView || cam == null)
+            return;
+
+        if (cam.orthographic)
+            cam.orthographicSize = orthographicSize;
+        else
+            cam.fieldOfView = fieldOfView;
+    }
+
+    private void OnValidate()
+    {
+        if (cam == null)
+            cam = GetComponent<Camera>();
+
+        ApplyView();
     }
 }

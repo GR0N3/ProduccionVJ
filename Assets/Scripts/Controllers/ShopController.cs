@@ -17,7 +17,7 @@ public class ShopController : MonoBehaviour
     {
         SceneController.Instance
             .NewTransition()
-            .Load(SceneDataBase.Slots.SessionContent, sessionController.CurrentScene.name)
+            .Load(SceneDataBase.Slots.SessionContent, sessionController.CurrentScene)
             .WithOverlay()
             .Unload(SceneDataBase.Scenes.Shop)
             .Perfrom();

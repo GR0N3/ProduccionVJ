@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48ea952a108e3fd4b9d96a6246298538, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SessionController
-  sceneAssets:
-  - {fileID: 102900000, guid: 6e2976812b466034aa922d5e2d6422df, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
+  sceneNames:
+  - LVL1Rework A
+  - LVL1Rework B
+  - LVL1Rework C
   pointsText: {fileID: 0}
   timer: {fileID: 0}
   maxTimerBonus: 0
