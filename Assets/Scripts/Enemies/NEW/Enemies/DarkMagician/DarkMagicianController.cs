@@ -6,7 +6,7 @@ namespace Enemies.DarkMagician
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(Collider2D))]
-    public class DarkMagicianController : MonoBehaviour
+    public class DarkMagicianController : MonoBehaviour, IDamageable
     {
         // ─────────────────────────────────────────────────────────────────────────
         //  Inspector
@@ -30,8 +30,6 @@ namespace Enemies.DarkMagician
         public LayerMask PlayerLayer;
 
         [Header("Projectile")]
-        [Tooltip("ScriptableObject con los datos del proyectil del enemigo")]
-        public ProjectileType ProjectileType;
         [Tooltip("Transform desde donde se dispara el proyectil (FirePoint)")]
         public Transform FirePoint;
         [Tooltip("Pool de proyectiles — arrastrar el objeto Pool de la escena")]
@@ -248,20 +246,18 @@ namespace Enemies.DarkMagician
         {
             if (FirePoint == null || Projectile == null) return;
 
-            // Orientar el FirePoint hacia el jugador antes de disparar
-            if (Player != null)
-            {
-                Vector2 dir = (Player.position - FirePoint.position).normalized;
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                FirePoint.rotation = Quaternion.Euler(0, 0, angle);
-            }
+            Vector2 dir = (Player.position - FirePoint.position).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            FirePoint.rotation = Quaternion.Euler(0, 0, angle);
+            
+            GameObject proj = Instantiate(Projectile, FirePoint.position, Quaternion.identity);
 
-            GameObject proj = Instantiate(Projectile);
+            var rb = proj.GetComponent<Rigidbody2D>();
+            var proyectileComponent = proj.GetComponent<EnemyProjectile>();
+
+            rb.linearVelocity = dir * proyectileComponent.speed;
 
             if (proj == null) return;
-
-            proj.transform.position = FirePoint.position;
-            proj.transform.rotation = FirePoint.rotation;
 
         }
 
@@ -269,12 +265,14 @@ namespace Enemies.DarkMagician
         //  Combate — Daño / Muerte
         // ─────────────────────────────────────────────────────────────────────────
 
-        public void TakeDamage(float damage)
+        public bool TakeDamage(int damage, Vector2 direction, float knockcack)
         {
-            if (IsDead) return;
             CurrentHealth -= damage;
+            Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
+            Debug.Log("soy mago y me hicieron daño: " + CurrentHealth);
+            return true;
         }
 
         // ─────────────────────────────────────────────────────────────────────────
@@ -320,6 +318,12 @@ namespace Enemies.DarkMagician
                     }
                 }
             }
+
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            
         }
 
         // ─────────────────────────────────────────────────────────────────────────

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DarkMagician
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyType
   EnemyName: DarkMagician
-  MaxHealth: 100
+  MaxHealth: 3
   WalkSpeed: 2
   ChaseSpeed: 3
   DetectionRange: 15

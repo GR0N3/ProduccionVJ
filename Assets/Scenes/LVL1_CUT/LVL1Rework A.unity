@@ -19493,7 +19493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2005810218016150192, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.85
+      value: 0.31
       objectReference: {fileID: 0}
     - target: {fileID: 2005810218016150192, guid: 71c27c627155ace46add69b79cb53a44, type: 3}
       propertyPath: m_LocalPosition.z
@@ -19811,7 +19811,6 @@ MonoBehaviour:
   PlayerLayer:
     serializedVersion: 2
     m_Bits: 8
-  ProjectileType: {fileID: 11400000, guid: 85c302a0f7b9ff04b904a7414ac3caf7, type: 2}
   FirePoint: {fileID: 1371867271}
   Projectile: {fileID: 4419710689854617045, guid: 8abb1c34cc87e6749b59ef1909bd490c, type: 3}
   IsWaiting: 0
@@ -375799,7 +375798,7 @@ GameObject:
   m_Layer: 8
   m_Name: FirePoint
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

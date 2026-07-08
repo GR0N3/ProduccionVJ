@@ -47,7 +47,7 @@ namespace Enemies.DarkMagician.StateMachine
             if (!hasShot && attackTimer >= magician.EnemyType.AttackCooldown * 0.4f)
             {
                 hasShot = true;
-                //magician.FireProjectile();
+                magician.FireProjectile();
             }
 
             // Cuando expira el cooldown → decidir próximo estado
