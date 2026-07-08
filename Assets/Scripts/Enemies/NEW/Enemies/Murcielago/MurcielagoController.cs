@@ -263,8 +263,8 @@ namespace Enemies.Murcielago
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, EnemyType.AttackRange, PlayerLayer);
             foreach (Collider2D hit in hits)
             {
+                hit.GetComponent<PlayerController>()?.TakeDamage(EnemyType.AttackDamage, Rigidbody.linearVelocity, 0.5f);
                 Debug.Log($"[Murcielago] Ataque al jugador! Daño: {EnemyType.AttackDamage}");
-                // hit.GetComponent<PlayerHealth>()?.TakeDamage(EnemyType.AttackDamage);
             }
         }
 

@@ -1,0 +1,859 @@
+fileFormatVersion: 2
+guid: 5b1a0869087f0304eb38e299c525c81f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8434136813379327706
+    second: DarkMagicianSheet_0
+  - first:
+      213: 835236291628098663
+    second: DarkMagicianSheet_1
+  - first:
+      213: -8059110256458246904
+    second: DarkMagicianSheet_2
+  - first:
+      213: 4134364454253695145
+    second: DarkMagicianSheet_3
+  - first:
+      213: 2975651621486269036
+    second: DarkMagicianSheet_4
+  - first:
+      213: -5396313251818965320
+    second: DarkMagicianSheet_5
+  - first:
+      213: -8977900575914146613
+    second: DarkMagicianSheet_6
+  - first:
+      213: 2440855653462791824
+    second: DarkMagicianSheet_7
+  - first:
+      213: -6610941773189441629
+    second: DarkMagicianSheet_8
+  - first:
+      213: 2833847312891755227
+    second: DarkMagicianSheet_9
+  - first:
+      213: -9143178136306293474
+    second: DarkMagicianSheet_10
+  - first:
+      213: 4732752557004272234
+    second: DarkMagicianSheet_11
+  - first:
+      213: -6201184310525483935
+    second: DarkMagicianSheet_12
+  - first:
+      213: -2861670797510393880
+    second: DarkMagicianSheet_13
+  - first:
+      213: 4399621933132110385
+    second: DarkMagicianSheet_14
+  - first:
+      213: -398178102898571899
+    second: DarkMagicianSheet_15
+  - first:
+      213: 3153936583390441980
+    second: DarkMagicianSheet_16
+  - first:
+      213: -5545315824498041582
+    second: DarkMagicianSheet_17
+  - first:
+      213: -2722432468517863677
+    second: DarkMagicianSheet_18
+  - first:
+      213: 551426081699417080
+    second: DarkMagicianSheet_19
+  - first:
+      213: 2825083138173928206
+    second: DarkMagicianSheet_20
+  - first:
+      213: 69553185665800409
+    second: DarkMagicianSheet_21
+  - first:
+      213: -6738454807031645283
+    second: DarkMagicianSheet_22
+  - first:
+      213: -2148428747807612680
+    second: DarkMagicianSheet_23
+  - first:
+      213: 369653521495803463
+    second: DarkMagicianSheet_24
+  - first:
+      213: -5564285747061628075
+    second: DarkMagicianSheet_25
+  - first:
+      213: 8361000655085138689
+    second: DarkMagicianSheet_26
+  - first:
+      213: -4117118442302764754
+    second: DarkMagicianSheet_27
+  - first:
+      213: -967146503099845730
+    second: DarkMagicianSheet_28
+  - first:
+      213: 1574468446658944530
+    second: DarkMagicianSheet_29
+  - first:
+      213: 8282981380619200935
+    second: DarkMagicianSheet_30
+  - first:
+      213: 1558599934809234174
+    second: DarkMagicianSheet_31
+  - first:
+      213: -2162896394155680449
+    second: DarkMagicianSheet_32
+  - first:
+      213: -5599316561305851285
+    second: DarkMagicianSheet_33
+  - first:
+      213: 3709993692380115681
+    second: DarkMagicianSheet_34
+  - first:
+      213: -5309483772820557926
+    second: DarkMagicianSheet_35
+  - first:
+      213: -6020585984192327752
+    second: DarkMagicianSheet_36
+  - first:
+      213: -1373006088869215581
+    second: DarkMagicianSheet_37
+  - first:
+      213: -5593912399218744398
+    second: DarkMagicianSheet_38
+  - first:
+      213: 193627470720457835
+    second: DarkMagicianSheet_39
+  - first:
+      213: -2754671406565044762
+    second: DarkMagicianSheet_40
+  - first:
+      213: -6649600887578665821
+    second: DarkMagicianSheet_41
+  - first:
+      213: -813260350961717002
+    second: DarkMagicianSheet_42
+  - first:
+      213: 2969168479823264687
+    second: DarkMagicianSheet_43
+  - first:
+      213: 3567692256436140680
+    second: DarkMagicianSheet_44
+  - first:
+      213: -5776717492593598392
+    second: DarkMagicianSheet_45
+  - first:
+      213: -7956002070412570834
+    second: DarkMagicianSheet_46
+  - first:
+      213: 9019115387746408285
+    second: DarkMagicianSheet_47
+  - first:
+      213: -1923562433968333994
+    second: DarkMagicianSheet_48
+  - first:
+      213: 8552035464091711873
+    second: DarkMagicianSheet_49
+  - first:
+      213: -7218087275891178862
+    second: DarkMagicianSheet_50
+  - first:
+      213: 3339480721271459242
+    second: DarkMagicianSheet_51
+  - first:
+      213: -6717452671326432424
+    second: DarkMagicianSheet_52
+  - first:
+      213: -1645485261461326396
+    second: DarkMagicianSheet_53
+  - first:
+      213: 1152986072832367626
+    second: DarkMagicianSheet_54
+  - first:
+      213: -2355865364752875337
+    second: DarkMagicianSheet_55
+  - first:
+      213: 5644353413562407356
+    second: DarkMagicianSheet_56
+  - first:
+      213: 2586160595615184147
+    second: DarkMagicianSheet_57
+  - first:
+      213: -2987439917204828346
+    second: DarkMagicianSheet_58
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DarkMagicianSheet_3
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 256
+        width: 161
+        height: 209
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a01bcbf096306930800000000000000
+      internalID: 4134364454253695145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_4
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 530
+        width: 138
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6211025263ab4920800000000000000
+      internalID: 2975651621486269036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_5
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 62
+        width: 194
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b6f89830b17c15b0800000000000000
+      internalID: -5396313251818965320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_13
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 792
+        width: 173
+        height: 209
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8efb84a429d4948d0800000000000000
+      internalID: -2861670797510393880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_24
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 254
+        width: 145
+        height: 199
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 746cab65be5412500800000000000000
+      internalID: 369653521495803463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_26
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 528
+        width: 156
+        height: 196
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 103782d1ccd380470800000000000000
+      internalID: 8361000655085138689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_27
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 62
+        width: 180
+        height: 131
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e298554179e0dd6c0800000000000000
+      internalID: -4117118442302764754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_29
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 793
+        width: 176
+        height: 207
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21eda29d5b2a9d510800000000000000
+      internalID: 1574468446658944530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_30
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 254
+        width: 153
+        height: 195
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a96bf83eaf03f270800000000000000
+      internalID: 8282981380619200935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_31
+      rect:
+        serializedVersion: 2
+        x: 539
+        y: 527
+        width: 146
+        height: 183
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efa5045026241a510800000000000000
+      internalID: 1558599934809234174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_32
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 60
+        width: 189
+        height: 148
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3d90646039dbf1e0800000000000000
+      internalID: -2162896394155680449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_33
+      rect:
+        serializedVersion: 2
+        x: 646
+        y: 256
+        width: 171
+        height: 193
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6a2762014b3b42b0800000000000000
+      internalID: -5599316561305851285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_34
+      rect:
+        serializedVersion: 2
+        x: 654
+        y: 791
+        width: 184
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e2b1495b9b8c7330800000000000000
+      internalID: 3709993692380115681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_35
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 530
+        width: 152
+        height: 193
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9f6454b3ace056b0800000000000000
+      internalID: -5309483772820557926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_36
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 65
+        width: 205
+        height: 127
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bf458022f4927ca0800000000000000
+      internalID: -6020585984192327752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_37
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 259
+        width: 193
+        height: 190
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a280869c3a12fce0800000000000000
+      internalID: -1373006088869215581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_38
+      rect:
+        serializedVersion: 2
+        x: 851
+        y: 794
+        width: 198
+        height: 209
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b3e9eb8f4e6e52b0800000000000000
+      internalID: -5593912399218744398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_39
+      rect:
+        serializedVersion: 2
+        x: 867
+        y: 527
+        width: 169
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6cdc03a827efa200800000000000000
+      internalID: 193627470720457835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_40
+      rect:
+        serializedVersion: 2
+        x: 1001
+        y: 65
+        width: 217
+        height: 87
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6edc3ca53f075c9d0800000000000000
+      internalID: -2754671406565044762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_48
+      rect:
+        serializedVersion: 2
+        x: 1008
+        y: 255
+        width: 171
+        height: 199
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65b180468222e45e0800000000000000
+      internalID: -1923562433968333994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_51
+      rect:
+        serializedVersion: 2
+        x: 1057
+        y: 793
+        width: 172
+        height: 231
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aad86adc508385e20800000000000000
+      internalID: 3339480721271459242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_52
+      rect:
+        serializedVersion: 2
+        x: 1073
+        y: 526
+        width: 148
+        height: 191
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 853d612d260d6c2a0800000000000000
+      internalID: -6717452671326432424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DarkMagicianSheet_58
+      rect:
+        serializedVersion: 2
+        x: 1223
+        y: 63
+        width: 181
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64f0f23393b7a86d0800000000000000
+      internalID: -2987439917204828346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d6eecda8a1645c2418bdb3f1c9c58369
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DarkMagicianSheet_0: -8434136813379327706
+      DarkMagicianSheet_1: 835236291628098663
+      DarkMagicianSheet_10: -9143178136306293474
+      DarkMagicianSheet_11: 4732752557004272234
+      DarkMagicianSheet_12: -6201184310525483935
+      DarkMagicianSheet_13: -2861670797510393880
+      DarkMagicianSheet_14: 4399621933132110385
+      DarkMagicianSheet_15: -398178102898571899
+      DarkMagicianSheet_16: 3153936583390441980
+      DarkMagicianSheet_17: -5545315824498041582
+      DarkMagicianSheet_18: -2722432468517863677
+      DarkMagicianSheet_19: 551426081699417080
+      DarkMagicianSheet_2: -8059110256458246904
+      DarkMagicianSheet_20: 2825083138173928206
+      DarkMagicianSheet_21: 69553185665800409
+      DarkMagicianSheet_22: -6738454807031645283
+      DarkMagicianSheet_23: -2148428747807612680
+      DarkMagicianSheet_24: 369653521495803463
+      DarkMagicianSheet_25: -5564285747061628075
+      DarkMagicianSheet_26: 8361000655085138689
+      DarkMagicianSheet_27: -4117118442302764754
+      DarkMagicianSheet_28: -967146503099845730
+      DarkMagicianSheet_29: 1574468446658944530
+      DarkMagicianSheet_3: 4134364454253695145
+      DarkMagicianSheet_30: 8282981380619200935
+      DarkMagicianSheet_31: 1558599934809234174
+      DarkMagicianSheet_32: -2162896394155680449
+      DarkMagicianSheet_33: -5599316561305851285
+      DarkMagicianSheet_34: 3709993692380115681
+      DarkMagicianSheet_35: -5309483772820557926
+      DarkMagicianSheet_36: -6020585984192327752
+      DarkMagicianSheet_37: -1373006088869215581
+      DarkMagicianSheet_38: -5593912399218744398
+      DarkMagicianSheet_39: 193627470720457835
+      DarkMagicianSheet_4: 2975651621486269036
+      DarkMagicianSheet_40: -2754671406565044762
+      DarkMagicianSheet_41: -6649600887578665821
+      DarkMagicianSheet_42: -813260350961717002
+      DarkMagicianSheet_43: 2969168479823264687
+      DarkMagicianSheet_44: 3567692256436140680
+      DarkMagicianSheet_45: -5776717492593598392
+      DarkMagicianSheet_46: -7956002070412570834
+      DarkMagicianSheet_47: 9019115387746408285
+      DarkMagicianSheet_48: -1923562433968333994
+      DarkMagicianSheet_49: 8552035464091711873
+      DarkMagicianSheet_5: -5396313251818965320
+      DarkMagicianSheet_50: -7218087275891178862
+      DarkMagicianSheet_51: 3339480721271459242
+      DarkMagicianSheet_52: -6717452671326432424
+      DarkMagicianSheet_53: -1645485261461326396
+      DarkMagicianSheet_54: 1152986072832367626
+      DarkMagicianSheet_55: -2355865364752875337
+      DarkMagicianSheet_56: 5644353413562407356
+      DarkMagicianSheet_57: 2586160595615184147
+      DarkMagicianSheet_58: -2987439917204828346
+      DarkMagicianSheet_6: -8977900575914146613
+      DarkMagicianSheet_7: 2440855653462791824
+      DarkMagicianSheet_8: -6610941773189441629
+      DarkMagicianSheet_9: 2833847312891755227
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

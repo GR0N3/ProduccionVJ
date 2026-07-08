@@ -19,7 +19,7 @@ namespace Enemies.Murcielago.StateMachine
         public override void Enter()
         {
             base.Enter();
-            murcielago.Animator.Play("Fly");
+            murcielago.Animator.Play("Flying");
             sineTimer = 0f;
         }
 

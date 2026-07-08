@@ -35,7 +35,7 @@ namespace Enemies.DarkMagician
         [Tooltip("Transform desde donde se dispara el proyectil (FirePoint)")]
         public Transform FirePoint;
         [Tooltip("Pool de proyectiles — arrastrar el objeto Pool de la escena")]
-        //public EnemyProjectilePool ProjectilePool;
+        public GameObject Projectile;
 
         // ─────────────────────────────────────────────────────────────────────────
         //  Componentes
@@ -244,31 +244,26 @@ namespace Enemies.DarkMagician
         /// Puede llamarse también desde un Animation Event en el clip "Attack".
         /// </summary>
        
-        //public void FireProjectile()
-        //{
-        //    if (FirePoint == null || ProjectilePool == null) return;
+        public void FireProjectile()
+        {
+            if (FirePoint == null || Projectile == null) return;
 
-        //    // Orientar el FirePoint hacia el jugador antes de disparar
-        //    if (Player != null)
-        //    {
-        //        Vector2 dir = (Player.position - FirePoint.position).normalized;
-        //        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        //        FirePoint.rotation = Quaternion.Euler(0, 0, angle);
-        //    }
+            // Orientar el FirePoint hacia el jugador antes de disparar
+            if (Player != null)
+            {
+                Vector2 dir = (Player.position - FirePoint.position).normalized;
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                FirePoint.rotation = Quaternion.Euler(0, 0, angle);
+            }
 
-        //    GameObject proj = ProjectilePool.GetProjectile();
-        //    if (proj == null) return;
+            GameObject proj = Instantiate(Projectile);
 
-        //    proj.transform.position = FirePoint.position;
-        //    proj.transform.rotation = FirePoint.rotation;
+            if (proj == null) return;
 
-        //    // Asignar el ProjectileType al proyectil si lo soporta
-        //    EnemyProjectile ep = proj.GetComponent<EnemyProjectile>();
-        //    if (ep != null)
-        //        ep.ProjectileType = ProjectileType;
+            proj.transform.position = FirePoint.position;
+            proj.transform.rotation = FirePoint.rotation;
 
-        //    proj.SetActive(true);
-        //}
+        }
 
         // ─────────────────────────────────────────────────────────────────────────
         //  Combate — Daño / Muerte

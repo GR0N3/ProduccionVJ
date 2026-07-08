@@ -7,7 +7,7 @@ namespace Enemies
     {
         [Header("Basic Stats")]
         public string EnemyName = "Enemy";
-        public float MaxHealth = 100f;
+        public int MaxHealth = 1;
 
         [Header("Movement")]
         public float WalkSpeed = 2f;
@@ -16,7 +16,7 @@ namespace Enemies
         public float AttackRange = 1.5f;
 
         [Header("Combat")]
-        public float AttackDamage = 10f;
+        public int AttackDamage = 1;
         public float AttackCooldown = 1f;
 
         [Header("Sounds")]
