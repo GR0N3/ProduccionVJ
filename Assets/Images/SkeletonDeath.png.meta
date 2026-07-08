@@ -73,7 +73,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -87,7 +87,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 25
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -139,10 +139,10 @@ TextureImporter:
       name: SkeletonDeath_0
       rect:
         serializedVersion: 2
-        x: 59
-        y: 57
-        width: 30
-        height: 37
+        x: 49
+        y: 47
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,10 +161,10 @@ TextureImporter:
       name: SkeletonDeath_1
       rect:
         serializedVersion: 2
-        x: 81
-        y: 88
-        width: 9
-        height: 13
+        x: 198
+        y: 48
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -183,10 +183,10 @@ TextureImporter:
       name: SkeletonDeath_2
       rect:
         serializedVersion: 2
-        x: 231
-        y: 80
-        width: 9
-        height: 13
+        x: 345
+        y: 48
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -205,10 +205,10 @@ TextureImporter:
       name: SkeletonDeath_3
       rect:
         serializedVersion: 2
-        x: 81
-        y: 58
-        width: 11
-        height: 13
+        x: 496
+        y: 49
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -223,209 +223,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_4
-      rect:
-        serializedVersion: 2
-        x: 84
-        y: 68
-        width: 22
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d42351c3d069c4e20800000000000000
-      internalID: 3336206407561458253
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_5
-      rect:
-        serializedVersion: 2
-        x: 205
-        y: 48
-        width: 19
-        height: 26
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d0e2e4130fb6a3870800000000000000
-      internalID: 8663355512564100621
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_6
-      rect:
-        serializedVersion: 2
-        x: 221
-        y: 48
-        width: 37
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 894b234d82d10f470800000000000000
-      internalID: 8426266964006188184
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_7
-      rect:
-        serializedVersion: 2
-        x: 381
-        y: 60
-        width: 9
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 51e80b7431d273ab0800000000000000
-      internalID: -5028500898105487851
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_8
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 48
-        width: 13
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ffd60bedb505bc310800000000000000
-      internalID: 1426322062501244415
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_9
-      rect:
-        serializedVersion: 2
-        x: 82
-        y: 46
-        width: 15
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7aaa81b69bb21aa80800000000000000
-      internalID: -8457430549859358041
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_10
-      rect:
-        serializedVersion: 2
-        x: 214
-        y: 48
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0ce6f25173ac3fe10800000000000000
-      internalID: 2230348578405969600
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_11
-      rect:
-        serializedVersion: 2
-        x: 353
-        y: 48
-        width: 56
-        height: 19
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e462069401b26ff50800000000000000
-      internalID: 6914761626824484430
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SkeletonDeath_12
-      rect:
-        serializedVersion: 2
-        x: 501
-        y: 48
-        width: 58
-        height: 15
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7817e6a3f08cdb550800000000000000
-      internalID: 6178314231552569735
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 9cbd42fcbe3b75247ae48fd89e522bd9
     internalID: 0
     vertices: []
     indices: 
@@ -440,6 +242,7 @@ TextureImporter:
       SkeletonDeath_10: 2230348578405969600
       SkeletonDeath_11: 6914761626824484430
       SkeletonDeath_12: 6178314231552569735
+      SkeletonDeath_13: -1338808746
       SkeletonDeath_2: -7879675877479902408
       SkeletonDeath_3: 1676813968956228443
       SkeletonDeath_4: 3336206407561458253
