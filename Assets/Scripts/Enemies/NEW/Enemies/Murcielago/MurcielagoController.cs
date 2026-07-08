@@ -1,12 +1,13 @@
 using UnityEngine;
 using Enemies.Murcielago.StateMachine;
+using UnityEngine.UIElements;
 
 namespace Enemies.Murcielago
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(Collider2D))]
-    public class MurcielagoController : MonoBehaviour
+    public class MurcielagoController : MonoBehaviour, IDamageable
     {
         // ─────────────────────────────────────────────────────────────────────────
         //  Inspector
@@ -264,18 +265,16 @@ namespace Enemies.Murcielago
             foreach (Collider2D hit in hits)
             {
                 hit.GetComponent<PlayerController>()?.TakeDamage(EnemyType.AttackDamage, Rigidbody.linearVelocity, 0.5f);
-                Debug.Log($"[Murcielago] Ataque al jugador! Daño: {EnemyType.AttackDamage}");
             }
         }
 
-        public void TakeDamage(float damage)
+        public bool TakeDamage(int damage, Vector2 direction, float knockcack)
         {
-            if (IsDead) return;
-
             CurrentHealth -= damage;
-
+            Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
+            return true;
         }
 
         // ─────────────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ namespace Enemies.Skeleton
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(Collider2D))]
-    public class SkeletonController : MonoBehaviour
+    public class SkeletonController : MonoBehaviour , IDamageable
     {
         [Header("Enemy Type")]
         public EnemyType EnemyType;
@@ -227,26 +227,22 @@ namespace Enemies.Skeleton
 
         public void PerformAttack()
         {
-            if (Player == null) return;
+            if (Player == null || EnemyType == null) return;
 
-            Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(transform.position, EnemyType.AttackRange, PlayerLayer);
-            foreach (Collider2D player in hitPlayers)
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, EnemyType.AttackRange, PlayerLayer);
+            foreach (Collider2D hit in hits)
             {
-                Debug.Log($"Ataque realizado al jugador! Daño: {EnemyType.AttackDamage}");
+                hit.GetComponent<PlayerController>()?.TakeDamage(EnemyType.AttackDamage, Rigidbody.linearVelocity, 0.5f);
             }
         }
 
-        public void TakeDamage(float damage)
+        public bool TakeDamage(int damage, Vector2 direction, float knockcack)
         {
-            if (IsDead) return;
-
             CurrentHealth -= damage;
-            IsHit = true;
-
+            Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
-            {
                 IsDead = true;
-            }
+            return true;
         }
 
         public void PlayAttackSound()

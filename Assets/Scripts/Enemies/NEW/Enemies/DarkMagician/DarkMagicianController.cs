@@ -271,7 +271,6 @@ namespace Enemies.DarkMagician
             Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
-            Debug.Log("soy mago y me hicieron daño: " + CurrentHealth);
             return true;
         }
 
