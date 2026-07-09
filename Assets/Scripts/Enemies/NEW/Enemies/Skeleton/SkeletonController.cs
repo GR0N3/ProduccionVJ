@@ -233,6 +233,7 @@ namespace Enemies.Skeleton
             foreach (Collider2D hit in hits)
             {
                 hit.GetComponent<PlayerController>()?.TakeDamage(EnemyType.AttackDamage, Rigidbody.linearVelocity, 0.5f);
+
             }
         }
 
@@ -301,6 +302,8 @@ namespace Enemies.Skeleton
             // Distancia de patrulla (verde)
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, transform.position + (Vector3)movementDirection * currentPatrolDistance);
+            Gizmos.DrawWireSphere(transform.position, EnemyType.AttackRange);
+
         }
 
         private void OnCollisionStay2D(Collision2D collision)
@@ -320,6 +323,8 @@ namespace Enemies.Skeleton
                         break;
                     }
                 }
+
+
             }
         }
 
