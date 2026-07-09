@@ -45,9 +45,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SessionController
   sceneNames:
-  - LVL1Rework A
+  - LVL1Rework E
   - LVL1Rework B
   - LVL1Rework C
+  - LVL1Rework D
+  - LVL1Rework A
   pointsText: {fileID: 0}
   timer: {fileID: 0}
   maxTimerBonus: 0

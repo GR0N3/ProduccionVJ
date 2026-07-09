@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
   maxHealth: 5
-  speed: 10
-  jumpForce: 13
+  speed: 7
+  jumpForce: 15
   acceleration: 100
   deceleration: 120
   riseMultiplier: 2
@@ -54,8 +54,8 @@ MonoBehaviour:
   fallMultiplier: 10
   maxFallSpeed: 16
   damage: 1
-  bulletSpeed: 20
+  bulletSpeed: 25
   bulletsCount: 1
   bulletsSpread: 0
-  attackSpeed: 2
+  attackSpeed: 3.5
   knockbackForce: 0.1

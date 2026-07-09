@@ -38,6 +38,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LVL1_CUT/LVL1Rework C.unity
     guid: c5ee1282dfaf4d946b21ed713d767377
+  - enabled: 1
+    path: Assets/Scenes/LVL1_CUT/LVL1Rework D.unity
+    guid: e67184a8fc9a8fb4494c8e2fa77c8f92
+  - enabled: 1
+    path: Assets/Scenes/LVL1_CUT/LVL1Rework E.unity
+    guid: 99e2f53a75cad4f4f8af936eecfa5791
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
