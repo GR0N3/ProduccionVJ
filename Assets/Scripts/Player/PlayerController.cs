@@ -103,11 +103,18 @@ public class PlayerController : MonoBehaviour
         weapon.Shoot();
     }
 
+    public void TakeDamage(int damage, Vector2 direction, float knockback)
+    {
+        health.TakeDamage(damage, direction, knockback);
+    }
+
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if ((collision.gameObject.layer == 8))
         {
-            health.TakeDamage(1, new Vector2(-1, -1), 25f);
+            TakeDamage(1, new Vector2(-1, -1), 25f);
+            Debug.Log("damage for collision");
         }
     }
 }

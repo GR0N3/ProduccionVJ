@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour
 {
-    [Header("Configuración de Daño")]
     public int damage = 1;
     public float knockbackForce = 5f;
+    public float speed = 10f;
 
-    [Header("Limpieza")]
     public float lifeTime = 3f;
+
     [Tooltip("Capas donde la flecha choca y se rompe (Ground, Paredes)")]
     public LayerMask groundLayer;
 
@@ -48,23 +48,15 @@ public class EnemyProjectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if (collision.gameObject.GetComponent<Enemy>() != null || collision.gameObject.CompareTag("Enemy"))
-        {
-            return;
-        }
-
         if (collision.gameObject.CompareTag("Player"))
         {
-            var player = ServiceLocator.Get<PlayerManager>().PlayerHealth;
+            var player = collision.GetComponent<PlayerController>();
 
             Vector2 direction = rb.linearVelocity.normalized;
 
             player.TakeDamage(damage, direction, knockbackForce);
-            
-        }
-        else if ((groundLayer.value & (1 << collision.gameObject.layer)) != 0)
-        {
             Destroy(gameObject);
+            
         }
     }
 }
