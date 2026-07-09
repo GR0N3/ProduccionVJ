@@ -933,7 +933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Timer
   timerText: {fileID: 821436421}
-  maxTime: 999
+  maxTime: 60
 --- !u!1001 &739446340152204498
 PrefabInstance:
   m_ObjectHideFlags: 0
