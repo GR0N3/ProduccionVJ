@@ -19,12 +19,21 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float acceleration;
     [SerializeField] private float deceleration;
+    [SerializeField] private float riseMultiplier = 1.5f;
+    [SerializeField] private float maxJumpSpeed = 20f;
+    [SerializeField] private float fallMultiplier = 2f;
+    [SerializeField] private float maxFallSpeed = 20f;
     [SerializeField] private float damage;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private float bulletsCount;
     [SerializeField] private float bulletsSpread;
     [SerializeField] private float attackSpeed;
     [SerializeField] private float knockbackForce;
+
+    public float RiseMultiplier => riseMultiplier;
+    public float MaxJumpSpeed => maxJumpSpeed;
+    public float FallMultiplier => fallMultiplier;
+    public float MaxFallSpeed => maxFallSpeed;
 
     private void Awake()
     {

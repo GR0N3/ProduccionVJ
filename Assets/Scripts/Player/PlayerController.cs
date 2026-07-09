@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour
     public float JumpForce => playerManager.Stats.GetStat(UpgradeType.JumpForce);
     public float Acceleration => playerManager.Stats.GetStat(UpgradeType.Acceleration);
     public float Deceleration => playerManager.Stats.GetStat(UpgradeType.Deceleration);
+    public float RiseMultiplier => playerManager.RiseMultiplier;
+    public float MaxJumpSpeed => playerManager.MaxJumpSpeed;
+    public float FallMultiplier => playerManager.FallMultiplier;
+    public float MaxFallSpeed => playerManager.MaxFallSpeed;
 
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask borderLayer;

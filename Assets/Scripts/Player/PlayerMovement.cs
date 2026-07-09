@@ -6,6 +6,10 @@ public class PlayerMovement
 {
     private float speed;
     private float jumpForce;
+    private float riseMultiplier;
+    private float maxJumpSpeed;
+    private float fallMultiplier;
+    private float maxFallSpeed;
 
     private LayerMask borderLayer;
     private Transform leftBorder;
@@ -35,6 +39,10 @@ public class PlayerMovement
         borderLayer = player.BorderLayer;
         acceleration = player.Acceleration;
         deceleration = player.Deceleration;
+        riseMultiplier = player.RiseMultiplier;
+        maxJumpSpeed = player.MaxJumpSpeed;
+        fallMultiplier = player.FallMultiplier;
+        maxFallSpeed = player.MaxFallSpeed;
         anim = player.AnimatorBrain;
     }
 
@@ -49,7 +57,11 @@ public class PlayerMovement
     {
         if (isGrounded)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            float finalJumpSpeed = jumpForce;
+            if (maxJumpSpeed > 0f)
+                finalJumpSpeed = Mathf.Min(finalJumpSpeed, maxJumpSpeed);
+
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, finalJumpSpeed);
         }
     }
 
@@ -91,6 +103,26 @@ public class PlayerMovement
         );                                                                                
                                                                                           
         rb.linearVelocity = new Vector2(newVelocityX, rb.linearVelocity.y);               
+
+        if (rb.linearVelocity.y > 0f)
+        {
+            rb.linearVelocity += Vector2.up * (Physics2D.gravity.y * (riseMultiplier - 1f) * Time.fixedDeltaTime);
+
+            if (maxJumpSpeed > 0f)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Min(rb.linearVelocity.y, maxJumpSpeed));
+            }
+        }
+
+        if (rb.linearVelocity.y < 0f)
+        {
+            rb.linearVelocity += Vector2.up * (Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime);
+
+            if (maxFallSpeed > 0f)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+            }
+        }
     }
     private void GroundCheck()
     {

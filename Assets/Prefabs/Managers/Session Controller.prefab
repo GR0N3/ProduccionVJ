@@ -48,6 +48,8 @@ MonoBehaviour:
   - LVL1Rework A
   - LVL1Rework B
   - LVL1Rework C
+  - LVL1Rework D
+  - LVL1Rework E
   pointsText: {fileID: 0}
   timer: {fileID: 0}
   maxTimerBonus: 0

@@ -44,14 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4edfb5a60cd471447b8fb190775c065e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
-  maxHealth: 10
-  speed: 30
-  jumpForce: 25
-  acceleration: 40
-  deceleration: 5
+  maxHealth: 5
+  speed: 7
+  jumpForce: 15
+  acceleration: 100
+  deceleration: 120
+  riseMultiplier: 2
+  maxJumpSpeed: 13
+  fallMultiplier: 10
+  maxFallSpeed: 16
   damage: 1
-  bulletSpeed: 10
+  bulletSpeed: 25
   bulletsCount: 1
   bulletsSpread: 0
-  attackSpeed: 1
+  attackSpeed: 3.5
   knockbackForce: 0.1
