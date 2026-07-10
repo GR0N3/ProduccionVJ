@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8313380610637513148}
   - component: {fileID: 556137282762688203}
+  - component: {fileID: 5093763044534796197}
   m_Layer: 0
   m_Name: Session Controller
   m_TagString: Untagged
@@ -51,6 +52,20 @@ MonoBehaviour:
   - LVL1Rework D
   - LVL1Rework E
   pointsText: {fileID: 0}
-  timer: {fileID: 0}
-  maxTimerBonus: 0
+  timer: {fileID: 5093763044534796197}
+  maxTimerBonus: 1000
   PlayerManager: {fileID: 0}
+--- !u!114 &5093763044534796197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5478930361933516675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dbc726da64aeed4fa7ba325f9070643, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Timer
+  timerText: {fileID: 0}
+  maxTime: 120

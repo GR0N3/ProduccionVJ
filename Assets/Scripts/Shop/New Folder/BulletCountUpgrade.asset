@@ -17,6 +17,6 @@ MonoBehaviour:
     value: 1
     multiplicative: 0
   Image: {fileID: 21300000, guid: 84880a7b5d24d4849b4003bb077eed1b, type: 3}
-  description: '+1 Knife  '
-  level: 1
-  cost: 1
+  description: '+1 Bulllet  '
+  tier: 3
+  cost: 75

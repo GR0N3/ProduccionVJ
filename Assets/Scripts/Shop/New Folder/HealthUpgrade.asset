@@ -17,6 +17,6 @@ MonoBehaviour:
     value: 1
     multiplicative: 0
   Image: {fileID: 21300000, guid: 4fc790c9019f9484fb79c35ced1ceda9, type: 3}
-  description: Health +1
-  level: 1
-  cost: 1
+  description: +1 Health
+  tier: 1
+  cost: 28
