@@ -11,7 +11,7 @@ namespace Enemies.DarkMagician.StateMachine
     /// </summary>
     public class DarkMagicianIdleState : DarkMagicianState
     {
-        private float waitTimer;
+        private float waitTimer = 0;
 
         public DarkMagicianIdleState(DarkMagicianController magician, StateMachine stateMachine)
             : base(magician, stateMachine) { }

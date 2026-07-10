@@ -93,11 +93,11 @@ public class SessionController : MonoBehaviour
     {
         SceneController.Instance
             .NewTransition()
-            .Unload(SceneDataBase.Scenes.Match)
-            .Unload(SceneDataBase.Scenes.Session)
             .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)
             .WithClearUnusedAssets()
             .WithOverlay()
+            .Unload(SceneDataBase.Slots.SessionContent)
+            .Unload(SceneDataBase.Slots.Session)
             .Perfrom();
     }
 
@@ -128,6 +128,8 @@ public class SessionController : MonoBehaviour
             points;
     }
 
+
+
     public void SubtractPoints(int amount)
     {
         points -= amount;
@@ -149,6 +151,7 @@ public class SessionController : MonoBehaviour
 
         OnLevelBegin?.Invoke();
     }
+
 
     private void OnDestroy()
     {

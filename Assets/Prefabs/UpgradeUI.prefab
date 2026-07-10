@@ -240,6 +240,7 @@ GameObject:
   - component: {fileID: 3874558304332243498}
   - component: {fileID: 7815190431441151568}
   - component: {fileID: 7505830403152205719}
+  - component: {fileID: 7365349564411906420}
   m_Layer: 5
   m_Name: UpgradeUI
   m_TagString: Untagged
@@ -324,6 +325,24 @@ MonoBehaviour:
   colour: {fileID: 8352177990676901318}
   Description_Text: {fileID: 4964495808493990915}
   Price_Text: {fileID: 2895676418588589857}
+  canvasGroup: {fileID: 7365349564411906420}
+  fadeDurationByTier:
+  - 0.3
+  - 0.6
+  - 1
+  - 1.5
+--- !u!225 &7365349564411906420
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4311018239715742215}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4625290059323881320
 GameObject:
   m_ObjectHideFlags: 0

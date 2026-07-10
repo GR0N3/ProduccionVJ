@@ -1,10 +1,13 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradesManager : MonoBehaviour
 {
     private SessionController controller;
     private PlayerManager playerManager;
+    private HealthBarManager healthBarManager;
     [SerializeField] private int upgradesCant;
     [SerializeField] private GameObject upgradeCardPrefab;
     [SerializeField] private List<ShopUpgrade> allUpgrades;
@@ -16,17 +19,31 @@ public class UpgradesManager : MonoBehaviour
     [SerializeField] private float[] tierBWeights = { 10f, 11.7f, 11.7f, 11f, 8.3f };
     [SerializeField] private float[] tierCWeights = { 12f, 9f, 6.6f, 5f, 4f };
 
+    [Header("Aparición secuencial")]
+    [SerializeField] private float delayBetweenCards = 1.7f;
+
+    [Header("Límites de la tienda")]
+    [SerializeField] private Button rerollButton;
+
+    private bool hasRerolled = false;
+    private bool hasPurchased = false;
+
     private List<GameObject> upgradesList = new();
+    private Coroutine spawnRoutine;
 
     private void Awake()
     {
         ServiceLocator.Register<UpgradesManager>(this);
         controller = ServiceLocator.Get<SessionController>();
         playerManager = ServiceLocator.Get<PlayerManager>();
+        healthBarManager = ServiceLocator.Get<HealthBarManager>();
     }
 
     private void Start()
     {
+        hasRerolled = false;
+        hasPurchased = false;
+        UpdateRerollButtonState();
         SpawnUpgrades();
     }
 
@@ -40,8 +57,6 @@ public class UpgradesManager : MonoBehaviour
             Tier.S => tierSWeights,
             _ => tierCWeights
         };
-
-        // Clamp por si el nivel supera los datos cargados (ej: Nvl6+)
         int index = Mathf.Clamp(levelIndex, 0, weights.Length - 1);
         return weights[index];
     }
@@ -51,29 +66,30 @@ public class UpgradesManager : MonoBehaviour
         float totalWeight = 0f;
         foreach (var upgrade in allUpgrades)
         {
-            totalWeight += GetWeightForTier(upgrade.tier, levelIndex); //NULL REFERENCE
+            totalWeight += GetWeightForTier(upgrade.tier, levelIndex);
         }
-
         float roll = Random.Range(0f, totalWeight);
         float cumulative = 0f;
-
         foreach (var upgrade in allUpgrades)
         {
             cumulative += GetWeightForTier(upgrade.tier, levelIndex);
             if (roll <= cumulative)
                 return upgrade;
         }
-
         return allUpgrades[allUpgrades.Count - 1];
     }
 
     private void SpawnUpgrades()
     {
         ClearUpgrades();
+        if (spawnRoutine != null)
+            StopCoroutine(spawnRoutine);
+        spawnRoutine = StartCoroutine(SpawnUpgradesRoutine());
+    }
 
-        // Ajustá este offset si SceneIndex arranca en 1 en vez de 0
+    private IEnumerator SpawnUpgradesRoutine()
+    {
         int levelIndex = controller.SceneIndex;
-
         for (int i = 0; i < upgradesCant; i++)
         {
             ShopUpgrade selected = GetRandomUpgradeWeighted(levelIndex);
@@ -81,6 +97,7 @@ public class UpgradesManager : MonoBehaviour
             card.transform.SetParent(upgradesParent.transform, false);
             card.GetComponent<Upgrade>().Init(selected);
             upgradesList.Add(card);
+            yield return new WaitForSeconds(delayBetweenCards);
         }
     }
 
@@ -95,6 +112,8 @@ public class UpgradesManager : MonoBehaviour
 
     public void Upgrade(ShopUpgrade upgrade)
     {
+        if (hasPurchased) return;
+
         foreach (var modifier in upgrade.modifiers)
         {
             if (modifier.multiplicative)
@@ -107,11 +126,26 @@ public class UpgradesManager : MonoBehaviour
             }
         }
         controller.SubtractPoints(upgrade.cost);
+        playerManager.PlayerHealth.SetHealth(playerManager.PlayerHealth.MaxHealth);
+        healthBarManager.Drawhearts();
+
+        hasPurchased = true;
+        UpdateRerollButtonState();
     }
 
     public void RerollUpgrades()
     {
+        if (hasRerolled || hasPurchased) return;
+
+        hasRerolled = true;
+        UpdateRerollButtonState();
         SpawnUpgrades();
+    }
+
+    private void UpdateRerollButtonState()
+    {
+        if (rerollButton == null) return;
+        rerollButton.interactable = !hasRerolled && !hasPurchased;
     }
 
     private void OnDestroy()

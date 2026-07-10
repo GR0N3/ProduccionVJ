@@ -19,6 +19,7 @@ public class PlayerHealth
     public void Init(PlayerController player)
     {
         anim = player.AnimatorBrain;
+        SetHealth(player.maxHealth);
     }
 
     public void SetHealth(int health)
@@ -71,7 +72,10 @@ public class PlayerHealth
     }
 
     #region Upgrades
-    public void UpgradeMaxHealth(int result) {maxHealth = result;}
+    public void UpgradeMaxHealth(int result) 
+    {
+        SetHealth(result);
+    }
 
     #endregion
 
