@@ -449,8 +449,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -679,10 +679,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1893817632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.845}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 83.96002, y: 17.892}
-  m_SizeDelta: {x: -378.08, y: -82.97}
+  m_AnchorMin: {x: 0.14400001, y: 0.8988519}
+  m_AnchorMax: {x: 0.44220835, y: 0.97655636}
+  m_AnchoredPosition: {x: -1.039978, y: 1.3919678}
+  m_SizeDelta: {x: 9.920044, y: 0.02999878}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1731952040
 MonoBehaviour:
@@ -836,14 +836,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 49211238}
     m_Modifications:
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      propertyPath: timer
-      value: 
-      objectReference: {fileID: 592752153569803423}
-    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      propertyPath: goldText
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: pointsText
       value: 
       objectReference: {fileID: 682751814}
@@ -851,18 +843,10 @@ PrefabInstance:
       propertyPath: PlayerManager
       value: 
       objectReference: {fileID: 1711601928}
-    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      propertyPath: maxTimerBonus
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      propertyPath: 'sceneAssets.Array.data[1]'
+    - target: {fileID: 5093763044534796197, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: timerText
       value: 
-      objectReference: {fileID: 102900000, guid: e25c37c703a60de4fbf0f088be002ec9, type: 3}
-    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      propertyPath: 'sceneAssets.Array.data[2]'
-      value: 
-      objectReference: {fileID: 102900000, guid: c5ee1282dfaf4d946b21ed713d767377, type: 3}
+      objectReference: {fileID: 821436421}
     - target: {fileID: 5478930361933516675, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: m_Name
       value: Session Controller
@@ -910,10 +894,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5478930361933516675, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 592752153569803423}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
 --- !u!1 &592752153569803422 stripped
 GameObject:

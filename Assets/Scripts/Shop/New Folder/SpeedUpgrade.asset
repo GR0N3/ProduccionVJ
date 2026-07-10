@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopUpgrade
   modifiers:
   - stat: 2
-    value: 3
+    value: 1
     multiplicative: 0
   Image: {fileID: 21300000, guid: bd3fc1b2030302f4bbdb1bd9afe050a9, type: 3}
-  description: +3 Speed
+  description: +1 Speed
   tier: 2
   cost: 45
