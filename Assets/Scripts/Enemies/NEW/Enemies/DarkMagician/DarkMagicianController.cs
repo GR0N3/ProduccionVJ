@@ -118,6 +118,7 @@ namespace Enemies.DarkMagician
         {
             if (IsDead && StateMachine.CurrentState != DeadState)
             {
+                DropItem();
                 StateMachine.ChangeState(DeadState);
                 return;
             }
@@ -225,6 +226,34 @@ namespace Enemies.DarkMagician
         {
             Rigidbody.linearVelocityX = vx;
             movementDirection         = Vector2.zero;
+        }
+
+        private void DropItem()
+        {
+            var dropChance = 100f;
+
+            if (EnemyType.Drops.Length == 0)
+            {
+                return;
+            }
+
+            float probabilidadAleatoria =
+                UnityEngine.Random.Range(0f, 100f);
+
+            if (probabilidadAleatoria <= dropChance)
+            {
+                int index =
+                    UnityEngine.Random.Range(
+                        0,
+                        EnemyType.Drops.Length + 1
+                    );
+
+                Instantiate(
+                    EnemyType.Drops[index],
+                    transform.position,
+                    Quaternion.identity
+                );
+            }
         }
 
         private void HandleFlip(float directionX)

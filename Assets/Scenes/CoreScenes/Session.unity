@@ -843,6 +843,10 @@ PrefabInstance:
       propertyPath: PlayerManager
       value: 
       objectReference: {fileID: 1711601928}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: maxTimerBonus
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 5093763044534796197, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: timerText
       value: 
@@ -896,25 +900,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
---- !u!1 &592752153569803422 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5478930361933516675, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
-  m_PrefabInstance: {fileID: 592752153569803421}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &592752153569803423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 592752153569803422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dbc726da64aeed4fa7ba325f9070643, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Timer
-  timerText: {fileID: 821436421}
-  maxTime: 60
 --- !u!1001 &739446340152204498
 PrefabInstance:
   m_ObjectHideFlags: 0

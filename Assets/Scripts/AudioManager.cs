@@ -21,9 +21,6 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //consisten Sound through-out Scenes
-        DontDestroyOnLoad(gameObject);
-
         //setting sounds in AudioSources
         foreach (Sound s in sounds)
         {

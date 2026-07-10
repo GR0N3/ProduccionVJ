@@ -51,7 +51,7 @@ public class UpgradesManager : MonoBehaviour
         float totalWeight = 0f;
         foreach (var upgrade in allUpgrades)
         {
-            totalWeight += GetWeightForTier(upgrade.tier, levelIndex);
+            totalWeight += GetWeightForTier(upgrade.tier, levelIndex); //NULL REFERENCE
         }
 
         float roll = Random.Range(0f, totalWeight);

@@ -93,6 +93,7 @@ namespace Enemies.Skeleton
         {
             if (IsDead && StateMachine.CurrentState != DeadState)
             {
+                DropItem();
                 StateMachine.ChangeState(DeadState);
                 return;
             }
@@ -105,6 +106,34 @@ namespace Enemies.Skeleton
         private void FixedUpdate()
         {
             StateMachine.CurrentState.FixedUpdate();
+        }
+
+        private void DropItem()
+        {
+            var dropChance = 100f;
+
+            if (EnemyType.Drops.Length == 0)
+            {
+                return;
+            }
+
+            float probabilidadAleatoria =
+                UnityEngine.Random.Range(0f, 100f);
+
+            if (probabilidadAleatoria <= dropChance)
+            {
+                int index =
+                    UnityEngine.Random.Range(
+                        0,
+                        EnemyType.Drops.Length
+                    );
+
+                Instantiate(
+                    EnemyType.Drops[index],
+                    transform.position,
+                    Quaternion.identity
+                );
+            }
         }
 
         private void CheckPlayerDetection()
@@ -239,11 +268,13 @@ namespace Enemies.Skeleton
 
         public bool TakeDamage(int damage, Vector2 direction, float knockcack)
         {
+            StateMachine.ChangeState(HitState);
             CurrentHealth -= damage;
             Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
             return true;
+
         }
 
         public void PlayAttackSound()

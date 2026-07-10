@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
@@ -18,6 +19,8 @@ public class SessionController : MonoBehaviour
     public string CurrentScene { get; private set; }
 
     public int SceneIndex => sceneIndex;
+
+    public static event Action OnLevelBegin;
 
     private void OnEnable()
     {
@@ -49,6 +52,8 @@ public class SessionController : MonoBehaviour
         pointsText.text += points.ToString();
 
         CurrentScene = sceneNames[sceneIndex];
+
+        OnLevelBegin?.Invoke();
 
     }
 
@@ -129,6 +134,20 @@ public class SessionController : MonoBehaviour
         pointsText.text =
             orignaltext +
             points;
+    }
+
+    public void GoToMatch()
+    {
+        SceneController.Instance
+            .NewTransition()
+            .Load(SceneDataBase.Slots.SessionContent, CurrentScene)
+            .WithOverlay()
+            .Unload(SceneDataBase.Scenes.Shop)
+            .Perfrom();
+
+        this.PlayerManager.PlayerHealth.GainHealth(PlayerManager.PlayerHealth.MaxHealth);
+
+        OnLevelBegin?.Invoke();
     }
 
     private void OnDestroy()

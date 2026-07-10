@@ -13,7 +13,9 @@ public class Upgrade : MonoBehaviour
 
     private string description;
     private string price;
+
     [SerializeField] private Image image;
+    [SerializeField] private Image colour;
     [SerializeField] private TMP_Text Description_Text;
     [SerializeField] private TMP_Text Price_Text;
     private void Start()
@@ -26,11 +28,14 @@ public class Upgrade : MonoBehaviour
         upgrade = data;
 
         image.sprite = upgrade.Image;
+        colour.color = upgrade.colour;
         description = upgrade.description;
         price = upgrade.cost + "\n Points";
 
         Description_Text.text = description;
         Price_Text.text = price;
+
+
     }
 
     public void SelectUpgrade()
