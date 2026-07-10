@@ -19,6 +19,9 @@ namespace Enemies
         public int AttackDamage = 1;
         public float AttackCooldown = 1f;
 
+        [Header("Drops")]
+        public GameObject[] Drops;
+
         [Header("Sounds")]
         public AudioClip AttackSound;
         public AudioClip HitSound;

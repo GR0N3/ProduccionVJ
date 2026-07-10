@@ -15,6 +15,7 @@ public class ShopUpgrade : ScriptableObject
 {
     public List<StatsModifier> modifiers;
     public Sprite Image;
+    public Color colour;
     public string description;
     public Tier tier;
     public int cost;

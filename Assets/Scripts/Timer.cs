@@ -12,11 +12,11 @@ public class Timer : MonoBehaviour
 
     private void OnEnable()
     {
-        ShopController.OnLevelBegin += StartLevel;
+        SessionController.OnLevelBegin += StartLevel;
     }
     private void OnDisable()
     {
-        ShopController.OnLevelBegin -= StartLevel;
+        SessionController.OnLevelBegin -= StartLevel;
     }
     private void Start()
     {

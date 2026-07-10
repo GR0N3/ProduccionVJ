@@ -19,6 +19,12 @@ public class HealthBarManager : MonoBehaviour
         PlayerHealth.OnPlayerDamaged -= Drawhearts;
         PlayerHealth.OnPlayerHealed -= Drawhearts;
     }
+
+    private void Awake()
+    {
+        ServiceLocator.Register<HealthBarManager>(this);
+    }
+
     void Start()
     {
         if (ServiceLocator.TryGet(out PlayerManager registeredPlayerManager))
@@ -64,7 +70,7 @@ public class HealthBarManager : MonoBehaviour
             int heartsStatusRemainder = Mathf.Clamp(playerManager.PlayerHealth.CurrentHealth - (i * 2), 0, 2);
             hearts[i].SetHeartImage((HeartStatus)heartsStatusRemainder);
         }
-
+        Debug.Log("curao");
     }
 
     public void CreateEmptyhearts()
@@ -85,4 +91,10 @@ public class HealthBarManager : MonoBehaviour
         }
         hearts = new List<HealthHeart>();
     }
+
+    private void OnDestroy()
+    {
+        ServiceLocator.Unregister<HealthBarManager>();
+    }
+
 }

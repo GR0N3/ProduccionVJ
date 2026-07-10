@@ -56,6 +56,29 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 687783f42e5037f40b2c4e797852c067, type: 2}
   - {fileID: 11400000, guid: 01e844f5d8cdb4f4bb72a74a392bf63d, type: 2}
   - {fileID: 11400000, guid: c6703e10d66299745bfc64b264950fe4, type: 2}
-  - {fileID: 11400000, guid: 4b18ff9c5e57a7f4ebad1cf0191a98f2, type: 2}
   - {fileID: 11400000, guid: 1aae23c4fa142334999500e46485a8f8, type: 2}
   upgradesParent: {fileID: 0}
+  tierSWeights:
+  - 0.7
+  - 2
+  - 4
+  - 6.7
+  - 10
+  tierAWeights:
+  - 4
+  - 7
+  - 10
+  - 12.5
+  - 12.5
+  tierBWeights:
+  - 10
+  - 11.7
+  - 11.7
+  - 11
+  - 8.3
+  tierCWeights:
+  - 12
+  - 9
+  - 6.6
+  - 5
+  - 4

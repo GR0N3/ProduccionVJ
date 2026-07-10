@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 296a46784e9948947ad85d4fe6952406, type: 3}
   m_Name: Skeleton
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyType
-  EnemyName: Enemy
+  EnemyName: Enemy(LVL1)
   MaxHealth: 1
   WalkSpeed: 2
   ChaseSpeed: 3
@@ -20,6 +20,7 @@ MonoBehaviour:
   AttackRange: 2
   AttackDamage: 1
   AttackCooldown: 1
+  Drops: []
   AttackSound: {fileID: 0}
   HitSound: {fileID: 0}
   DeathSound: {fileID: 0}

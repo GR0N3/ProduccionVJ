@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Bat
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyType
   EnemyName: Bat
-  MaxHealth: 100
+  MaxHealth: 1
   WalkSpeed: 2
   ChaseSpeed: 3
   DetectionRange: 5
   AttackRange: 1.5
   AttackDamage: 1
   AttackCooldown: 1
+  Drops: []
   AttackSound: {fileID: 0}
   HitSound: {fileID: 0}
   DeathSound: {fileID: 0}

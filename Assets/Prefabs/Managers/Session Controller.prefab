@@ -53,7 +53,7 @@ MonoBehaviour:
   - LVL1Rework E
   pointsText: {fileID: 0}
   timer: {fileID: 5093763044534796197}
-  maxTimerBonus: 1000
+  maxTimerBonus: 10
   PlayerManager: {fileID: 0}
 --- !u!114 &5093763044534796197
 MonoBehaviour:
