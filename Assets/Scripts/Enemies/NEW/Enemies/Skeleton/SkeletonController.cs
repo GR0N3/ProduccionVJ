@@ -258,12 +258,61 @@ namespace Enemies.Skeleton
         {
             if (Player == null || EnemyType == null) return;
 
+            PlayerController directTarget = GetPlayerController(Player);
+            if (CanHitPlayer(directTarget))
+            {
+                ApplyDamageToPlayer(directTarget);
+                return;
+            }
+
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, EnemyType.AttackRange, PlayerLayer);
             foreach (Collider2D hit in hits)
             {
-                hit.GetComponent<PlayerController>()?.TakeDamage(EnemyType.AttackDamage, Rigidbody.linearVelocity, 0.5f);
-
+                PlayerController playerController = GetPlayerController(hit.transform);
+                if (CanHitPlayer(playerController))
+                {
+                    ApplyDamageToPlayer(playerController);
+                    return;
+                }
             }
+        }
+
+        private PlayerController GetPlayerController(Transform target)
+        {
+            if (target == null)
+            {
+                return null;
+            }
+
+            PlayerController playerController = target.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                return playerController;
+            }
+
+            return target.GetComponentInParent<PlayerController>();
+        }
+
+        private bool CanHitPlayer(PlayerController playerController)
+        {
+            if (playerController == null)
+            {
+                return false;
+            }
+
+            float distanceToPlayer = Vector2.Distance(transform.position, playerController.transform.position);
+            return distanceToPlayer <= EnemyType.AttackRange;
+        }
+
+        private void ApplyDamageToPlayer(PlayerController playerController)
+        {
+            Vector2 hitDirection = (playerController.transform.position - transform.position).normalized;
+            if (hitDirection == Vector2.zero)
+            {
+                hitDirection = transform.right;
+            }
+
+            playerController.TakeDamage(EnemyType.AttackDamage, hitDirection, 0.5f);
         }
 
         public bool TakeDamage(int damage, Vector2 direction, float knockcack)
@@ -369,4 +418,3 @@ namespace Enemies.Skeleton
         }
     }
 }
-

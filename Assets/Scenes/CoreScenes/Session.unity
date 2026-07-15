@@ -1615,7 +1615,31 @@ PrefabInstance:
       objectReference: {fileID: 1711601928}
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: maxTimerBonus
-      value: 100
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: 'sceneNames.Array.data[0]'
+      value: LVL1Rework A
+      objectReference: {fileID: 0}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: 'sceneNames.Array.data[1]'
+      value: LVL1Rework B
+      objectReference: {fileID: 0}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: 'sceneNames.Array.data[2]'
+      value: LVL1Rework C
+      objectReference: {fileID: 0}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: 'sceneNames.Array.data[3]'
+      value: LVL1Rework D
+      objectReference: {fileID: 0}
+    - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: 'sceneNames.Array.data[4]'
+      value: LVL1Rework E
+      objectReference: {fileID: 0}
+    - target: {fileID: 5093763044534796197, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
+      propertyPath: maxTime
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 5093763044534796197, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: timerText

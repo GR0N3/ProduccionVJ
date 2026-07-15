@@ -46,10 +46,9 @@ public class SceneController : MonoBehaviour
 
     private IEnumerator ChangeSceneCoroutine(SceneTransitionPlan plan)
     {
-        if (plan.Overlay)
+        if (plan.Overlay && loadingOverlay != null)
         {
             yield return loadingOverlay.FadeInBlack();
-            yield return new WaitForSeconds(0.5f);
         }
         foreach (var slotkey in plan.ScenesToUnload) 
         {
@@ -64,7 +63,7 @@ public class SceneController : MonoBehaviour
             }
             yield return LoadAdditiveRoutine(kvp.Key, kvp.Value, plan.ActiveSceneName == kvp.Value);
         }
-        if (plan.Overlay)
+        if (plan.Overlay && loadingOverlay != null)
         {
             yield return loadingOverlay.FadeOutBlack();
         }
@@ -104,12 +103,12 @@ public class SceneController : MonoBehaviour
         AsyncOperation unloadOP = SceneManager.UnloadSceneAsync(sceneName);
         if (unloadOP != null) 
         {
-            while (unloadOP.isDone)
+            while (!unloadOP.isDone)
             {
                 yield return null;
             }
         }
-            loadedSceneBySlot.Remove(slotKey);
+        loadedSceneBySlot.Remove(slotKey);
     }
 
     private IEnumerator CleanupUnusedAssetsRoutine()

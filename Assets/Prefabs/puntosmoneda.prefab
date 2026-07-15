@@ -179,4 +179,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f4b3e4a8f1c7e247be6135de589945a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PointsItem
-  points: 100
+  points: 2

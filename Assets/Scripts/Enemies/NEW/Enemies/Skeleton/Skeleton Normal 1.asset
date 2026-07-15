@@ -16,9 +16,9 @@ MonoBehaviour:
   MaxHealth: 1
   WalkSpeed: 2
   ChaseSpeed: 4
-  DetectionRange: 8
-  AttackRange: 1.2
-  AttackDamage: 5
+  DetectionRange: 20
+  AttackRange: 3
+  AttackDamage: 1
   AttackCooldown: 0.8
   Drops:
   - {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}

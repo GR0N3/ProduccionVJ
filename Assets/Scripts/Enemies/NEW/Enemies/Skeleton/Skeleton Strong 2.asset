@@ -18,7 +18,7 @@ MonoBehaviour:
   ChaseSpeed: 4.5
   DetectionRange: 9
   AttackRange: 1.3
-  AttackDamage: 8
+  AttackDamage: 4
   AttackCooldown: 0.7
   Drops:
   - {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}

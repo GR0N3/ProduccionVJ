@@ -29,11 +29,13 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float bulletsSpread;
     [SerializeField] private float attackSpeed;
     [SerializeField] private float knockbackForce;
+    [SerializeField] private bool startWithGodMode;
 
     public float RiseMultiplier => riseMultiplier;
     public float MaxJumpSpeed => maxJumpSpeed;
     public float FallMultiplier => fallMultiplier;
     public float MaxFallSpeed => maxFallSpeed;
+    public bool IsGodMode { get; private set; }
 
     private void Awake()
     {
@@ -50,6 +52,7 @@ public class PlayerManager : MonoBehaviour
         playerMovement = new PlayerMovement();
 
         InitialStats();
+        IsGodMode = startWithGodMode;
     }
 
     private void InitialStats() 
@@ -72,6 +75,16 @@ public class PlayerManager : MonoBehaviour
     private void OnDestroy()
     {
         ServiceLocator.Unregister<PlayerManager>();
+    }
+
+    public void SetGodMode(bool enabled)
+    {
+        IsGodMode = enabled;
+    }
+
+    public void ToggleGodMode()
+    {
+        SetGodMode(!IsGodMode);
     }
 
 }

@@ -641,6 +641,10 @@ MonoBehaviour:
   canvasGroup: {fileID: 10341418}
   fadeInTime: 0.5
   fadeOutTime: 0.5
+  backgroundColor: {r: 0.03, g: 0.04, b: 0.09, a: 1}
+  primaryAccent: {r: 0.15, g: 0.96, b: 0.98, a: 0.92}
+  secondaryAccent: {r: 0.58, g: 0.22, b: 1, a: 0.88}
+  centerGlowColor: {r: 1, g: 1, b: 1, a: 0.95}
 --- !u!1 &956606507
 GameObject:
   m_ObjectHideFlags: 0
