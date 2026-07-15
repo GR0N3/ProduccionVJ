@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public float MaxJumpSpeed => playerManager.MaxJumpSpeed;
     public float FallMultiplier => playerManager.FallMultiplier;
     public float MaxFallSpeed => playerManager.MaxFallSpeed;
+    public bool IsGodMode => playerManager.IsGodMode;
 
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask borderLayer;
@@ -109,6 +110,11 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage, Vector2 direction, float knockback)
     {
+        if (IsGodMode)
+        {
+            return;
+        }
+
         health.TakeDamage(damage, direction, knockback);
     }
 

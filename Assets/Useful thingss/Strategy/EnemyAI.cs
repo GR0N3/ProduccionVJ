@@ -327,14 +327,27 @@ public class EnemyAI : MonoBehaviour
 
             if (impacto != null)
             {
-                //PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
-                //if (playerCtrl != null && !playerCtrl.isDead)
-                //{
-                //    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
-                //    direccionEmpuje.y = 0.5f;
-                //    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
-                //    yaGolpeo = true;
-                //}
+                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                if (playerCtrl == null)
+                {
+                    playerCtrl = impacto.GetComponentInParent<PlayerController>();
+                }
+
+                Debug.Log($"[EnemyAI] Ataque horizontal detecto collider: {impacto.name} | tag: {impacto.tag} | layer: {LayerMask.LayerToName(impacto.gameObject.layer)} | playerController: {(playerCtrl != null)}", impacto);
+
+                if (playerCtrl != null)
+                {
+                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                    if (direccionEmpuje == Vector2.zero)
+                    {
+                        direccionEmpuje = movingRight ? Vector2.right : Vector2.left;
+                    }
+
+                    direccionEmpuje.y = 0.5f;
+                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                    Debug.Log($"[EnemyAI] Ataque horizontal aplico dano: {enemyComponent.damageToPlayer}", playerCtrl);
+                    yaGolpeo = true;
+                }
             }
 
             tiempo += Time.deltaTime;
@@ -356,14 +369,27 @@ public class EnemyAI : MonoBehaviour
 
             if (impacto != null)
             {
-                //PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
-                //if (playerCtrl != null && !playerCtrl.isDead)
-                //{
-                //    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
-                //    direccionEmpuje.y = 0.5f;
-                //    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
-                //    yaGolpeo = true;
-                //}
+                PlayerController playerCtrl = impacto.GetComponent<PlayerController>();
+                if (playerCtrl == null)
+                {
+                    playerCtrl = impacto.GetComponentInParent<PlayerController>();
+                }
+
+                Debug.Log($"[EnemyAI] Ataque omni detecto collider: {impacto.name} | tag: {impacto.tag} | layer: {LayerMask.LayerToName(impacto.gameObject.layer)} | playerController: {(playerCtrl != null)}", impacto);
+
+                if (playerCtrl != null)
+                {
+                    Vector2 direccionEmpuje = (impacto.transform.position - transform.position).normalized;
+                    if (direccionEmpuje == Vector2.zero)
+                    {
+                        direccionEmpuje = movingRight ? Vector2.right : Vector2.left;
+                    }
+
+                    direccionEmpuje.y = 0.5f;
+                    playerCtrl.TakeDamage(enemyComponent.damageToPlayer, direccionEmpuje, enemyComponent.knockbackToPlayer);
+                    Debug.Log($"[EnemyAI] Ataque omni aplico dano: {enemyComponent.damageToPlayer}", playerCtrl);
+                    yaGolpeo = true;
+                }
             }
 
             tiempo += Time.deltaTime;

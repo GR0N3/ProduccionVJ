@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HealthItem : MonoBehaviour
 {
-    [Tooltip("Cuánta vida cura este objeto (Ej: 2 equivale a 1 corazón entero)")]
+    [Tooltip("Cuï¿½nta vida cura este objeto (Ej: 2 equivale a 1 corazï¿½n entero)")]
     public int curacion = 2;
 
     private void Start()
@@ -16,13 +16,13 @@ public class HealthItem : MonoBehaviour
         }
     }
 
-    // Funciona con físicas sólidas (cuando el corazón choca contra el piso o el jugador)
+    // Funciona con fï¿½sicas sï¿½lidas (cuando el corazï¿½n choca contra el piso o el jugador)
     private void OnCollisionEnter2D(Collision2D collision)
     {
         IntentarCurar(collision.gameObject);
     }
 
-    // Lo dejamos por las dudas si alguna vez usás un radar Trigger
+    // Lo dejamos por las dudas si alguna vez usï¿½s un radar Trigger
     private void OnTriggerEnter2D(Collider2D collision)
     {
         IntentarCurar(collision.gameObject);
@@ -30,17 +30,23 @@ public class HealthItem : MonoBehaviour
 
     private void IntentarCurar(GameObject objetoTocado)
     {
-        // Si lo que tocó el corazón es el Jugador...
+        // Si lo que tocï¿½ el corazï¿½n es el Jugador...
         if (objetoTocado.CompareTag("Player"))
         {
             var jugador = ServiceLocator.Get<PlayerManager>().PlayerHealth;
 
-            // Si el jugador existe y NO tiene la vida al máximo...
-            if (jugador != null && jugador.CurrentHealth < jugador.MaxHealth)
+            if (jugador == null)
+            {
+                return;
+            }
+
+            // Si el jugador no estÃ¡ al mÃ¡ximo, el corazÃ³n cura antes de consumirse.
+            if (jugador.CurrentHealth < jugador.MaxHealth)
             {
                 jugador.GainHealth(curacion);
-                Destroy(gameObject); // Destruye el corazón
             }
+
+            Destroy(gameObject);
         }
     }
 }

@@ -4,7 +4,7 @@ public class DeathWall : MonoBehaviour
 {
     public Transform player;
 
-    [Tooltip("Distancia detrás del jugador")]
+    [Tooltip("Distancia detrï¿½s del jugador")]
     public float followOffset = 8f;
 
     public bool neverMoveBack = true;
@@ -40,6 +40,11 @@ public class DeathWall : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
+            if (ServiceLocator.TryGet<PlayerManager>(out PlayerManager playerManager) && playerManager.IsGodMode)
+            {
+                return;
+            }
+
             SceneController.Instance
                 .NewTransition()
                 .Load(SceneDataBase.Slots.Menu, SceneDataBase.Scenes.MainMenu)

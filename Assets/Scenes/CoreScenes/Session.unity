@@ -1615,7 +1615,7 @@ PrefabInstance:
       objectReference: {fileID: 1711601928}
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: maxTimerBonus
-      value: 140
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: 'sceneNames.Array.data[0]'

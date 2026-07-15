@@ -7,6 +7,7 @@ public class PlayerHealth
     private int maxHealth;
     private int currentHealth;
     private bool isDead;
+    private PlayerController player;
 
     public static event Action OnPlayerDamaged;
     public static event Action OnPlayerHealed;
@@ -18,6 +19,7 @@ public class PlayerHealth
 
     public void Init(PlayerController player)
     {
+        this.player = player;
         anim = player.AnimatorBrain;
         SetHealth(player.maxHealth);
     }
@@ -31,7 +33,7 @@ public class PlayerHealth
 
     public void TakeDamage(int damage, Vector2 hitDirection, float knockbackForce)
     {
-        if (isDead)
+        if (isDead || (player != null && player.IsGodMode))
         {
             return;
         }

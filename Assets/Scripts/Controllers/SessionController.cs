@@ -26,13 +26,13 @@ public class SessionController : MonoBehaviour
     {
         Enemy.OnEnemyDeath += UpdateScoreUI;
         Door.OnLevelCompleted += LevelCompleted;
-        PlayerHealth.OnPlayerDeath += ResetLevel;
+        PlayerHealth.OnPlayerDeath += HandlePlayerDeath;
     }
     private void OnDisable()
     {
         Enemy.OnEnemyDeath -= UpdateScoreUI;
         Door.OnLevelCompleted -= LevelCompleted;
-        PlayerHealth.OnPlayerDeath -= ResetLevel;
+        PlayerHealth.OnPlayerDeath -= HandlePlayerDeath;
     }
 
     private string orignaltext;
@@ -48,19 +48,19 @@ public class SessionController : MonoBehaviour
 
     private void Start()
     {
+        orignaltext = pointsText.text;
 
-        pointsText.text += points.ToString();
+        pointsText.text = orignaltext + points.ToString();
 
-        CurrentScene = sceneNames[sceneIndex];
+        UpdateCurrentScene();
 
         OnLevelBegin?.Invoke();
 
     }
 
-    private void ResetLevel()
+    private void HandlePlayerDeath()
     {
-        sceneIndex = 0;
-        CurrentScene = sceneNames[sceneIndex];
+        ResetSessionProgress();
         BackToMainMenu();
     }
 
@@ -69,16 +69,19 @@ public class SessionController : MonoBehaviour
         sceneIndex++;
         TimerPoints();
 
-        timer.RestartTimer();
+        if (timer != null)
+        {
+            timer.RestartTimer();
+        }
 
         if (sceneIndex > sceneNames.Count - 1)
         {
-
-            ResetLevel();
+            ResetSessionProgress();
+            BackToMainMenu();
         }
         else
         {
-            CurrentScene = sceneNames[sceneIndex];
+            UpdateCurrentScene();
         }
 
         Debug.Log(sceneIndex);
@@ -140,22 +143,107 @@ public class SessionController : MonoBehaviour
 
     public void GoToMatch()
     {
+        LoadCurrentLevel();
+    }
+
+    public void RestartCurrentLevel()
+    {
+        LoadCurrentLevel();
+    }
+
+    public void FinalizeCurrentLevel()
+    {
+        if (string.IsNullOrEmpty(CurrentScene))
+        {
+            return;
+        }
+
         SceneController.Instance
             .NewTransition()
-            .Load(SceneDataBase.Slots.SessionContent, CurrentScene)
+            .Load(SceneDataBase.Slots.SessionContent, SceneDataBase.Scenes.Shop, setActive: true)
+            .WithClearUnusedAssets()
             .WithOverlay()
-            .Unload(SceneDataBase.Scenes.Shop)
             .Perfrom();
 
-        this.PlayerManager.PlayerHealth.GainHealth(PlayerManager.PlayerHealth.MaxHealth);
+        LevelCompleted();
+    }
 
-        OnLevelBegin?.Invoke();
+    public void LoadLevelByIndex(int levelIndex)
+    {
+        if (!HasValidLevelIndex(levelIndex))
+        {
+            Debug.LogWarning($"Level index {levelIndex} fuera de rango.");
+            return;
+        }
+
+        sceneIndex = levelIndex;
+        UpdateCurrentScene();
+        LoadCurrentLevel();
     }
 
 
     private void OnDestroy()
     {
         ServiceLocator.Unregister<SessionController>();
+    }
+
+    private void LoadCurrentLevel()
+    {
+        if (string.IsNullOrEmpty(CurrentScene))
+        {
+            return;
+        }
+
+        SceneController.Instance
+            .NewTransition()
+            .Load(SceneDataBase.Slots.SessionContent, CurrentScene, setActive: true)
+            .WithOverlay()
+            .Perfrom();
+
+        if (timer != null)
+        {
+            timer.RestartTimer();
+        }
+
+        RestorePlayerForLevel();
+        OnLevelBegin?.Invoke();
+    }
+
+    private void RestorePlayerForLevel()
+    {
+        if (PlayerManager == null || PlayerManager.PlayerHealth == null)
+        {
+            return;
+        }
+
+        PlayerManager.PlayerHealth.GainHealth(PlayerManager.PlayerHealth.MaxHealth);
+    }
+
+    private void ResetSessionProgress()
+    {
+        sceneIndex = 0;
+        UpdateCurrentScene();
+
+        if (timer != null)
+        {
+            timer.RestartTimer();
+        }
+    }
+
+    private void UpdateCurrentScene()
+    {
+        if (HasValidLevelIndex(sceneIndex))
+        {
+            CurrentScene = sceneNames[sceneIndex];
+            return;
+        }
+
+        CurrentScene = string.Empty;
+    }
+
+    private bool HasValidLevelIndex(int levelIndex)
+    {
+        return levelIndex >= 0 && levelIndex < sceneNames.Count;
     }
 
 }
