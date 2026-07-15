@@ -236,18 +236,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 515428967}
     m_Modifications:
     - target: {fileID: 3374211931738756783, guid: 71e09995d8c1b0044a7637c57bf81e69, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3374211931738756783, guid: 71e09995d8c1b0044a7637c57bf81e69, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 3.8418682
-      objectReference: {fileID: 0}
-    - target: {fileID: 3374211931738756783, guid: 71e09995d8c1b0044a7637c57bf81e69, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2.4484677
-      objectReference: {fileID: 0}
-    - target: {fileID: 3374211931738756783, guid: 71e09995d8c1b0044a7637c57bf81e69, type: 3}
       propertyPath: m_LocalPosition.x
       value: -60.78
       objectReference: {fileID: 0}
@@ -44637,7 +44625,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2075924828}
-  - component: {fileID: 2075924827}
   m_Layer: 0
   m_Name: ScoreManager
   m_TagString: Untagged
@@ -44645,18 +44632,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2075924827
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2075924826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 030c532a58d2e5a4caa8192212d27d9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
 --- !u!4 &2075924828
 Transform:
   m_ObjectHideFlags: 0
