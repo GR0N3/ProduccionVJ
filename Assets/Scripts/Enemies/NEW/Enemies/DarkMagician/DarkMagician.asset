@@ -10,19 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 296a46784e9948947ad85d4fe6952406, type: 3}
-  m_Name: DarkMagician Normal 1
+  m_Name: DarkMagician
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyType
   EnemyName: DarkMagician
-  MaxHealth: 2
+  MaxHealth: 3
   WalkSpeed: 2
   ChaseSpeed: 3
   DetectionRange: 15
   AttackRange: 13
   AttackDamage: 10
   AttackCooldown: 1
-  Drops:
-  - {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}
-  - {fileID: 154130448415801424, guid: 337bf9fcef2105140833a319294bba75, type: 3}
   AttackSound: {fileID: 0}
   HitSound: {fileID: 0}
   DeathSound: {fileID: 0}
