@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +17,7 @@ public class HealthBarManager : MonoBehaviour
 
     private void Awake()
     {
-        ServiceLocator.Register(this);
-        playerManager = ServiceLocator.Get<PlayerManager>();
+
     }
 
     private void OnEnable()
@@ -32,9 +32,21 @@ public class HealthBarManager : MonoBehaviour
         PlayerHealth.OnPlayerHealed -= DrawHearts;
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return null;
+        yield return new WaitForEndOfFrame();
+        ServiceLocator.Register(this);
+        playerManager = ServiceLocator.Get<PlayerManager>();
         DrawHearts();
+    }
+
+    private void OnRectTransformDimensionsChange()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        UpdateGrid();
     }
 
     public void DrawHearts()
@@ -46,7 +58,8 @@ public class HealthBarManager : MonoBehaviour
             CreateHeart();
         }
 
-        UpdateGrid();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(
+            GetComponent<RectTransform>());
     }
 
     private void CreateHeart()

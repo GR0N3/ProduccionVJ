@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+[DefaultExecutionOrder(-100)]
 public class SessionController : MonoBehaviour
 {
     
@@ -42,6 +43,7 @@ public class SessionController : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("SessionController Awake");
         ServiceLocator.Register<SessionController>(this);
         sceneIndex = 0;
     }

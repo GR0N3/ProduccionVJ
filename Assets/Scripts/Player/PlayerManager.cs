@@ -1,10 +1,8 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-90)]
 public class PlayerManager : MonoBehaviour
 {
-    private SessionController sessionController;
-
-
     private PlayerHealth playerHealth;
     private PlayerMovement playerMovement;
     private PlayerWeapon playerWeapon;
@@ -39,10 +37,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        sessionController = ServiceLocator.Get<SessionController>();
-
-        sessionController.PlayerManager = this;
-
+        Debug.Log("PlayerManager Awake");
         ServiceLocator.Register<PlayerManager>(this);
 
         Stats = new Stats();
