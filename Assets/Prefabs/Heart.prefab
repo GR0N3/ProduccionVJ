@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8124259339964715380, guid: 708fe94888ca607458d7ce78382a0a25, type: 3}
+  m_Sprite: {fileID: -5139221226480423320, guid: 9adaccf4cbda5194dae4b47f9d2e0fe7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -109,6 +109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecd3a2988325e8944af1f7e1d24cbcc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthHeart
-  fullheart: {fileID: 8124259339964715380, guid: 708fe94888ca607458d7ce78382a0a25, type: 3}
+  fullheart: {fileID: 707521556535773187, guid: 0a97090e6c14f41409ebff76f7a41d21, type: 3}
   halfheart: {fileID: 5642012044021194823, guid: 708fe94888ca607458d7ce78382a0a25, type: 3}
   emptyheart: {fileID: 4432793351920879750, guid: 708fe94888ca607458d7ce78382a0a25, type: 3}

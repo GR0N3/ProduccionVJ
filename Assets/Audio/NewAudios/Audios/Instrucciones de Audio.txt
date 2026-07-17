@@ -1,0 +1,4 @@
+Zombie: Elegir cualquier sonido de la carpeta para el esqueleto
+Bat: Elegir cualquier sonido de la carpeta para el murcielago
+Hit: Se utiliza para cuando el player recibe dano
+Bow: Sonido para cuando el enemigo a distancia ataque

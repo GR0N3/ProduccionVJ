@@ -270,7 +270,7 @@ MonoBehaviour:
   - name: Fall
     clip: {fileID: 8300000, guid: 1acb46510aebcfc4eb458420be4dc954, type: 3}
     volume: 0.432
-    pitch: 0.55
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: Checkpoint
@@ -303,10 +303,46 @@ MonoBehaviour:
     pitch: 1.49
     loop: 0
     source: {fileID: 0}
-  - name: ArrowHit
-    clip: {fileID: 8300000, guid: 1824ecd7864c0b94abf916f209576abd, type: 3}
+  - name: MainMenu
+    clip: {fileID: 8300000, guid: 11d69f5c3915f8e40a982351564ffda0, type: 3}
     volume: 0.771
-    pitch: 0.87
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: Gameplay
+    clip: {fileID: 8300000, guid: a05e07dd6c63e1c4dbed5c92c6b7e0d3, type: 3}
+    volume: 0.771
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: Shop
+    clip: {fileID: 8300000, guid: fd1db0a0740d83c488c05c24df9c576c, type: 3}
+    volume: 0.771
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: BowShoot
+    clip: {fileID: 8300000, guid: 43c132bc9c278d041863c68c745b4c54, type: 3}
+    volume: 0.771
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: BatSound
+    clip: {fileID: 8300000, guid: 036cb120abf7a4c449780829e49fc60d, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: SkeletonSound
+    clip: {fileID: 8300000, guid: b0fb0f30d08564b458f837a0ea4ad022, type: 3}
+    volume: 0.771
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: PlayerHit
+    clip: {fileID: 8300000, guid: f190add5d06a56a4e8b255bb0d81805a, type: 3}
+    volume: 0.771
+    pitch: 1
     loop: 0
     source: {fileID: 0}
 --- !u!1 &483726869

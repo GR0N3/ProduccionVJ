@@ -1093,6 +1093,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthBarManager
   heartsPrefab: {fileID: 6981732473526125828, guid: c913ff6be5893e74b9b2874df4912d73, type: 3}
+  gridLayout: {fileID: 1731952041}
+  maxColumns: 10
+  spacing: {x: 4, y: 4}
 --- !u!114 &1731952041
 MonoBehaviour:
   m_ObjectHideFlags: 0

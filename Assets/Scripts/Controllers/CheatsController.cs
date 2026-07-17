@@ -11,10 +11,6 @@ public class CheatsController : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
     {
-        if (FindObjectOfType<CheatsController>() != null)
-        {
-            return;
-        }
 
         GameObject cheatsControllerObject = new("CheatsController");
         cheatsControllerObject.AddComponent<CheatsController>();

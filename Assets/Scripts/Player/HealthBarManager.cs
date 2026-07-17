@@ -1,100 +1,102 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HealthBarManager : MonoBehaviour
 {
-    public GameObject heartsPrefab;
-    private List<HealthHeart> hearts = new List<HealthHeart>();
+    [SerializeField] private GameObject heartsPrefab;
+
+    [SerializeField] private GridLayoutGroup gridLayout;
+    [SerializeField] private int maxColumns = 10;
+    [SerializeField] private Vector2 spacing = new Vector2(4, 4);
+
+    private readonly List<HealthHeart> hearts = new();
+
     private PlayerManager playerManager;
+
+    private void Awake()
+    {
+        ServiceLocator.Register(this);
+        playerManager = ServiceLocator.Get<PlayerManager>();
+    }
 
     private void OnEnable()
     {
-        PlayerHealth.OnPlayerDamaged += Drawhearts;
-        PlayerHealth.OnPlayerHealed += Drawhearts;
+        PlayerHealth.OnPlayerDamaged += DrawHearts;
+        PlayerHealth.OnPlayerHealed += DrawHearts;
     }
 
     private void OnDisable()
     {
-        PlayerHealth.OnPlayerDamaged -= Drawhearts;
-        PlayerHealth.OnPlayerHealed -= Drawhearts;
+        PlayerHealth.OnPlayerDamaged -= DrawHearts;
+        PlayerHealth.OnPlayerHealed -= DrawHearts;
     }
 
-    private void Awake()
+    private void Start()
     {
-        ServiceLocator.Register<HealthBarManager>(this);
+        DrawHearts();
     }
 
-    void Start()
+    public void DrawHearts()
     {
-        if (ServiceLocator.TryGet(out PlayerManager registeredPlayerManager))
-        {
-            playerManager = registeredPlayerManager;
-        }
-        else
-        {
-            playerManager = FindAnyObjectByType<PlayerManager>();
+        ClearHearts();
 
-            if (playerManager != null)
-            {
-                ServiceLocator.Register(playerManager);
-            }
+        for (int i = 0; i < playerManager.PlayerHealth.CurrentHealth; i++)
+        {
+            CreateHeart();
         }
 
-        if (playerManager == null)
-        {
-            return;
-        }
-
-        Drawhearts();
-    }
-    public void Drawhearts()
-    {
-        if (playerManager == null)
-        {
-            return;
-        }
-
-        Clearhearts();
-
-        //cuantos corazones hay en total
-
-        float maxHealthRemainder = playerManager.PlayerHealth.CurrentHealth % 2;
-        int heartsToMake = (int)((playerManager.PlayerHealth.MaxHealth / 2) + maxHealthRemainder);
-        for (int i = 0; i < heartsToMake; i++)
-        {
-            CreateEmptyhearts();
-        }
-        for (int i = 0; i < hearts.Count; i++)
-        {
-            int heartsStatusRemainder = Mathf.Clamp(playerManager.PlayerHealth.CurrentHealth - (i * 2), 0, 2);
-            hearts[i].SetHeartImage((HeartStatus)heartsStatusRemainder);
-        }
-        Debug.Log("curao");
+        UpdateGrid();
     }
 
-    public void CreateEmptyhearts()
+    private void CreateHeart()
     {
-        GameObject newhearts = Instantiate(heartsPrefab);
-        newhearts.transform.SetParent(transform, false);
-
-        HealthHeart heartsComponent = newhearts.GetComponent<HealthHeart>();
-        heartsComponent.SetHeartImage(HeartStatus.Empty);
-        hearts.Add(heartsComponent);
+        GameObject newHeart = Instantiate(heartsPrefab, transform, false);
+        var heartClass = newHeart.GetComponent<HealthHeart>();
+        heartClass.SetHeartImage(HeartStatus.Full);
+        hearts.Add(heartClass);
     }
 
-    public void Clearhearts()
+    private void ClearHearts()
     {
-        foreach (Transform t in transform)
+        foreach (Transform child in transform)
         {
-            Destroy(t.gameObject);
+            Destroy(child.gameObject);
         }
-        hearts = new List<HealthHeart>();
+
+        hearts.Clear();
+    }
+
+    private void UpdateGrid()
+    {
+        RectTransform rect = (RectTransform)transform;
+
+        gridLayout.spacing = spacing;
+
+        int heartCount = Mathf.Max(playerManager.PlayerHealth.CurrentHealth, 1);
+
+        // Cantidad de columnas (hasta maxColumns)
+        int columns = Mathf.Min(heartCount, maxColumns);
+
+        // Cantidad de filas necesarias
+        int rows = Mathf.CeilToInt((float)heartCount / columns);
+
+        float availableWidth = rect.rect.width - spacing.x * (columns - 1);
+        float availableHeight = rect.rect.height - spacing.y * (rows - 1);
+
+        float cellWidth = availableWidth / columns;
+        float cellHeight = availableHeight / rows;
+
+        // Corazones cuadrados
+        float size = Mathf.Min(cellWidth, cellHeight);
+
+        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        gridLayout.constraintCount = columns;
+        gridLayout.cellSize = new Vector2(size, size);
     }
 
     private void OnDestroy()
     {
         ServiceLocator.Unregister<HealthBarManager>();
     }
-
 }

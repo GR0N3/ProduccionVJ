@@ -11,7 +11,7 @@ public class CoreManager : MonoBehaviour
         //se llama al controlador de escenas para cargar lo necesario.
         //primero NewTransition y ultimo Perform.
         //Cargar SessionContent sirve para escenas con datos temporales
-        //Session se deja cargada la majoria de las veces pq ahi guardamos los datos constantes de la partida
+        //Session se deja cargada la mayoria de las veces pq ahi guardamos los datos constantes de la partida
 
         SceneController.Instance
             .NewTransition()

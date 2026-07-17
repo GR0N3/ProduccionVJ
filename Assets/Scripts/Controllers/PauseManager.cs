@@ -75,7 +75,6 @@ public class PauseManager : MonoBehaviour
 
     public void BackToMenu()
     {
-        Resume();
         controller.BackToMainMenu();
     }
 

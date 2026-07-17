@@ -127,7 +127,7 @@ public class UpgradesManager : MonoBehaviour
         }
         controller.SubtractPoints(upgrade.cost);
         playerManager.PlayerHealth.SetHealth(playerManager.PlayerHealth.MaxHealth);
-        healthBarManager.Drawhearts();
+        healthBarManager.DrawHearts();
 
         hasPurchased = true;
         UpdateRerollButtonState();
