@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,6 +27,8 @@ public class SceneController : MonoBehaviour
     private Dictionary<string, string> loadedSceneBySlot = new();
 
     private bool isBusy = false;
+
+    public static event Action OnSceneChanged;
 
     //API
     public SceneTransitionPlan NewTransition()
@@ -153,6 +156,7 @@ public class SceneController : MonoBehaviour
 
         public Coroutine Perfrom()
         {
+            OnSceneChanged?.Invoke();
             return SceneController.Instance.ExecutePlan(this);
         }
 

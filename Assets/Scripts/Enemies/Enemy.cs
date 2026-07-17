@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Mathematics;
 
-public class Enemy : MonoBehaviour, IDamageable
+public class Enemy : MonoBehaviour
 {
     [Header("Salud")]
     public int maxHealth = 3;

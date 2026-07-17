@@ -40,6 +40,9 @@ namespace Enemies.Skeleton
         public SkeletonHitState HitState { get; private set; }
         public SkeletonDeadState DeadState { get; private set; }
 
+        [Header("Effects")]
+        [SerializeField] private DamageEffects damageEffects;
+
         [Header("State Flags")]
         public bool IsDead = false;
         public bool IsHit = false;
@@ -50,6 +53,7 @@ namespace Enemies.Skeleton
 
         [Header("Current Stats")]
         public float CurrentHealth;
+
 
         private Vector2 startPosition;
         private Vector2 movementDirection;
@@ -258,6 +262,7 @@ namespace Enemies.Skeleton
         {
             if (Player == null || EnemyType == null) return;
 
+            AudioManager.instance.Play("SkeletonSound");
             PlayerController directTarget = GetPlayerController(Player);
             if (CanHitPlayer(directTarget))
             {
@@ -275,6 +280,7 @@ namespace Enemies.Skeleton
                     return;
                 }
             }
+
         }
 
         private PlayerController GetPlayerController(Transform target)
@@ -322,6 +328,7 @@ namespace Enemies.Skeleton
             Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
+            damageEffects.PlayHitEffects();
             return true;
 
         }
@@ -416,5 +423,6 @@ namespace Enemies.Skeleton
                 HitWall = true;
             }
         }
+
     }
 }

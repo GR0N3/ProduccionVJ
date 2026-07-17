@@ -287,7 +287,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Step1
     clip: {fileID: 8300000, guid: bc5b967ad2bc7ac42b05fb28efab2eb4, type: 3}
-    volume: 0.828
+    volume: 0.072
     pitch: 0.99
     loop: 1
     source: {fileID: 0}
@@ -299,25 +299,25 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Jump
     clip: {fileID: 8300000, guid: 88c3e983344f66c4390d7b70538e2723, type: 3}
-    volume: 0.729
-    pitch: 1.49
+    volume: 0.29
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: MainMenu
     clip: {fileID: 8300000, guid: 11d69f5c3915f8e40a982351564ffda0, type: 3}
-    volume: 0.771
+    volume: 0.457
     pitch: 1
     loop: 1
     source: {fileID: 0}
   - name: Gameplay
     clip: {fileID: 8300000, guid: a05e07dd6c63e1c4dbed5c92c6b7e0d3, type: 3}
-    volume: 0.771
+    volume: 0.29
     pitch: 1
     loop: 1
     source: {fileID: 0}
   - name: Shop
     clip: {fileID: 8300000, guid: fd1db0a0740d83c488c05c24df9c576c, type: 3}
-    volume: 0.771
+    volume: 0.319
     pitch: 1
     loop: 1
     source: {fileID: 0}
@@ -328,16 +328,16 @@ MonoBehaviour:
     loop: 0
     source: {fileID: 0}
   - name: BatSound
-    clip: {fileID: 8300000, guid: 036cb120abf7a4c449780829e49fc60d, type: 3}
+    clip: {fileID: 8300000, guid: c8ae8829488547241b7f1d883909409a, type: 3}
     volume: 1
     pitch: 1
-    loop: 1
+    loop: 0
     source: {fileID: 0}
   - name: SkeletonSound
-    clip: {fileID: 8300000, guid: b0fb0f30d08564b458f837a0ea4ad022, type: 3}
-    volume: 0.771
+    clip: {fileID: 8300000, guid: 5b1d81b33b65e684fbdc498be1120185, type: 3}
+    volume: 0.1
     pitch: 1
-    loop: 1
+    loop: 0
     source: {fileID: 0}
   - name: PlayerHit
     clip: {fileID: 8300000, guid: f190add5d06a56a4e8b255bb0d81805a, type: 3}
@@ -345,6 +345,140 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: MagicianShoot
+    clip: {fileID: 8300000, guid: 43c132bc9c278d041863c68c745b4c54, type: 3}
+    volume: 0.862
+    pitch: 0.35
+    loop: 0
+    source: {fileID: 0}
+--- !u!1 &338977957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 338977958}
+  - component: {fileID: 338977961}
+  - component: {fileID: 338977959}
+  m_Layer: 0
+  m_Name: Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &338977958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338977957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 812319377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &338977959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338977957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!20 &338977961
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338977957}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1 &483726869
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,6 +757,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 749904199}
+  - {fileID: 338977958}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &885786512

@@ -34,6 +34,9 @@ namespace Enemies.Murcielago
         [Tooltip("Duración en segundos del tramo de regreso al punto de inicio")]
         public float ReturnDuration = 0.8f;
 
+        [Header("Effects")]
+        [SerializeField] private DamageEffects damageEffects;
+
         // ─────────────────────────────────────────────────────────────────────────
         //  Componentes (acceso de solo lectura desde los estados)
         // ─────────────────────────────────────────────────────────────────────────
@@ -290,6 +293,8 @@ namespace Enemies.Murcielago
         {
             if (Player == null || EnemyType == null) return;
 
+            AudioManager.instance.Play("BatSound");
+
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, EnemyType.AttackRange, PlayerLayer);
             foreach (Collider2D hit in hits)
             {
@@ -303,6 +308,7 @@ namespace Enemies.Murcielago
             Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
+            damageEffects.PlayHitEffects();
             return true;
         }
 

@@ -129,6 +129,8 @@ public class SessionController : MonoBehaviour
         pointsText.text =
             orignaltext +
             points;
+
+        AudioManager.instance.Play("Coin");
     }
 
 
@@ -164,7 +166,7 @@ public class SessionController : MonoBehaviour
             .WithClearUnusedAssets()
             .WithOverlay()
             .Perfrom();
-
+        AudioManager.instance.Play("Shop");
         LevelCompleted();
     }
 

@@ -67,11 +67,15 @@ public class PlayerMovement
 
     public void OnMove(InputAction.CallbackContext ctx)                                                    
     {                                                                                                       
-        SetMoveInput(ctx.ReadValue<Vector2>());                                                                
-    }                                                                                                       
-                                                                                                            
+        SetMoveInput(ctx.ReadValue<Vector2>()); 
+        AudioManager.instance.Play("Step1");
+
+    }
+
     public void OnJump(InputAction.CallbackContext ctx)                                                    
-    {                                                                                                       
+    {            
+        AudioManager.instance.Play("Jump");
+
         Jump();
     }
 
@@ -183,6 +187,7 @@ public class PlayerMovement
         else
         {
             anim.Play(PlayerAnimations.Idle);
+            AudioManager.instance.Stop("Step1");
         }
     }
 

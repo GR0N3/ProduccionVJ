@@ -986,7 +986,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.7792895}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0.000061035156}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1515469964
@@ -1111,7 +1111,7 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 50
+    m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
   m_StartCorner: 0
@@ -1618,7 +1618,7 @@ PrefabInstance:
       objectReference: {fileID: 1711601928}
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: maxTimerBonus
-      value: 30
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 556137282762688203, guid: 5174d84ec5db6d1498688c6f64c38c01, type: 3}
       propertyPath: 'sceneNames.Array.data[0]'

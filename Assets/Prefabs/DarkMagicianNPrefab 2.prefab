@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8014700481134610193}
   - component: {fileID: 4161608233626427078}
   - component: {fileID: 811097885756244364}
+  - component: {fileID: 8579913178203711681}
   m_Layer: 8
   m_Name: DarkMagicianNPrefab 2
   m_TagString: Untagged
@@ -63,7 +64,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9755001b8416f8d4086ebf031a8fb509, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -218,8 +219,25 @@ MonoBehaviour:
     m_Bits: 8
   FirePoint: {fileID: 8446474735033080078}
   Projectile: {fileID: 4419710689854617045, guid: 8abb1c34cc87e6749b59ef1909bd490c, type: 3}
+  damageEffects: {fileID: 8579913178203711681}
   IsWaiting: 0
   HitWall: 0
+--- !u!114 &8579913178203711681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1436852028111102912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40aa7c744a5c1a341a9ca4ec7ff610dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageEffects
+  numberOfFlashes: 2
+  durationBetweenFlashes: 0.05
+  flashDuration: 0.1
+  hitParticlesPrefab: {fileID: 4991135100181142037, guid: 20525168e62193841bea727a22302aba, type: 3}
 --- !u!1 &9180452486425093921
 GameObject:
   m_ObjectHideFlags: 0

@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     public float AttackSpeed => playerManager.Stats.GetStat(UpgradeType.AttackSpeed);
 
     [SerializeField] private Transform firePoint;
+
+    [Header("Effects")]
+    [SerializeField] private DamageEffects damageEffects;
     public Transform FirePoint => firePoint;
 
     private PlayerMovement movement;
@@ -40,6 +43,8 @@ public class PlayerController : MonoBehaviour
 
     public LayerMask GroundLayer => groundLayer;
     public LayerMask BorderLayer => borderLayer;
+
+
 
     public InputSystem_Actions InputActions { get; private set; }
 
@@ -78,6 +83,9 @@ public class PlayerController : MonoBehaviour
         InputActions.Player.Move.performed += movement.OnMove;
         InputActions.Player.Move.canceled += movement.OnMove;
         InputActions.Player.Jump.performed += movement.OnJump;
+
+        AudioManager.instance.Play("Gameplay");
+
     }
 
     private void OnDisable()
@@ -90,6 +98,8 @@ public class PlayerController : MonoBehaviour
         InputActions.Player.Jump.performed -= movement.OnJump;
 
         InputActions.Disable();
+
+        AudioManager.instance.Stop("Gameplay");
     }
 
     private void Update()
@@ -116,6 +126,9 @@ public class PlayerController : MonoBehaviour
         }
 
         health.TakeDamage(damage, direction, knockback);
+
+        AudioManager.instance.Play("PlayerHit");
+        
     }
 
 

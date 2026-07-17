@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class FlyingEnemy : MonoBehaviour, IDamageable
+public class FlyingEnemy : MonoBehaviour
 {
     [Header("Estadísticas")]
     public int health = 3;

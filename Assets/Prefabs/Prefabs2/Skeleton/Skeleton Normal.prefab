@@ -44,8 +44,7 @@ GameObject:
   - component: {fileID: 2987946952633152323}
   - component: {fileID: 389599942464470757}
   - component: {fileID: 1474747446662804939}
-  - component: {fileID: 1149105417208400636}
-  - component: {fileID: 3110277410348264064}
+  - component: {fileID: 4838902342176179906}
   m_Layer: 8
   m_Name: Skeleton Normal
   m_TagString: Untagged
@@ -63,8 +62,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 21.6403, y: -3.2068, z: 0}
-  m_LocalScale: {x: 4, y: 3.8418682, z: 2.4484677}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5170453407035919687}
   m_Father: {fileID: 0}
@@ -118,7 +117,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 4723107735738678597, guid: 1018b0ba13578bf459bd254ae1a2be99, type: 3}
+  m_Sprite: {fileID: -354787944733107064, guid: fabacaec2bb174b45947393edaf7b522, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -189,17 +188,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.008766487}
+  m_Offset: {x: -0.1327124, y: -0.18477228}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.46, y: 0.52}
+    oldSize: {x: 1.88, y: 2.12}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.34, y: 0.53740954}
+  m_Size: {x: 0.6054248, y: 1.6101673}
   m_EdgeRadius: 0
 --- !u!95 &1474747446662804939
 Animator:
@@ -211,7 +210,7 @@ Animator:
   m_GameObject: {fileID: 4214904499902491054}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4f064b0846ddcc94fbb74a785f7c352a, type: 2}
+  m_Controller: {fileID: 9100000, guid: c8296e1d0722dc54c97c98ec048af44d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -223,7 +222,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1149105417208400636
+--- !u!114 &4838902342176179906
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -232,67 +231,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 4214904499902491054}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5a9f18c7163d9a42b59d5ac9e5b7565, type: 3}
+  m_Script: {fileID: 11500000, guid: 13202a70222c86347b7d6ebf663a9b36, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 2
-  knockbackResistance: 1
-  damageToPlayer: 1
-  knockbackToPlayer: 10
-  stunDuration: 0.5
-  fadeDuration: 1
-  healthDropPrefab:
-  - {fileID: 154130448415801424, guid: 337bf9fcef2105140833a319294bba75, type: 3}
-  - {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}
-  dropChance: 100
-  golpesParaInmunidad: 3
-  duracionInmunidad: 1.5
-  isStunned: 0
-  isBlocking: 0
-  currentHealth: 0
---- !u!114 &3110277410348264064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4214904499902491054}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d4277773db8b164abf5d113bba0f269, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  patrolSpeed: 2
-  chaseSpeed: 3
-  patrolRange: 4
-  detectionRange: 3.5
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  groundLayer:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemies.Skeleton.SkeletonController
+  EnemyType: {fileID: 11400000, guid: 62c5beb4ee85ce54a8eaf461a0423095, type: 2}
+  GroundLayer:
     serializedVersion: 2
     m_Bits: 64
-  groundCheckDistance: 1
-  wallCheckDistance: 0.5
-  sensorOrigin: {fileID: 5170453407035919687}
-  horizontalHitboxSize: {x: 2, y: 1}
-  horizontalHitboxOffset: {x: 0.75, y: 0}
-  attack1Delay: 0.3
-  attack1Duration: 0.2
-  omniHitboxRadius: 1.3
-  omniHitboxOffset: {x: 0, y: 0}
-  attack2Delay: 0.3
-  attack2Duration: 0.2
-  attackTriggerDistance: 1.5
-  postAttackPause: 0.8
-  attackCooldown: 2
-  blockDuration: 1.5
-  normalBlockCooldown: 4
-  lowHealthBlockCooldown: 1.5
-  lowHealthThreshold: 0.2
-  rb: {fileID: 0}
-  player: {fileID: 0}
-  startPosition: {x: 0, y: 0}
-  movingRight: 1
-  lastTurnTime: 0
-  turnCooldown: 0.5
+  PatrolDistance1: 1
+  PatrolDistance2: 2
+  IdleWaitTime: 1
+  EdgeCheckDistance: 0.4
+  EdgeRayLength: 1.5
+  Player: {fileID: 0}
+  PlayerLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  IsDead: 0
+  IsHit: 0
+  PlayerDetected: 0
+  IsInAttackRange: 0
+  IsWaiting: 0
+  HitWall: 0
+  CurrentHealth: 0

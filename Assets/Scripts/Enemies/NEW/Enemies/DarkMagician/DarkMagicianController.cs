@@ -8,9 +8,6 @@ namespace Enemies.DarkMagician
     [RequireComponent(typeof(Collider2D))]
     public class DarkMagicianController : MonoBehaviour, IDamageable
     {
-        // ─────────────────────────────────────────────────────────────────────────
-        //  Inspector
-        // ─────────────────────────────────────────────────────────────────────────
 
         [Header("Enemy Type")]
         public EnemyType EnemyType;
@@ -35,9 +32,8 @@ namespace Enemies.DarkMagician
         [Tooltip("Pool de proyectiles — arrastrar el objeto Pool de la escena")]
         public GameObject Projectile;
 
-        // ─────────────────────────────────────────────────────────────────────────
-        //  Componentes
-        // ─────────────────────────────────────────────────────────────────────────
+        [Header("Effects")]
+        [SerializeField] private DamageEffects damageEffects;
 
         public Rigidbody2D    Rigidbody     { get; private set; }
         public Animator       Animator      { get; private set; }
@@ -288,6 +284,8 @@ namespace Enemies.DarkMagician
 
             if (proj == null) return;
 
+            AudioManager.instance.Play("MagicianShoot");
+
         }
 
         // ─────────────────────────────────────────────────────────────────────────
@@ -300,6 +298,7 @@ namespace Enemies.DarkMagician
             Rigidbody.AddForce(direction * knockcack);
             if (CurrentHealth <= 0)
                 IsDead = true;
+            damageEffects.PlayHitEffects();
             return true;
         }
 
@@ -318,7 +317,6 @@ namespace Enemies.DarkMagician
             if (EnemyType?.DeathSound != null && AudioSource != null)
                 AudioSource.PlayOneShot(EnemyType.DeathSound);
         }
-
         // ─────────────────────────────────────────────────────────────────────────
         //  Colliders
         // ─────────────────────────────────────────────────────────────────────────
@@ -379,5 +377,6 @@ namespace Enemies.DarkMagician
             Vector3 wallOrigin = transform.position + Vector3.up * 0.5f;
             Gizmos.DrawLine(wallOrigin, wallOrigin + (Vector3)movementDirection * 0.7f);
         }
+
     }
 }

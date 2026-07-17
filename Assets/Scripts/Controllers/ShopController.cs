@@ -8,6 +8,7 @@ public class ShopController : MonoBehaviour
     private void Awake()
     {
         sessionController = ServiceLocator.Get<SessionController>();
+        AudioManager.instance.Play("Shop");
     }
 
     public void GoToMatch()
@@ -15,6 +16,9 @@ public class ShopController : MonoBehaviour
         sessionController.GoToMatch();
     }
 
-    
+    private void OnDestroy()
+    {
+        AudioManager.instance.Stop("Shop");
+    }
 
 }

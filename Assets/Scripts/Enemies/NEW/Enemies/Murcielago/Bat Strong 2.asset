@@ -15,10 +15,10 @@ MonoBehaviour:
   EnemyName: Bat
   MaxHealth: 4
   WalkSpeed: 3.5
-  ChaseSpeed: 5.5
-  DetectionRange: 11
+  ChaseSpeed: 2
+  DetectionRange: 5
   AttackRange: 1.8
-  AttackDamage: 9
+  AttackDamage: 2
   AttackCooldown: 0.8
   Drops:
   - {fileID: 154130448415801424, guid: 718e9c93564ab0841a4e079d42aa3f9e, type: 3}

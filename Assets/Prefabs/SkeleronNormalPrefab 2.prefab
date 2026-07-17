@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7290733000025606959}
   - component: {fileID: 294097746597334756}
   - component: {fileID: 2959643560931739101}
+  - component: {fileID: -2771126458921840277}
   m_Layer: 8
   m_Name: SkeleronNormalPrefab 2
   m_TagString: Untagged
@@ -62,7 +63,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9755001b8416f8d4086ebf031a8fb509, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -215,6 +216,7 @@ MonoBehaviour:
   PlayerLayer:
     serializedVersion: 2
     m_Bits: 8
+  damageEffects: {fileID: -2771126458921840277}
   IsDead: 0
   IsHit: 0
   PlayerDetected: 0
@@ -222,3 +224,19 @@ MonoBehaviour:
   IsWaiting: 0
   HitWall: 0
   CurrentHealth: 0
+--- !u!114 &-2771126458921840277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8534530272736756893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40aa7c744a5c1a341a9ca4ec7ff610dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageEffects
+  numberOfFlashes: 2
+  durationBetweenFlashes: 0.05
+  flashDuration: 0.1
+  hitParticlesPrefab: {fileID: 4991135100181142037, guid: 20525168e62193841bea727a22302aba, type: 3}

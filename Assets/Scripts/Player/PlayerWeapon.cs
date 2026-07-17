@@ -57,12 +57,14 @@ public class PlayerWeapon
     public void OnFire(InputAction.CallbackContext ctx)
     {
         anim.Play(PlayerAnimations.Attack, lockAnimation: true, speed: attackSpeed);
+
     }
 
     public void Shoot()
     {
         Vector2 baseDir = (movement != Vector2.zero) ? movement.normalized : lastDirection;
 
+        AudioManager.instance.Play("BowShoot");
         if (bulletsCount == 1)
         {
             FireBullet(baseDir);
@@ -76,6 +78,7 @@ public class PlayerWeapon
             float angle = (i - (bulletsCount - 1) / 2f) * bulletsSpread;
             FireBullet(Rotate(baseDir, angle));
         }
+
 
     }
 

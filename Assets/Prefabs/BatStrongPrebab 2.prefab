@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8464109784280658272}
   - component: {fileID: 3002828702385056273}
   - component: {fileID: 5642362134191023407}
+  - component: {fileID: 7641040650703863183}
   m_Layer: 8
   m_Name: BatStrongPrebab 2
   m_TagString: Untagged
@@ -62,7 +63,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9755001b8416f8d4086ebf031a8fb509, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -129,7 +130,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.08882226, y: -0.051423073}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -139,7 +140,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.01, y: 1.68}
+  m_Size: {x: 0.9534862, y: 0.86657727}
   m_EdgeRadius: 0
 --- !u!50 &8464109784280658272
 Rigidbody2D:
@@ -212,3 +213,20 @@ MonoBehaviour:
   SineFrequency: 2
   DiveDuration: 0.5
   ReturnDuration: 0.8
+  damageEffects: {fileID: 7641040650703863183}
+--- !u!114 &7641040650703863183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439392473448692108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40aa7c744a5c1a341a9ca4ec7ff610dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageEffects
+  numberOfFlashes: 2
+  durationBetweenFlashes: 0.05
+  flashDuration: 0.1
+  hitParticlesPrefab: {fileID: 4991135100181142037, guid: 20525168e62193841bea727a22302aba, type: 3}

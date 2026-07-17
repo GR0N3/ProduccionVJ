@@ -5,6 +5,7 @@ public class MainMenuController : MonoBehaviour
 
     private void Awake()
     {
+        AudioManager.instance.Play("MainMenu");
     }
 
     public void QuitGame()
@@ -26,5 +27,10 @@ public class MainMenuController : MonoBehaviour
             .WithOverlay()
             .WithClearUnusedAssets()
             .Perfrom();
+    }
+
+    private void OnDestroy()
+    {
+        AudioManager.instance.Stop("MainMenu");
     }
 }
